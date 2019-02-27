@@ -1,0 +1,25 @@
+language: r
+sudo: false
+cache: packages
+
+env:
+  - LINTR_COMMENT_BOT=false
+
+r_packages:
+  - devtools
+  - testthat
+  - phytools
+  - ape
+  - ade4
+  - expm
+  - pracma
+
+r_github_packages:
+  - jimhester/lintr
+  - jimhester/covr
+  - MangoTheCat/goodpractice
+
+after_success:
+  - Rscript -e 'lintr::lint_package()'
+  - Rscript -e 'library(covr); codecov()'
+  - Rscript -e 'library(goodpractice); gp()'
