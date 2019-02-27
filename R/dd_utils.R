@@ -110,6 +110,37 @@ flavec = function(ddep,la,mu,K,r,lx,kk,n0)
    return(lavec)
 }
 
+
+
+#' Function to convert a table with speciation and extinction events to a
+#' phylogeny
+#' 
+#' Converting a table with speciation and extinction events to a phylogeny
+#' 
+#' 
+#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param dropextinct Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @return \item{ phy }{ A phylogeny of the phylo type }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' sim = dd_sim(c(0.2,0.1,20),10)
+#' phy = L2phylo(sim$L)
+#' plot(phy)
+#' 
+#' @export L2phylo
 L2phylo = function(L,dropextinct = T)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
@@ -158,6 +189,41 @@ L2phylo = function(L,dropextinct = T)
    return(tree)
 }
 
+
+
+#' Function to convert phylogeny to a table with speciation and extinction
+#' events
+#' 
+#' Converting a phylogeny to a table with speciation and extinction events
+#' 
+#' 
+#' @param phy A phylogeny of the phylo type
+#' @return \item{L}{Matrix of events as produced by dd_sim: \cr \cr - the first
+#' column is the time at which a species is born in Mya\cr - the second column
+#' is the label of the parent of the species; positive and negative values
+#' indicate whether the species belongs to the left or right crown lineage \cr
+#' - the third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' }
+#' @author Liang Xu
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' sim = dd_sim(c(0.2,0.1,20),10)
+#' phy = sim$tas
+#' L = phylo2L(phy)
+#' phy2 = L2phylo(L, dropextinct = FALSE)
+#' par(mfrow = c(1,3))
+#' plot(phy)
+#' plot(phy2)
+#' plot(L2phylo(sim$L, dropextinct = FALSE))
+#' 
+#' @export phylo2L
 phylo2L = function(phy)
 {
   emdata = phy
@@ -245,6 +311,38 @@ phylo2L = function(phy)
   return(L)
 }
 
+
+
+#' Function to convert a table with speciation and extinction events to a set
+#' of branching times
+#' 
+#' Converting a table with speciation and extinction events to a set of
+#' branching times
+#' 
+#' 
+#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param dropextinct Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @return \item{ brts }{ A set of branching times }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' sim = dd_sim(c(0.2,0.1,20),10)
+#' phy = L2brts(sim$L)
+#' plot(phy)
+#' 
+#' @export L2brts
 L2brts = function(L,dropextinct = T)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
@@ -294,6 +392,31 @@ L2brts = function(L,dropextinct = T)
    return(brts)
 }
 
+
+
+#' Rounds up in the usual manner
+#' 
+#' The standard round function in R rounds x.5 to the nearest even integer.
+#' This is odd behavior that is corrected in roundn
+#' 
+#' 
+#' @param x Number to be rounded
+#' @param digits Sets the number of decimals in rounding.
+#' @return \item{n}{ A number }
+#' @author Rampal S. Etienne
+#' @keywords models
+#' @examples
+#' 
+#' round(2.5)
+#' roundn(2.5)
+#' round(3.5)
+#' roundn(3.5)
+#' round(2.65,digits = 1)
+#' roundn(2.65,digits = 1)
+#' round(2.75,digits = 1)
+#' roundn(2.75,digits = 1)
+#' 
+#' @export roundn
 roundn = function(x, digits = 0)
 {
     fac = 10^digits
@@ -301,6 +424,30 @@ roundn = function(x, digits = 0)
     return(n)
 }
 
+
+
+#' Takes samples in the usual manner
+#' 
+#' The standard sample function in R samples from n numbers when x = n. This is
+#' unwanted behavior when the size of the vector to sample from changes
+#' dynamically. This is corrected in sample2
+#' 
+#' 
+#' @param x A vector of one or more elements
+#' @param size A non-negative integer giving the number of items to choose.
+#' @param replace Should sampling be with replacement?
+#' @param prob A vector of probability weights for obtaining the elements of
+#' the vector being sampled.
+#' @return \item{sam}{A vector of length \code{size} that is sampled from
+#' \code{x}. }
+#' @author Rampal S. Etienne
+#' @keywords models
+#' @examples
+#' 
+#' sample(x = 10,size = 5,replace = TRUE)
+#' sample2(x = 10,size = 5,replace = TRUE)
+#' 
+#' @export sample2
 sample2 = function(x,size,replace = FALSE,prob = NULL)
 {
     if(length(x) == 1)
@@ -470,6 +617,37 @@ simplex = function(fun,trparsopt,optimpars,...)
   invisible(out)
 }
 
+
+
+#' Carries out optimization (finding a minimum)
+#' 
+#' A wrapper to use several optimization routines, currently only 'simplex' (a
+#' method adopted from Matlab, or 'subplex', from the R package subplex). The
+#' function is called from several packages by the same author.
+#' 
+#' 
+#' @param optimmethod The method to use for optimization, either 'simplex' or
+#' 'subplex'
+#' @param optimpars Parameters of the optimization: relative tolerance in
+#' function arguments, relative tolerance in function value, absolute tolerance
+#' in function arguments, and maximum number of iterations
+#' @param num_cycles Number of cycles of the optimization. When set to Inf, the
+#' optimization will be repeated until the result is, within the tolerance,
+#' equal to the starting values, with a maximum of 5 cycles.
+#' @param fun Function to be optimized
+#' @param trparsopt Initial guess of the parameters to be optimized
+#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' of the optimization routine
+#' @return \item{out}{ A list containing optimal function arguments
+#' (\code{par}, the optimal function value (\code{fvalues}) and whether the
+#' optimization converged (\code{conv})}.
+#' @author Rampal S. Etienne
+#' @keywords models
+#' @examples
+#' 
+#' cat("No examples")
+#' 
+#' @export optimizer
 optimizer = function(
   optimmethod = 'simplex',
   optimpars = c(1E-4,1E-4,1E-6,1000),

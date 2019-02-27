@@ -7,7 +7,5 @@ $(SHLIB) : $(FT_OBJS) $(C_OBJS)
  
 dd_dimmod.mod : dd_loglik_rhs_FORTRAN.o
 
-.PHONY : clean
-
 clean :
 	@rm -rf *.mod *.o
