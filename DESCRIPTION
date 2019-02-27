@@ -1,0 +1,23 @@
+Package: DDD
+Type: Package
+Title: Diversity-Dependent Diversification
+Version: 3.8
+Date: 2019-02-04
+Depends: R (>= 3.5.0), deSolve, ape, ade4
+Imports: phytools, subplex, Matrix, expm, SparseM, pracma, testthat
+Author: Rampal S. Etienne & Bart Haegeman
+Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
+License: GPL-3
+Description:
+ Implements maximum likelihood and bootstrap methods based on
+ the diversity-dependent birth-death process to test whether
+ speciation or extinction are diversity-dependent, under various
+ models including various types of key innovations.
+ See Etienne et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+ <DOI:10.1098/rspb.2011.1439>,
+ Etienne & Haegeman 2012, Am. Nat. 180: E75-E89,
+ <DOI:10.1086/667574> and
+ Etienne et al. 2016. Meth. Ecol. Evol. 7: 1092-1099,
+ <DOI:10.1111/2041-210X.12565>.
+ Also contains functions to simulate the diversity-dependent
+ process.

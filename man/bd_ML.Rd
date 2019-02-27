@@ -1,0 +1,102 @@
+\name{bd_ML}
+\alias{bd_ML}
+\title{Maximization of the loglikelihood under the diversity-independent, possibly time-dependent diversification model }
+\description{
+   This function computes the maximum likelihood estimates of the parameters of a
+   diversity-independent diversification model for a given set of phylogenetic branching times.
+   It also outputs the corresponding loglikelihood that can be used in model comparisons.
+}
+\usage{
+bd_ML(
+   brts,
+   initparsopt = c(0.1,0.05 * (tdmodel <= 1)
++ 10 * (length(brts) + missnumspec) * (tdmodel > 1)),
+   idparsopt = c(1,2 + (tdmodel > 1)),
+   idparsfix = (1:4)[-idparsopt],
+   parsfix = rep(0,4)[idparsfix],
+   missnumspec = 0,
+   tdmodel = 0,
+   cond = 1,
+   btorph = 1,
+   soc = 2,
+   tol = c(1E-3, 1E-4, 1E-6), 
+   maxiter = 1000 * round((1.25)^length(idparsopt)),
+   changeloglikifnoconv = FALSE,
+   optimmethod = 'subplex',
+   methode = 'lsoda'      
+   )
+}
+\arguments{
+  \item{brts}{ A set of branching times of a phylogeny, all positive }
+  \item{initparsopt}{ The initial values of the parameters that must be optimized}
+  \item{idparsopt}{
+   The ids of the parameters that must be optimized, e.g. 1:3 for intrinsic speciation rate, extinction rate and carrying capacity.
+   The ids are defined as follows: \cr
+   id == 1 corresponds to lambda0 (speciation rate) \cr
+   id == 2 corresponds to mu0 (extinction rate) \cr
+   id == 3 corresponds to lamda1 (parameter controlling decline in speciation rate with time) \cr
+   id == 4 corresponds to mu1 (parameter controlling decline in extinction rate with time)
+   }
+  \item{idparsfix}{
+The ids of the parameters that should not be optimized, e.g. c(1,3) if lambda0 and lambda1
+should not be optimized, but only mu0 and mu1. In that case idparsopt must be c(2,4). The default is to fix all parameters
+not specified in idparsopt. 
+  }
+  \item{parsfix}{ The values of the parameters that should not be optimized }
+  \item{missnumspec}{The number of species that are in the clade but missing in the phylogeny } 
+  \item{tdmodel}{ Sets the model of time-dependence: \cr
+   tdmodel == 0 : constant speciation and extinction rates \cr
+   tdmodel == 1 : speciation and/or extinction rate is exponentially declining with time \cr
+   tdmodel == 2 : stepwise decline in speciation rate as in diversity-dependence without extinction \cr
+   tdmodel == 3 : decline in speciation rate following deterministic logistic equation for ddmodel = 1 \cr
+   tdmodel == 4 : decline in speciation rate such that the expected number of species matches with that of ddmodel = 1 with the same mu
+  }
+  \item{cond}{ Conditioning: \cr
+    cond == 0 : conditioning on stem or crown age \cr
+    cond == 1 : conditioning on stem or crown age and non-extinction of the phylogeny \cr
+    cond == 2 : conditioning on stem or crown age and on the total number of extant taxa (including missing species) \cr
+    cond == 3 : conditioning on the total number of extant taxa (including missing species)
+  }
+  \item{btorph}{ Sets whether the likelihood is for the branching times (0) or the phylogeny (1)}
+  \item{soc}{ Sets whether stem or crown age should be used (1 or 2) }
+  \item{tol}{ Sets the tolerances in the optimization. Consists of: \cr
+   reltolx = relative tolerance of parameter values in optimization \cr
+   reltolf = relative tolerance of function value in optimization \cr
+   abstolx = absolute tolerance of parameter values in optimization
+  }
+  \item{maxiter}{ Sets the maximum number of iterations in the optimization}
+  \item{changeloglikifnoconv}{ if TRUE the loglik will be set to -Inf if ML does not converge}
+  \item{optimmethod}{ Method used in optimization of the likelihood. Current default is 'subplex'. Alternative is 'simplex' (default of previous versions)}
+  \item{methode}{The method used to solve the master equation under tdmodel = 4, default is 'lsoda'.}     
+}
+\details{
+The output is a dataframe containing estimated parameters and maximum loglikelihood.
+The computed loglikelihood contains the factor
+q! m! / (q + m)!
+where q is the number of species in the phylogeny and m is the number of missing species,
+as explained in the supplementary material to Etienne et al. 2012.
+}
+\value{
+ \item{lambda0}{ gives the maximum likelihood estimate of lambda0}
+ \item{mu0}{ gives the maximum likelihood estimate of mu0}
+ \item{lambda1}{ gives the maximum likelihood estimate of lambda1}
+ \item{mu1}{ gives the maximum likelihood estimate of mu1}
+ \item{loglik}{ gives the maximum loglikelihood}
+ \item{df}{ gives the number of estimated parameters, i.e. degrees of feedom}
+ \item{conv}{ gives a message on convergence of optimization; conv = 0 means convergence}
+}
+\references{
+- Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309, doi: 10.1098/rspb.2011.1439 \cr
+- Etienne, R.S. & B. Haegeman 2012. Am. Nat. 180: E75-E89, doi: 10.1086/667574
+}
+\author{ Rampal S. Etienne & Bart Haegeman }
+
+\seealso{
+ \code{\link{bd_loglik}}
+}
+\examples{
+cat("Estimating parameters for a set of branching times brts with the default settings:")
+brts = 1:20
+bd_ML(brts = brts, cond = 1)
+}
+\keyword{ models }
