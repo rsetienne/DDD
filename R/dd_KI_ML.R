@@ -1,3 +1,120 @@
+#' Maximization of the loglikelihood under a diversity-dependent
+#' diversification model with decoupling of a subclade's diversication dynamics
+#' from the main clade's dynamics
+#' 
+#' This function computes the maximum likelihood estimates of the parameters of
+#' a diversity-dependent diversification model with decoupling of the
+#' diversification dynamics of a subclade from the dynamics of the main clade
+#' for a given set of phylogenetic branching times of main clade and subclade
+#' and the time of splitting of the lineage that will form the subclade.  It
+#' also outputs the corresponding loglikelihood that can be used in model
+#' comparisons.
+#' 
+#' The output is a dataframe containing estimated parameters and maximum
+#' loglikelihood. The computed loglikelihood contains the factor q! m!/(q + m)!
+#' where q is the number of species in the phylogeny and m is the number of
+#' missing species, as explained in the supplementary material to Etienne et
+#' al. 2012.
+#' 
+#' @param brtsM A set of branching times of the main clade in a phylogeny, all
+#' positive
+#' @param brtsS A set of branching times of the subclade in a phylogeny, all
+#' positive
+#' @param tsplit The branching time at which the lineage forming the subclade
+#' branches off, positive
+#' @param initparsopt The initial values of the parameters that must be
+#' optimized
+#' @param parsfix The values of the parameters that should not be optimized
+#' @param idparsopt The ids of the parameters that must be optimized, e.g. 1:7
+#' for all parameters.  The ids are defined as follows: \cr id == 1 corresponds
+#' to lambda_M (speciation rate) of the main clade \cr id == 2 corresponds to
+#' mu_M (extinction rate) of the main clade \cr id == 3 corresponds to K_M
+#' (clade-level carrying capacity) of the main clade \cr id == 4 corresponds to
+#' lambda_S (speciation rate) of the subclade \cr id == 5 corresponds to mu_S
+#' (extinction rate) of the subclade \cr id == 6 corresponds to K_S
+#' (clade-level carrying capacity) of the subclade \cr id == 7 corresponds to
+#' t_d (the time of decoupling)
+#' @param idparsfix The ids of the parameters that should not be optimized,
+#' e.g. c(1,3,4,6) if lambda and K should not be optimized, but only mu. In
+#' that case idparsopt must be c(2,5,7). The default is to fix all parameters
+#' not specified in idparsopt.
+#' @param idparsnoshift The ids of the parameters that should not shift; This
+#' can only apply to ids 4, 5 and 6, e.g. idparsnoshift = c(4,5) means that
+#' lambda and mu have the same values before and after tshift
+#' @param res sets the maximum number of species for which a probability must
+#' be computed, must be larger than 1 + max(length(brtsM),length(brtsS))
+#' @param ddmodel sets the model of diversity-dependence: \cr \code{ddmodel ==
+#' 1} : linear dependence in speciation rate with parameter K (= diversity
+#' where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
+#' in speciation rate with parameter K' (= diversity where speciation = 0)\cr
+#' \code{ddmodel == 2} : exponential dependence in speciation rate with
+#' parameter K (= diversity where speciation = extinction)\cr \code{ddmodel ==
+#' 2.1} : variant of exponential dependence in speciation rate with offset at
+#' infinity\cr \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
+#' \code{ddmodel == 2.3} : exponential dependence in speciation rate with
+#' parameter x (= exponent)\cr \code{ddmodel == 3} : linear dependence in
+#' extinction rate \cr \code{ddmodel == 4} : exponential dependence in
+#' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
+#' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
+#' 4.2} : 1/n dependence in extinction rate with offset at infinity \cr
+#' @param missnumspec The number of species that are in the clade but missing
+#' in the phylogeny. One can specify the sum of the missing species in main
+#' clade and subclade or a vector c(missnumspec_M,missnumspec_S) with missing
+#' species in main clade and subclade respectively.
+#' @param cond Conditioning: \cr cond == 0 : no conditioning \cr cond == 1 :
+#' conditioning on non-extinction of the phylogeny \cr
+#' @param soc Sets whether stem or crown age should be used (1 or 2); stem age
+#' only works when cond = 0
+#' @param tol Sets the tolerances in the optimization. Consists of: \cr reltolx
+#' = relative tolerance of parameter values in optimization \cr reltolf =
+#' relative tolerance of function value in optimization \cr abstolx = absolute
+#' tolerance of parameter values in optimization
+#' @param maxiter Sets the maximum number of iterations in the optimization
+#' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
+#' does not converge
+#' @param optimmethod Method used in optimization of the likelihood. Current
+#' default is 'subplex'. Alternative is 'simplex' (default of previous
+#' versions)
+#' @param methode The method used to solve the master equation, default is
+#' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
+#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' package before version 3.1.
+#' @param correction Sets whether the correction should be applied (TRUE) or
+#' not (FALSE)
+#' @return \item{lambda_M}{ gives the maximum likelihood estimate of lambda of
+#' the main clade} \item{mu_M}{ gives the maximum likelihood estimate of mu of
+#' the main clade} \item{K_M}{ gives the maximum likelihood estimate of K of
+#' the main clade} \item{lambda_2}{ gives the maximum likelihood estimate of
+#' lambda of the subclade} \item{mu_S}{ gives the maximum likelihood estimate
+#' of mu of the subclade} \item{K_S}{ gives the maximum likelihood estimate of
+#' K of the subclade} \item{t_d}{ gives the time of the decoupling event}
+#' \item{loglik}{ gives the maximum loglikelihood} \item{df}{ gives the number
+#' of estimated parameters, i.e. degrees of feedom} \item{conv}{ gives a
+#' message on convergence of optimization; conv = 0 means convergence}
+#' @note The optimization may get trapped in local optima. Try different
+#' starting values to search for the global optimum.
+#' @author Rampal S. Etienne & Bart Haegeman
+#' @seealso \code{\link{dd_KI_loglik}}, \code{\link{dd_ML}},
+#' \code{\link{dd_SR_ML}},
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' cat("This will estimate parameters for two sets of branching times brtsM, brtsS\n")
+#' cat("without conditioning.\n")
+#' cat("The tolerance of the optimization is set high so runtime is fast in this example.\n")
+#' cat("In real applications, use the default or more stringent settins for tol.\n")
+#' brtsM = 4:10
+#' brtsS = seq(0.1,3.5,0.7)
+#' tsplit = 5
+#' dd_KI_ML(brtsM = brtsM, brtsS = brtsS, tsplit = tsplit, idparsopt = c(1:3,6,7),
+#'   initparsopt = c(0.885, 2e-14, 6.999, 6.848, 4.001), idparsfix = NULL,
+#'   parsfix = NULL,idparsnoshift = c(4,5), cond = 0, tol = c(3E-1,3E-1,3E-1),
+#'   optimmethod = 'simplex')
+#' 
+#' @export dd_KI_ML
 dd_KI_ML = function(brtsM, brtsS, tsplit, initparsopt = c(0.5,0.1,2*(1 + length(brtsM) + missnumspec[1]),2*(1 + length(brtsS) + missnumspec[length(missnumspec)]),(tsplit + max(brtsS))/2), parsfix = NULL, idparsopt = c(1:3,6:7), idparsfix = NULL, idparsnoshift = (1:7)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(c(brtsM,brtsS)) + sum(missnumspec)), ddmodel = 1, missnumspec = 0, cond = 1, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex',methode = 'analytical',correction = FALSE)
 {
 # brtsM, brtsS = branching times of main clade and subclade (positive, from present to past)

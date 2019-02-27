@@ -8,6 +8,7 @@ Imports: phytools, subplex, Matrix, expm, SparseM, pracma, testthat
 Author: Rampal S. Etienne & Bart Haegeman
 Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
 License: GPL-3
+Encoding: UTF-8
 Description:
  Implements maximum likelihood and bootstrap methods based on
  the diversity-dependent birth-death process to test whether
@@ -21,3 +22,4 @@ Description:
  <DOI:10.1111/2041-210X.12565>.
  Also contains functions to simulate the diversity-dependent
  process.
+RoxygenNote: 6.1.1

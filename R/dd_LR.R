@@ -1,3 +1,107 @@
+#' Bootstrap likelihood ratio test of diversity-dependent diversification model
+#' 
+#' This function computes the maximum likelihood and the associated estimates
+#' of the parameters of a diversity-dependent diversification model for a given
+#' set of phylogenetic branching times. It then performs a bootstrap likelihood
+#' ratio test of the diversity-dependent (DD) model against the constant-rates
+#' (CR) birth-death model. Finally, it computes the power of this test.
+#' 
+#' The output is a list with 3 elements:
+#' 
+#' @param brts A set of branching times of a phylogeny, all positive
+#' @param initparsoptDD The initial values of the parameters that must be
+#' optimized for the diversity-dependent (DD) model: lambda_0, mu and K
+#' @param initparsoptCR The initial values of the parameters that must be
+#' optimized for the constant-rates (CR) model: lambda and mu
+#' @param missnumspec The number of species that are in the clade but missing
+#' in the phylogeny
+#' @param outputfilename The name (and location) of the file where the output
+#' will be saved. Default is no save.
+#' @param seed The seed for the pseudo random number generator for simulating
+#' the bootstrap data
+#' @param endmc The number of bootstraps
+#' @param alpha The significance level of the test
+#' @param plotit Boolean to plot results or not
+#' @param res Sets the maximum number of species for which a probability must
+#' be computed, must be larger than 1 + length(brts)
+#' @param ddmodel Sets the model of diversity-dependence: \cr \code{ddmodel ==
+#' 1} : linear dependence in speciation rate with parameter K (= diversity
+#' where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
+#' in speciation rate with parameter K' (= diversity where speciation = 0)\cr
+#' \code{ddmodel == 2} : exponential dependence in speciation rate with
+#' parameter K (= diversity where speciation = extinction)\cr \code{ddmodel ==
+#' 2.1} : variant of exponential dependence in speciation rate with offset at
+#' infinity\cr \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
+#' \code{ddmodel == 2.3} : exponential dependence in speciation rate with
+#' parameter x (= exponent)\cr \code{ddmodel == 3} : linear dependence in
+#' extinction rate \cr \code{ddmodel == 4} : exponential dependence in
+#' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
+#' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
+#' 4.2} : 1/n dependence in extinction rate with offset at infinity \cr
+#' \code{ddmodel == 5} : linear dependence in speciation and extinction rate
+#' \cr
+#' @param cond Conditioning: \cr cond == 0 : conditioning on stem or crown age
+#' \cr cond == 1 : conditioning on stem or crown age and non-extinction of the
+#' phylogeny \cr cond == 2 : conditioning on stem or crown age and on the total
+#' number of extant taxa (including missing species) \cr cond == 3 :
+#' conditioning on the total number of extant taxa (including missing species)
+#' \cr Note: cond == 3 assumes a uniform prior on stem age, as is the standard
+#' in constant-rate birth-death models, see e.g. D. Aldous & L. Popovic 2004.
+#' Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J. Theor. Biol. 261:
+#' 58-66.
+#' @param btorph Sets whether the likelihood is for the branching times (0) or
+#' the phylogeny (1)
+#' @param soc Sets whether stem or crown age should be used (1 or 2)
+#' @param tol Sets the tolerances in the optimization. Consists of: \cr reltolx
+#' = relative tolerance of parameter values in optimization \cr reltolf =
+#' relative tolerance of function value in optimization \cr abstolx = absolute
+#' tolerance of parameter values in optimization
+#' @param maxiter Sets the maximum number of iterations in the optimization
+#' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
+#' does not converge
+#' @param optimmethod Method used in optimization of the likelihood. Current
+#' default is 'subplex'. Alternative is 'simplex' (default of previous
+#' versions)
+#' @param methode The method used to solve the master equation, default is
+#' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
+#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' package before version 3.1.
+#' @return \item{treeCR}{a list of trees generated under the constant-rates
+#' model using the ML parameters under the CR model} \item{treeDD}{a list of
+#' trees generated under the diversity-dependent model using the ML parameters
+#' under the diversity-dependent model} \item{out}{a dataframe with the
+#' parameter estimates and maximum likelihoods for diversity-dependent and
+#' constant-rates models \code{$model} - the model used to generate the data. 0
+#' = unknown (for real data), 1 = CR, 2 = DD \cr \code{$mc} - the simulation
+#' number for each model \cr \code{$lambda_CR} - speciation rate estimated
+#' under CR \cr \code{$mu_CR} - extinction rate estimated under CR \cr
+#' \code{$LL_CR} - maximum likelihood estimated under CR \cr \code{$conv_CR} -
+#' convergence code for likelihood optimization; conv = 0 means convergence \cr
+#' \code{$lambda_DD1} - initial speciation rate estimated under DD for first
+#' set of initial values\cr \code{$mu_DD1} - extinction rate estimated under DD
+#' for first set of initial values \cr \code{$K_DD1} - clade-wide
+#' carrying-capacity estimated under DD for first set of initial values \cr
+#' \code{$LL_DD1} - maximum likelihood estimated under DD for first set of
+#' initial values \cr \code{$conv_DD1} - convergence code for likelihood
+#' optimization for first set of initial values; conv = 0 means convergence \cr
+#' \code{$lambda_DD2} - initial speciation rate estimated under DD for second
+#' set of initial values\cr \code{$mu_DD2} - extinction rate estimated under DD
+#' for second set of initial values \cr \code{$K_DD2} - clade-wide
+#' carrying-capacity estimated under DD for second set of initial values \cr
+#' \code{$LL_DD2} - maximum likelihood estimated under DD for second set of
+#' initial values \cr \code{$conv_DD2} - convergence code for likelihood
+#' optimization for second set of initial values; conv = 0 means convergence
+#' \cr \code{$LR} - likelihood ratio between DD and CR } \item{pvalue}{p-value
+#' of the test} \item{LRalpha}{Likelihood ratio at the signifiance level alpha}
+#' \item{poweroftest}{power of the test for significance level alpha}
+#' @author Rampal S. Etienne & Bart Haegeman
+#' @seealso \code{\link{dd_loglik}}, \code{\link{dd_ML}}
+#' @references - Etienne, R.S. et al. 2016. Meth. Ecol. Evol. 7: 1092-1099,
+#' doi: 10.1111/2041-210X.12565 \cr - Etienne, R.S. et al. 2012, Proc. Roy.
+#' Soc. B 279: 1300-1309, doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B.
+#' Haegeman 2012. Am. Nat. 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @export dd_LR
 dd_LR = function(             
    brts,
    initparsoptDD,
