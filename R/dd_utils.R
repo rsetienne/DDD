@@ -59,6 +59,23 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
   return(phy)
 }
 
+#' Function to do convolution of two vectors
+#' 
+#' Convolution of two vectors
+#' 
+#' @param x first vector
+#' @param y second vector
+#' @return vector that is the convolution of x and y
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' conv(1:10,1:10)
+#' 
+#' @export conv
 conv = function(x,y)
 {
    lx = length(x)
