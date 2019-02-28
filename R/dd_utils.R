@@ -393,7 +393,6 @@ L2brts = function(L,dropextinct = T)
 }
 
 
-
 #' Rounds up in the usual manner
 #' 
 #' The standard round function in R rounds x.5 to the nearest even integer.
@@ -698,6 +697,15 @@ optimizer = function(
   return(out)
 }
 
+#' @name transform_pars
+#' @title Transforming parameters from -Inf to Inf into parameters
+#' from -1 to 1
+#' @description Function to transform pars in a way that is more
+#' useful for optimization: trpars <- sign(pars) * pars/(sign(pars) + pars);
+#' @param pars Parameters to be transformed
+#' @return Transformed parameters
+#' @author Rampal S. Etienne
+#' @export transform_pars
 transform_pars <- function(pars)
 {
   trpars1 <- sign(pars) * pars/(sign(pars) + pars);
@@ -707,11 +715,20 @@ transform_pars <- function(pars)
   return(trpars1);
 }
 
-untransform_pars <- function(trpars1)
+#' @name untransform_pars
+#' @title Untransforming parameters from -1 to 1 into parameters
+#' from -Inf to Inf.
+#' @description Function to untransform pars after optimization:
+#' pars <- sign(trpars) * trpars/(sign(trpars) - trpars);
+#' @param trpars Parameters to be untransformed
+#' @return Untransformed parameters
+#' @author Rampal S. Etienne
+#' @export untransform_pars
+untransform_pars <- function(trpars)
 {
-  pars <- sign(trpars1) * trpars1/(sign(trpars1) - trpars1);
-  pars[which(trpars1 == 0)] <- 0;
-  pars[which(trpars1 == 1)] <- Inf;
-  pars[which(trpars1 == -1)] <- -Inf;
+  pars <- sign(trpars) * trpars/(sign(trpars) - trpars);
+  pars[which(trpars == 0)] <- 0;
+  pars[which(trpars == 1)] <- Inf;
+  pars[which(trpars == -1)] <- -Inf;
   return(pars)
 }
