@@ -59,6 +59,23 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
   return(phy)
 }
 
+#' Function to do convolution of two vectors
+#' 
+#' Convolution of two vectors
+#' 
+#' @param x first vector
+#' @param y second vector
+#' @return vector that is the convolution of x and y
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' conv(1:10,1:10)
+#' 
+#' @export conv
 conv = function(x,y)
 {
    lx = length(x)
@@ -393,7 +410,6 @@ L2brts = function(L,dropextinct = T)
 }
 
 
-
 #' Rounds up in the usual manner
 #' 
 #' The standard round function in R rounds x.5 to the nearest even integer.
@@ -698,6 +714,15 @@ optimizer = function(
   return(out)
 }
 
+#' @name transform_pars
+#' @title Transforming parameters from -Inf to Inf into parameters
+#' from -1 to 1
+#' @description Function to transform pars in a way that is more
+#' useful for optimization: trpars <- sign(pars) * pars/(sign(pars) + pars);
+#' @param pars Parameters to be transformed
+#' @return Transformed parameters
+#' @author Rampal S. Etienne
+#' @export transform_pars
 transform_pars <- function(pars)
 {
   trpars1 <- sign(pars) * pars/(sign(pars) + pars);
@@ -707,11 +732,20 @@ transform_pars <- function(pars)
   return(trpars1);
 }
 
-untransform_pars <- function(trpars1)
+#' @name untransform_pars
+#' @title Untransforming parameters from -1 to 1 into parameters
+#' from -Inf to Inf.
+#' @description Function to untransform pars after optimization:
+#' pars <- sign(trpars) * trpars/(sign(trpars) - trpars);
+#' @param trpars Parameters to be untransformed
+#' @return Untransformed parameters
+#' @author Rampal S. Etienne
+#' @export untransform_pars
+untransform_pars <- function(trpars)
 {
-  pars <- sign(trpars1) * trpars1/(sign(trpars1) - trpars1);
-  pars[which(trpars1 == 0)] <- 0;
-  pars[which(trpars1 == 1)] <- Inf;
-  pars[which(trpars1 == -1)] <- -Inf;
+  pars <- sign(trpars) * trpars/(sign(trpars) - trpars);
+  pars[which(trpars == 0)] <- 0;
+  pars[which(trpars == 1)] <- Inf;
+  pars[which(trpars == -1)] <- -Inf;
   return(pars)
 }
