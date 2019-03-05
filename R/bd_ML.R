@@ -57,6 +57,9 @@
 #' versions)
 #' @param methode The method used to solve the master equation under tdmodel =
 #' 4, default is 'lsoda'.
+#' @param num_cycles Number of cycles of the optimization. When set to Inf, the
+#' optimization will be repeated until the result is, within the tolerance,
+#' equal to the starting values, with a maximum of 5 cycles.
 #' @return \item{lambda0}{ gives the maximum likelihood estimate of lambda0}
 #' \item{mu0}{ gives the maximum likelihood estimate of mu0} \item{lambda1}{
 #' gives the maximum likelihood estimate of lambda1} \item{mu1}{ gives the
@@ -77,7 +80,7 @@
 #' bd_ML(brts = brts, cond = 1)
 #' 
 #' @export bd_ML
-bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(brts) + missnumspec) * (tdmodel > 1)), idparsopt = c(1,2 + (tdmodel > 1)), idparsfix = (1:4)[-idparsopt], parsfix = rep(0,4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1, btorph = 1, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex',methode = 'lsoda')
+bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(brts) + missnumspec) * (tdmodel > 1)), idparsopt = c(1,2 + (tdmodel > 1)), idparsfix = (1:4)[-idparsopt], parsfix = rep(0,4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1, btorph = 1, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex',methode = 'lsoda', num_cycles = 1)
 {
   # brts = branching times (positive, from present to past)
   # - max(brts) = crown age
@@ -148,7 +151,7 @@ bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(
      cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
      return(out2)
   }
-  out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = bd_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
+  out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = bd_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode, num_cycles = num_cycles)
   if(out$conv != 0)
   {
      cat("Optimization has not converged. Try again with different initial values.\n")
