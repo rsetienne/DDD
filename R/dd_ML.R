@@ -100,6 +100,9 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
 #' package before version 3.1.
+#' @param num_cycles Number of cycles of the optimization. When set to Inf, the
+#' optimization will be repeated until the result is, within the tolerance,
+#' equal to the starting values, with a maximum of 5 cycles.
 #' @return \item{lambda}{ gives the maximum likelihood estimate of lambda}
 #' \item{mu}{ gives the maximum likelihood estimate of mu} \item{K}{ gives the
 #' maximum likelihood estimate of K} \item{r}{ (only if ddmodel == 5) gives the
@@ -139,7 +142,8 @@ dd_ML = function(
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = 'subplex',
-  methode = 'analytical')
+  methode = 'analytical'),
+  num_cycles = 1
 {
 # brts = branching times (positive, from present to past)
 # - max(brts) = crown age
@@ -217,7 +221,7 @@ if(initloglik == -Inf)
 } else {
 #code up to DDD v1.6: out = optimx2(trparsopt,dd_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,brts = brts, pars2 = pars2,missnumspec = missnumspec)
 #out = dd_simplex(trparsopt,idparsopt,trparsfix,idparsfix,pars2,brts,missnumspec)
-out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts, missnumspec = missnumspec, methode = methode)
+out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts, missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
 if(out$conv != 0)
 {
    cat("Optimization has not converged. Try again with different initial values.\n")
