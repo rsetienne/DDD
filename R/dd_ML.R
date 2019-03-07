@@ -51,35 +51,40 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' @param parsfix The values of the parameters that should not be optimized
 #' @param res Sets the maximum number of species for which a probability must
 #' be computed, must be larger than 1 + length(brts)
-#' @param ddmodel Sets the model of diversity-dependence: \cr \code{ddmodel ==
-#' 1} : linear dependence in speciation rate with parameter K (= diversity
-#' where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
+#' @param ddmodel Sets the model of diversity-dependence: \cr
+#' \code{ddmodel == 1} : linear dependence in speciation rate with parameter K (= diversity
+#' where speciation = extinction)\cr
+#' \code{ddmodel == 1.3} : linear dependence
 #' in speciation rate with parameter K' (= diversity where speciation = 0)\cr
 #' \code{ddmodel == 1.4} : positive diversity-dependence in speciation rate
 #' with parameter K' (= diversity where speciation rate reaches half its
 #' maximum); lambda = lambda0 * S/(S + K') where S is species richness\cr
 #' \code{ddmodel == 1.5} : positive and negative dependence in speciation rate
 #' with parameter K' (= diversity where speciation = 0); lambda = lambda0 *
-#' S/K' * (1 - S/K') where S is species richness\cr \code{ddmodel == 2} :
-#' exponential dependence in speciation rate with parameter K (= diversity
-#' where speciation = extinction)\cr \code{ddmodel == 2.1} : variant of
-#' exponential dependence in speciation rate with offset at infinity\cr
-#' \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr \code{ddmodel
-#' == 2.3} : exponential dependence in speciation rate with parameter x (=
-#' exponent)\cr \code{ddmodel == 3} : linear dependence in extinction rate \cr
+#' S/K' * (1 - S/K') where S is species richness\cr
+#' \code{ddmodel == 2} : exponential dependence in speciation rate with parameter
+#' K (= diversity where speciation = extinction)\cr
+#' \code{ddmodel == 2.1} : variant of exponential dependence in speciation rate
+#' with offset at infinity\cr
+#' \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr 
+#' \code{ddmodel == 2.3} : exponential dependence in speciation rate with parameter x (=
+#' exponent)\cr
+#' \code{ddmodel == 3} : linear dependence in extinction rate \cr
 #' \code{ddmodel == 4} : exponential dependence in extinction rate \cr
 #' \code{ddmodel == 4.1} : variant of exponential dependence in extinction rate
-#' with offset at infinity \cr \code{ddmodel == 4.2} : 1/n dependence in
-#' extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
+#' with offset at infinity \cr
+#' \code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
 #' dependence in speciation and extinction rate \cr
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
-#' @param cond Conditioning: \cr cond == 0 : conditioning on stem or crown age
-#' \cr cond == 1 : conditioning on stem or crown age and non-extinction of the
-#' phylogeny \cr cond == 2 : conditioning on stem or crown age and on the total
-#' number of extant taxa (including missing species) \cr cond == 3 :
-#' conditioning on the total number of extant taxa (including missing species)
-#' \cr Note: cond == 3 assumes a uniform prior on stem age, as is the standard
+#' @param cond Conditioning: \cr
+#' cond == 0 : conditioning on stem or crown age\cr
+#' cond == 1 : conditioning on stem or crown age and non-extinction of the
+#' phylogeny \cr
+#' cond == 2 : conditioning on stem or crown age and on the total
+#' number of extant taxa (including missing species) \cr
+#' cond == 3 : conditioning on the total number of extant taxa (including missing species)\cr
+#' Note: cond == 3 assumes a uniform prior on stem age, as is the standard
 #' in constant-rate birth-death models, see e.g. D. Aldous & L. Popovic 2004.
 #' Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J. Theor. Biol. 261:
 #' 58-66.
@@ -96,6 +101,8 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' @param optimmethod Method used in optimization of the likelihood. Current
 #' default is 'subplex'. Alternative is 'simplex' (default of previous
 #' versions)
+#' @param num_cycles the number of cycles of opimization. If set at Inf, it will
+#' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
@@ -139,44 +146,9 @@ dd_ML = function(
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = 'subplex',
+  num_cycles = 1,
   methode = 'analytical')
 {
-# brts = branching times (positive, from present to past)
-# - max(brts) = crown age
-# - min(brts) = most recent branching time
-# - initpars[1] = la = (initial) speciation rate
-# - initpars[2] = mu = extinction rate
-# - initpars[3] = K = carrying capacity
-# - res = resolution of the method; res should be larger than the total number of species
-# - ddmodel = diversity-dependent model,mode of diversity-dependence
-#  . ddmodel == 1 : linear dependence in speciation rate with parameter K
-#  . ddmodel == 1.3: linear dependence in speciation rate with parameter K'
-#  . ddmodel == 1.4: positive and negative linear diversity-dependence in speciation rate with parameter K'
-#  . ddmodel == 2 : exponential dependence in speciation rate
-#  . ddmodel == 2.1: variant with offset at infinity
-#  . ddmodel == 2.2: 1/n dependence in speciation rate
-#  . ddmodel == 2.3: exponential dependence in speciation rate with parameter x
-#  . ddmodel == 3 : linear dependence in extinction rate
-#  . ddmodel == 4 : exponential dependence in extinction rate
-#  . ddmodel == 4.1: variant with offset at infinity
-#  . ddmodel == 4.2: 1/n dependence in speciation rate
-#  . ddmodel == 5 : linear dependence in speciation rate and in extinction rate
-# - missnumspec = number of missing species    
-# - cond = conditioning
-#  . cond == 0 : no conditioning
-#  . cond == 1 : conditioning on non-extinction of the phylogeny
-#  . cond == 2 : conditioning on non-extinction of the phylogeny and on the total number of extant taxa (including missing species)
-#  . cond == 3 : conditioning on the total number of extant taxa (including missing species)
-# - btorph = likelihood of branching times (0) or phylogeny (1), differ by a factor (S - 1)! where S is the number of extant species
-# - tol = tolerance in optimization
-#  . reltolx = relative tolerance of parameter values in optimization
-#  . reltolf = relative tolerance of function value in optimization
-#  . abstolx = absolute tolerance of parameter values in optimization
-# - maxiter = the maximum number of iterations in the optimization
-# - changeloglikifnoconv = if T the loglik will be set to -Inf if ML does not converge
-# - optimmethod = 'subplex' (current default) or 'simplex' (default of previous versions)
-# - methode = the method used in the numerical solving of the set of the ode's
-
 options(warn=-1)
 brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
 if(is.numeric(brts) == FALSE)
@@ -217,7 +189,7 @@ if(initloglik == -Inf)
 } else {
 #code up to DDD v1.6: out = optimx2(trparsopt,dd_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,brts = brts, pars2 = pars2,missnumspec = missnumspec)
 #out = dd_simplex(trparsopt,idparsopt,trparsfix,idparsfix,pars2,brts,missnumspec)
-out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts, missnumspec = missnumspec, methode = methode)
+out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts, missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
 if(out$conv != 0)
 {
    cat("Optimization has not converged. Try again with different initial values.\n")
