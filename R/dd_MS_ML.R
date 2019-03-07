@@ -28,13 +28,13 @@
 #' optimized
 #' @param parsfix The values of the parameters that should not be optimized
 #' @param idparsopt The ids of the parameters that must be optimized, e.g. 1:7
-#' for all parameters.  The ids are defined as follows: \cr id == 1 corresponds
-#' to lambda_M (speciation rate) of the main clade \cr id == 2 corresponds to
-#' mu_M (extinction rate) of the main clade \cr id == 3 corresponds to K_M
-#' (clade-level carrying capacity) of the main clade \cr id == 4 corresponds to
-#' lambda_S (speciation rate) of the subclade \cr id == 5 corresponds to mu_S
-#' (extinction rate) of the subclade \cr id == 6 corresponds to t_d (the time
-#' of the key innovation)
+#' for all parameters.  The ids are defined as follows: \cr
+#' id == 1 corresponds to lambda_M (speciation rate) of the main clade \cr
+#' id == 2 corresponds to mu_M (extinction rate) of the main clade \cr
+#' id == 3 corresponds to K_M (clade-level carrying capacity) of the main clade \cr id == 4 corresponds to
+#' lambda_S (speciation rate) of the subclade \cr
+#' id == 5 corresponds to mu_S (extinction rate) of the subclade \cr
+#' id == 6 corresponds to t_d (the time of the key innovation)
 #' @param idparsfix The ids of the parameters that should not be optimized,
 #' e.g. c(1,3,4,6) if lambda and K should not be optimized, but only mu. In
 #' that case idparsopt must be c(2,5,7). The default is to fix all parameters
@@ -44,20 +44,24 @@
 #' lambda and mu have the same values before and after tshift
 #' @param res sets the maximum number of species for which a probability must
 #' be computed, must be larger than 1 + max(length(brtsM),length(brtsS))
-#' @param ddmodel sets the model of diversity-dependence: \cr \code{ddmodel ==
-#' 1} : linear dependence in speciation rate with parameter K (= diversity
-#' where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
-#' in speciation rate with parameter K' (= diversity where speciation = 0)\cr
+#' @param ddmodel sets the model of diversity-dependence: \cr
+#' \code{ddmodel == 1} : linear dependence in speciation rate with parameter K (= diversity
+#' where speciation = extinction)\cr
+#' \code{ddmodel == 1.3} : linear dependence in speciation rate with parameter K' (= diversity where speciation = 0)\cr
 #' \code{ddmodel == 2} : exponential dependence in speciation rate with
-#' parameter K (= diversity where speciation = extinction)\cr \code{ddmodel ==
-#' 2.1} : variant of exponential dependence in speciation rate with offset at
-#' infinity\cr \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
+#' parameter K (= diversity where speciation = extinction)\cr 
+#' \code{ddmodel == 2.1} : variant of exponential dependence in speciation rate with offset at
+#' infinity\cr
+#' \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
 #' \code{ddmodel == 2.3} : exponential dependence in speciation rate with
-#' parameter x (= exponent)\cr \code{ddmodel == 3} : linear dependence in
-#' extinction rate \cr \code{ddmodel == 4} : exponential dependence in
-#' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
-#' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
-#' 4.2} : 1/n dependence in extinction rate with offset at infinity \cr
+#' parameter x (= exponent)\cr
+#'\code{ddmodel == 3} : linear dependence in extinction rate \cr
+#'\code{ddmodel == 4} : exponential dependence in
+#' extinction rate \cr
+#' \code{ddmodel == 4.1} : variant of exponential dependence in extinction rate
+#' with offset at infinity \cr
+#' \code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at
+#' infinity \cr
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny. One can specify the sum of the missing species in main
 #' clade and subclade or a vector c(missnumspec_M,missnumspec_S) with missing
@@ -76,6 +80,8 @@
 #' @param optimmethod Method used in optimization of the likelihood. Current
 #' default is 'subplex'. Alternative is 'simplex' (default of previous
 #' versions)
+#' @param num_cycles the number of cycles of opimization. If set at Inf, it will
+#' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used in the ode solver, default is ode45
 #' @param correction Sets whether the correction should be applied (TRUE) or
 #' not (FALSE)
@@ -111,40 +117,8 @@
 #'           idparsnoshift = c(4,5), cond = 0, tol = c(3E-1,3E-1,3E-1))
 #' 
 #' @export dd_MS_ML
-dd_MS_ML = function(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 + length(brtsM) + length(brtsS) + sum(missnumspec)),(tsplit + max(brtsS))/2), parsfix = NULL, idparsopt = c(1:3,6), idparsfix = NULL, idparsnoshift = (1:6)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(c(brtsM,brtsS)) + sum(missnumspec)), ddmodel = 1.3, missnumspec = 0, cond = 0, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex', methode = 'analytical',correction = FALSE)
+dd_MS_ML = function(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 + length(brtsM) + length(brtsS) + sum(missnumspec)),(tsplit + max(brtsS))/2), parsfix = NULL, idparsopt = c(1:3,6), idparsfix = NULL, idparsnoshift = (1:6)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(c(brtsM,brtsS)) + sum(missnumspec)), ddmodel = 1.3, missnumspec = 0, cond = 0, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex', num_cycles = 1, methode = 'analytical',correction = FALSE)
 {
-# brtsM, brtsS = branching times of main clade and subclade (positive, from present to past)
-# - max(brtsM) = crown age
-# - min(brtsM,brtsS) = most recent branching time
-# - tsplit = the branching time where the subclade branches off from the main clade
-# - idparsopt contains the ids of the parameters to be optimized, e.g. to optimize la, mu, K, K2 and tshift idparsopt = c(1,2,3,6,7)
-# - initparsopt contains the starting values of the parameters to be optimized
-# - idparsfix contains the ids of the parameters that are fixed and must not be optimized
-# - parsfix contains the values of the fixed parameters
-# - idparsnoshift contains the ids of the parameters la2, mu2 and K2 that do not shift, i.e. that need to be set equal to la, mu and K
-# - pars[1] = la_M = (initial) speciation rate in main clade
-# - pars[2] = mu_M = extinction rate in main clade
-# - pars[3] = K = carrying capacity
-# - pars[4] = la_S = (initial) speciation rate in subclade
-# - pars[5] = mu_S = extinction rate in subclade
-# - pars[6] = t_d = time of decoupling
-# - res = resolution of the method; res should be larger than the total number of species
-# - ddmodel = diversity-dependent model,mode of diversity-dependence
-#  . ddmodel == 1.3: linear dependence in speciation rate with parameter K'
-#  . ddmodel == 2.3: exponential dependence in speciation rate with parameter x
-# - missnumspec = number of missing species    
-# - cond = conditioning:
-#  . cond == 0 : no conditioning
-#  . cond == 1 : conditioning on non-extinction of the phylogeny NYI
-# - tol = tolerance in optimization
-#  . reltolx = relative tolerance of parameter values in optimization
-#  . reltolf = relative tolerance of function value in optimization
-#  . abstolx = absolute tolerance of parameter values in optimization
-# - maxiter = the maximum number of iterations in the optimization
-# - changeloglikifnoconv = if T the loglik will be set to -Inf if ML does not converge
-# - optimmethod = 'subplex' (current default) or 'simplex' (default of previous versions)
-# - methode = the method used in the numerical solving of the set of the ode's
-
 options(warn = -1)
 brtsM = sort(abs(as.numeric(brtsM)),decreasing = TRUE)
 brtsS = sort(abs(as.numeric(brtsS)),decreasing = TRUE)
@@ -188,7 +162,7 @@ if(initloglik == -Inf)
    cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
    out2 = data.frame(row.names = "results",lambda_M = -1, mu_M = -1, K = -1, lambda_S = -1, mu_S = -1, t_d = -1, loglik = -1, df = -1, conv = -1)
 } else {
-out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_MS_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brtsM = brtsM,brtsS = brtsS,missnumspec = missnumspec,methode = methode)
+out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_MS_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brtsM = brtsM,brtsS = brtsS,missnumspec = missnumspec,methode = methode, num_cycles = num_cycles)
 if(out$conv > 0)
 {
    cat("Optimization has not converged. Try again with different initial values.\n")

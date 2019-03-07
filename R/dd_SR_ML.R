@@ -34,22 +34,26 @@
 #' lambda and mu have the same values before and after tshift
 #' @param res sets the maximum number of species for which a probability must
 #' be computed, must be larger than 1 + length(brts)
-#' @param ddmodel sets the model of diversity-dependence: \cr ddmodel == 1 :
-#' linear dependence in speciation rate \cr ddmodel == 2 : exponential
-#' dependence in speciation rate \cr ddmodel == 2.1 : variant of exponential
-#' dependence in speciation rate with offset at infinity\cr ddmodel == 2.2 :
-#' 1/n dependence in speciation rate\cr ddmodel == 3 : linear dependence in
-#' extinction rate \cr ddmodel == 4 : exponential dependence in extinction rate
-#' \cr ddmodel == 4.1 : variant of exponential dependence in extinction rate
-#' with offset at infinity ddmodel == 4.2 : 1/n dependence in extinction rate
+#' @param ddmodel sets the model of diversity-dependence: \cr
+#' ddmodel == 1 : linear dependence in speciation rate \cr
+#' ddmodel == 2 : exponential dependence in speciation rate \cr
+#' ddmodel == 2.1 : variant of exponential dependence in speciation rate with offset at infinity\cr ddmodel == 2.2 :
+#' 1/n dependence in speciation rate\cr
+#' ddmodel == 3 : linear dependence in extinction rate \cr
+#' ddmodel == 4 : exponential dependence in extinction rate\cr
+#' ddmodel == 4.1 : variant of exponential dependence in extinction rate
+#' with offset at infinity\cr
+#' ddmodel == 4.2 : 1/n dependence in extinction rate
 #' with offset at infinity
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
-#' @param cond Conditioning: \cr cond == 0 : no conditioning \cr cond == 1 :
-#' conditioning on non-extinction of the phylogeny \cr cond == 2 : conditioning
-#' on non-extinction of the phylogeny and on the total number of extant taxa
-#' (including missing species) \cr cond == 3 : conditioning on the total number
-#' of extant taxa (including missing species) \cr (including missing species)
+#' @param cond Conditioning: \cr
+#' cond == 0 : no conditioning \cr
+#' cond == 1 : conditioning on non-extinction of the phylogeny \cr
+#' cond == 2 : conditioning on non-extinction of the phylogeny and on the total
+#' number of extant taxa (including missing species) \cr
+#' cond == 3 : conditioning on the total number of extant taxa (including missing
+#' species) \cr
 #' \cr Note: cond == 3 assumes a uniform prior on stem age, as is the standard
 #' in constant-rate birth-death models, see e.g. D. Aldous & L. Popovic 2004.
 #' Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J. Theor. Biol. 261:
@@ -69,6 +73,8 @@
 #' @param optimmethod Method used in optimization of the likelihood. Current
 #' default is 'subplex'. Alternative is 'simplex' (default of previous
 #' versions)
+#' @param num_cycles the number of cycles of opimization. If set at Inf, it will
+#' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
@@ -104,7 +110,7 @@
 #' )
 #' 
 #' @export dd_SR_ML
-dd_SR_ML = function(brts, initparsopt = c(0.5,0.1,2*(1+length(brts)+missnumspec),2*(1+length(brts)+missnumspec),max(brts)/2), parsfix = NULL, idparsopt = c(1:3,6:7), idparsfix = NULL, idparsnoshift = (1:7)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(brts) + missnumspec), ddmodel = 1, missnumspec = 0, cond = 1, btorph = 1, soc = 2, allbp = FALSE, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex', methode = 'analytical')
+dd_SR_ML = function(brts, initparsopt = c(0.5,0.1,2*(1+length(brts)+missnumspec),2*(1+length(brts)+missnumspec),max(brts)/2), parsfix = NULL, idparsopt = c(1:3,6:7), idparsfix = NULL, idparsnoshift = (1:7)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(brts) + missnumspec), ddmodel = 1, missnumspec = 0, cond = 1, btorph = 1, soc = 2, allbp = FALSE, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex', num_cycles = 1, methode = 'analytical')
 {
 # brts = branching times (positive, from present to past)
 # - max(brts) = crown age
@@ -186,7 +192,7 @@ if(initloglik == -Inf)
    out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
 } else {
 #code up to DDD v1.6: out = optimx2(trparsopt,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
-out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
+out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
 if(out$conv != 0)
 {
    cat("Optimization has not converged. Try again with different initial values.\n")
@@ -211,7 +217,7 @@ if(sum(idparsfix == 7) == 0 && allbp == TRUE)
          trparsopt1 = initparsopt1/(1 + initparsopt1)
          trparsfix1 = parsfix1/(1 + parsfix1)
          #code up to DDD v1.6: out = optimx2(trparsopt1,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = 1E-10,reltol = pars2[2],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix1,idparsopt = idparsopt1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
-         out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt1,idparsopt = idparsopt1,trparsfix = trparsfix1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
+         out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt1,idparsopt = idparsopt1,trparsfix = trparsfix1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
          if(as.numeric(out$fvalues) > ML)
          {
             MLtrpars = as.numeric(unlist(out$par))

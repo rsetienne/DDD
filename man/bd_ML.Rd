@@ -11,7 +11,7 @@ bd_ML(brts, initparsopt = c(0.1, 0.05 * (tdmodel <= 1) + 10 *
   4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1,
   btorph = 1, soc = 2, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000
   * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", methode = "lsoda")
+  optimmethod = "subplex", num_cycles = 1, methode = "lsoda")
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
@@ -37,30 +37,34 @@ parameters not specified in idparsopt.}
 \item{missnumspec}{The number of species that are in the clade but missing
 in the phylogeny}
 
-\item{tdmodel}{Sets the model of time-dependence: \cr tdmodel == 0 :
-constant speciation and extinction rates \cr tdmodel == 1 : speciation
-and/or extinction rate is exponentially declining with time \cr tdmodel == 2
-: stepwise decline in speciation rate as in diversity-dependence without
-extinction \cr tdmodel == 3 : decline in speciation rate following
-deterministic logistic equation for ddmodel = 1 \cr tdmodel == 4 : decline
-in speciation rate such that the expected number of species matches with
+\item{tdmodel}{Sets the model of time-dependence: \cr
+tdmodel == 0 : constant speciation and extinction rates \cr
+tdmodel == 1 : speciation and/or extinction rate is exponentially declining
+with time \cr
+tdmodel == 2 : stepwise decline in speciation rate as in diversity-dependence
+without extinction \cr
+tdmodel == 3 : decline in speciation rate following deterministic logistic
+equation for ddmodel = 1 \cr
+tdmodel == 4 : decline in speciation rate such that the expected number of species matches with
 that of ddmodel = 1 with the same mu}
 
-\item{cond}{Conditioning: \cr cond == 0 : conditioning on stem or crown age
-\cr cond == 1 : conditioning on stem or crown age and non-extinction of the
-phylogeny \cr cond == 2 : conditioning on stem or crown age and on the total
-number of extant taxa (including missing species) \cr cond == 3 :
-conditioning on the total number of extant taxa (including missing species)}
+\item{cond}{Conditioning: \cr
+cond == 0 : conditioning on stem or crown age \cr
+cond == 1 : conditioning on stem or crown age and non-extinction of the
+phylogeny \cr
+cond == 2 : conditioning on stem or crown age and on the total
+number of extant taxa (including missing species) \cr
+cond == 3 : conditioning on the total number of extant taxa (including missing species)}
 
 \item{btorph}{Sets whether the likelihood is for the branching times (0) or
 the phylogeny (1)}
 
 \item{soc}{Sets whether stem or crown age should be used (1 or 2)}
 
-\item{tol}{Sets the tolerances in the optimization. Consists of: \cr reltolx
-= relative tolerance of parameter values in optimization \cr reltolf =
-relative tolerance of function value in optimization \cr abstolx = absolute
-tolerance of parameter values in optimization}
+\item{tol}{Sets the tolerances in the optimization. Consists of: \cr
+reltolx = relative tolerance of parameter values in optimization \cr
+reltolf = relative tolerance of function value in optimization \cr
+abstolx = absolute tolerance of parameter values in optimization}
 
 \item{maxiter}{Sets the maximum number of iterations in the optimization}
 
@@ -71,17 +75,25 @@ does not converge}
 default is 'subplex'. Alternative is 'simplex' (default of previous
 versions)}
 
+\item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
+do as many cycles as needed to meet the tolerance set for the target function.}
+
 \item{methode}{The method used to solve the master equation under tdmodel =
 4, default is 'lsoda'.}
 }
 \value{
+A dataframe with the following elements:\cr
 \item{lambda0}{ gives the maximum likelihood estimate of lambda0}
-\item{mu0}{ gives the maximum likelihood estimate of mu0} \item{lambda1}{
-gives the maximum likelihood estimate of lambda1} \item{mu1}{ gives the
-maximum likelihood estimate of mu1} \item{loglik}{ gives the maximum
-loglikelihood} \item{df}{ gives the number of estimated parameters, i.e.
-degrees of feedom} \item{conv}{ gives a message on convergence of
-optimization; conv = 0 means convergence}
+\item{mu0}{ gives the maximum likelihood estimate of mu0}
+\item{lambda1}{gives the maximum likelihood estimate of lambda1}
+\item{mu1}{ gives the
+maximum likelihood estimate of mu1}
+\item{loglik}{ gives the maximum
+loglikelihood}
+\item{df}{ gives the number of estimated parameters, i.e.
+degrees of feedom}
+\item{conv}{ gives a message on convergence of optimization; conv = 0 means
+convergence}
 }
 \description{
 This function computes the maximum likelihood estimates of the parameters of
