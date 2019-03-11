@@ -88,7 +88,7 @@ td_sim = function(pars,age,ddmodel = 1,methode = 'ode45')
     denom = (lamax + mumax) * N[i]
     
     #update the time with the first potential event
-    t[i + 1] = t[i] + rexp(1,denom)
+    t[i + 1] = t[i] + stats::rexp(1,denom)
     
     while(t[i + 1] <= age)
     {
@@ -98,7 +98,7 @@ td_sim = function(pars,age,ddmodel = 1,methode = 'ode45')
       ranL = sample(linlist,1)
       
       # calculation of the rate latd at the new time step
-      y = ode(variables, c(t[i-1], t[i]), td_loglik_rhs_sim,c(pars[1:min(4,length(pars))],tdmodel-3, lx), rtol = 1e-10, atol = 1e-16, method = methode)
+      y = deSolve::ode(variables, c(t[i-1], t[i]), td_loglik_rhs_sim,c(pars[1:min(4,length(pars))],tdmodel-3, lx), rtol = 1e-10, atol = 1e-16, method = methode)
       
       variables = y[2, 2:(lx + 1)]
       expn = sum((0:(lx - 1)) * variables[1:lx])
@@ -111,12 +111,12 @@ td_sim = function(pars,age,ddmodel = 1,methode = 'ode45')
       {
          stop('latd should be a decreasing function of time')
       }      
-      if( ((latd + mutd)/(lamax + mumax)) >= runif(1) )  #does the next potential event occur?                    
+      if( ((latd + mutd)/(lamax + mumax)) >= stats::runif(1) )  #does the next potential event occur?                    
       {
         ev = ev + 1
         lamax = latd
         
-        if( latd/(latd + mutd) >= runif(1) )  # Is it a speciation event?
+        if( latd/(latd + mutd) >= stats::runif(1) )  # Is it a speciation event?
         {           
           N[ev] = N[ev - 1] + 1
           newL = newL + 1
@@ -141,7 +141,7 @@ td_sim = function(pars,age,ddmodel = 1,methode = 'ode45')
         #parameter for the next potential event is updated with new lambda_max, mu_max, and number of species      
         denom = (lamax + mumax) * N[ev]
         #time is updated by adding a new potential step
-        t[i + 1] = t[i] + rexp(1,denom)
+        t[i + 1] = t[i] + stats::rexp(1,denom)
       } 
     }
     

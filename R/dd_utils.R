@@ -52,7 +52,7 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 
   class(phy) <- "phylo"
 
-  phy <- reorder(phy)
+  phy <- stats::reorder(phy)
   ## to avoid crossings when converting with as.hclust:
   phy$edge[phy$edge[, 2] <= n, 2] <- 1:n
 
@@ -201,8 +201,8 @@ L2phylo = function(L,dropextinct = T)
       if(nrow(linlist) == 1) { done = 1 }
    }
    linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
-   phy = read.tree(text = linlist[1,4])
-   tree = as.phylo(phy)
+   phy = ape::read.tree(text = linlist[1,4])
+   tree = ape::as.phylo(phy)
    return(tree)
 }
 
@@ -235,17 +235,17 @@ L2phylo = function(L,dropextinct = T)
 #' phy = sim$tas
 #' L = phylo2L(phy)
 #' phy2 = L2phylo(L, dropextinct = FALSE)
-#' par(mfrow = c(1,3))
-#' plot(phy)
-#' plot(phy2)
-#' plot(L2phylo(sim$L, dropextinct = FALSE))
+#' graphics::par(mfrow = c(1,3))
+#' graphics::plot(phy)
+#' graphics::plot(phy2)
+#' graphics::plot(L2phylo(sim$L, dropextinct = FALSE))
 #' 
 #' @export phylo2L
 phylo2L = function(phy)
 {
   emdata = phy
   # compute the relative branching times 
-  brt = branching.times(emdata)
+  brt = ape::branching.times(emdata)
   if(min(brt) < 0)
   {
     brt = brt + abs(min(brt))
@@ -513,7 +513,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   }
   string = paste(string, -fv[1], how, "\n", sep = " ")
   cat(string)
-  flush.console()
+  utils::flush.console()
   
   tmp = order(fv)
   if(numpar == 1)
@@ -620,7 +620,7 @@ simplex = function(fun,trparsopt,optimpars,...)
      }
      string = paste(string, -fv[1], how, "\n", sep = " ")
      cat(string)
-     flush.console()
+     utils::flush.console()
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)

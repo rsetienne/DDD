@@ -229,7 +229,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
               for(k in (S + 2 - soc):(kshift + 1))
               {
                  k1 = k + (soc - 2)
-                 y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+                 y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
                  probs = y[2,2:(lx+2)]
                  if(k > soc)
                  {
@@ -247,9 +247,9 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            }
            k = kshift
            k1 = k + (soc - 2)
-           y = ode(probs,-c(brts[k],tshift),dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+           y = deSolve::ode(probs,-c(brts[k],tshift),dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
            probs = y[2,2:(lx+2)]
-           y = ode(probs,-c(tshift,brts[k-1]),dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+           y = deSolve::ode(probs,-c(tshift,brts[k-1]),dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
            probs = y[2,2:(lx+2)]
            if(k > soc)
            {
@@ -265,7 +265,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            for(k in (kshift-1):2)
            {
               k1 = k + (soc - 2)
-              y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+              y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
               probs = y[2,2:(lx+2)]
               if(k > soc)
               {
@@ -308,16 +308,16 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              probsn = rep(0,lx + 1)
              probsn[S + missnumspec + 1] = 1
              TT = max(1,1/abs(la - mu),1/abs(la2 - mu2)) * 1E+8 * max(abs(brts)) # make this more efficient later
-             y = ode(probsn,c(0,-tshift),dd_loglik_bw_rhs,c(pars1[4:6],0,ddep),rtol = reltol,atol = abstol, method = methode)
+             y = deSolve::ode(probsn,c(0,-tshift),dd_loglik_bw_rhs,c(pars1[4:6],0,ddep),rtol = reltol,atol = abstol, method = methode)
              probsn = y[2,2:(lx+2)]
-             y = ode(probsn,c(-tshift,TT),dd_loglik_bw_rhs,c(pars1[1:3],0,ddep),rtol = reltol,atol = abstol, method = methode)
+             y = deSolve::ode(probsn,c(-tshift,TT),dd_loglik_bw_rhs,c(pars1[1:3],0,ddep),rtol = reltol,atol = abstol, method = methode)
              logliknorm = log(y[2,lx + 2])
              if(soc == 2)
              {
                 probsn = rep(0,lx + 1)
                 probsn[1:lx] = probs[1:lx]
                 probsn = c(flavec(ddep,la,mu,K,0,lx,1,n0),1) * probsn # speciation event
-                y = ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
+                y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
                 logliknorm = logliknorm - log(y[2,lx + 2])
              }
           }
@@ -330,7 +330,7 @@ if(pars2[5] == 1)
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
@@ -464,7 +464,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
               for(k in (S + 2 - soc):(kshift + 1))
               {
                  k1 = k + (soc - 2)
-                 #y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+                 #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
                  #probs = y[2,2:(lx+2)]
                  probs = dd_loglik_M_bw(pars1[4:6],lx,k1,ddep,tt = abs(brts[k - 1] - brts[k]),probs[1:lx])
                  probs = c(probs,0) 
@@ -485,11 +485,11 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            }
            k = kshift
            k1 = k + (soc - 2)
-           #y = ode(probs,-c(brts[k],tshift),dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+           #y = deSolve::ode(probs,-c(brts[k],tshift),dd_loglik_bw_rhs,c(pars1[4:6],k1,ddep),rtol = reltol,atol = abstol, method = methode)
            #probs = y[2,2:(lx+2)]
            probs = dd_loglik_M_bw(pars1[4:6],lx,k1,ddep,tt = abs(tshift - brts[k]),probs[1:lx])
            probs = c(probs,0)            
-           #y = ode(probs,-c(tshift,brts[k-1]),dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+           #y = deSolve::ode(probs,-c(tshift,brts[k-1]),dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
            #probs = y[2,2:(lx+2)]
            probs = dd_loglik_M_bw(pars1[1:3],lx,k1,ddep,tt = abs(brts[k - 1] - tshift),probs[1:lx])
            probs = c(probs,0) 
@@ -508,7 +508,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            for(k in (kshift-1):2)
            {
               k1 = k + (soc - 2)
-              #y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+              #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
               #probs = y[2,2:(lx+2)]
               probs = dd_loglik_M_bw(pars1[1:3],lx,k1,ddep,tt = abs(brts[k - 1] - brts[k]),probs[1:lx])
               probs = c(probs,0)
@@ -552,9 +552,9 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              #probsn = rep(0,lx + 1)
              #probsn[S + missnumspec + 1] = 1
              #TT = max(1,1/abs(la - mu),1/abs(la2 - mu2)) * 1E+10 * max(abs(brts)) # make this more efficient later
-             #y = ode(probsn,c(0,-tshift),dd_loglik_bw_rhs,c(pars1[4:6],0,ddep),rtol = reltol,atol = abstol, method = methode)
+             #y = deSolve::ode(probsn,c(0,-tshift),dd_loglik_bw_rhs,c(pars1[4:6],0,ddep),rtol = reltol,atol = abstol, method = methode)
              #probsn = y[2,2:(lx+2)]
-             #y = ode(probsn,c(-tshift,TT),dd_loglik_bw_rhs,c(pars1[1:3],0,ddep),rtol = reltol,atol = abstol, method = methode)
+             #y = deSolve::ode(probsn,c(-tshift,TT),dd_loglik_bw_rhs,c(pars1[1:3],0,ddep),rtol = reltol,atol = abstol, method = methode)
              #logliknorm = log(y[2,lx + 2])
                        
              probsn = rep(0,lx + 1)
@@ -572,7 +572,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                 #probsn = rep(0,lx + 1)
                 #probsn[1:lx] = probs[1:lx]
                 #probsn = c(flavec(ddep,la,mu,K,0,lx,1,n0),1) * probsn # speciation event
-                #y = ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
+                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
                 #logliknorm = logliknorm - log(y[2,lx + 2])
                 #print(log(y[2,lx + 2]))
                 probsn2 = rep(0,lx)
@@ -592,7 +592,7 @@ if(pars2[5] == 1)
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))

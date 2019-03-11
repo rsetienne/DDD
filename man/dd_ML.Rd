@@ -12,7 +12,7 @@ dd_ML(brts, initparsopt = initparsoptdefault(ddmodel, brts, missnumspec),
   missnumspec = 0, cond = 1, btorph = 1, soc = 2, tol = c(0.001,
   1e-04, 1e-06), maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE, optimmethod = "subplex",
-  methode = "analytical")
+  num_cycles = 1, methode = "analytical")
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
@@ -38,37 +38,42 @@ in idparsopt.}
 \item{res}{Sets the maximum number of species for which a probability must
 be computed, must be larger than 1 + length(brts)}
 
-\item{ddmodel}{Sets the model of diversity-dependence: \cr \code{ddmodel ==
-1} : linear dependence in speciation rate with parameter K (= diversity
-where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
+\item{ddmodel}{Sets the model of diversity-dependence: \cr
+\code{ddmodel == 1} : linear dependence in speciation rate with parameter K (= diversity
+where speciation = extinction)\cr
+\code{ddmodel == 1.3} : linear dependence
 in speciation rate with parameter K' (= diversity where speciation = 0)\cr
 \code{ddmodel == 1.4} : positive diversity-dependence in speciation rate
 with parameter K' (= diversity where speciation rate reaches half its
 maximum); lambda = lambda0 * S/(S + K') where S is species richness\cr
 \code{ddmodel == 1.5} : positive and negative dependence in speciation rate
 with parameter K' (= diversity where speciation = 0); lambda = lambda0 *
-S/K' * (1 - S/K') where S is species richness\cr \code{ddmodel == 2} :
-exponential dependence in speciation rate with parameter K (= diversity
-where speciation = extinction)\cr \code{ddmodel == 2.1} : variant of
-exponential dependence in speciation rate with offset at infinity\cr
-\code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr \code{ddmodel
-== 2.3} : exponential dependence in speciation rate with parameter x (=
-exponent)\cr \code{ddmodel == 3} : linear dependence in extinction rate \cr
+S/K' * (1 - S/K') where S is species richness\cr
+\code{ddmodel == 2} : exponential dependence in speciation rate with parameter
+K (= diversity where speciation = extinction)\cr
+\code{ddmodel == 2.1} : variant of exponential dependence in speciation rate
+with offset at infinity\cr
+\code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr 
+\code{ddmodel == 2.3} : exponential dependence in speciation rate with parameter x (=
+exponent)\cr
+\code{ddmodel == 3} : linear dependence in extinction rate \cr
 \code{ddmodel == 4} : exponential dependence in extinction rate \cr
 \code{ddmodel == 4.1} : variant of exponential dependence in extinction rate
-with offset at infinity \cr \code{ddmodel == 4.2} : 1/n dependence in
-extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
+with offset at infinity \cr
+\code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
 dependence in speciation and extinction rate \cr}
 
 \item{missnumspec}{The number of species that are in the clade but missing
 in the phylogeny}
 
-\item{cond}{Conditioning: \cr cond == 0 : conditioning on stem or crown age
-\cr cond == 1 : conditioning on stem or crown age and non-extinction of the
-phylogeny \cr cond == 2 : conditioning on stem or crown age and on the total
-number of extant taxa (including missing species) \cr cond == 3 :
-conditioning on the total number of extant taxa (including missing species)
-\cr Note: cond == 3 assumes a uniform prior on stem age, as is the standard
+\item{cond}{Conditioning: \cr
+cond == 0 : conditioning on stem or crown age\cr
+cond == 1 : conditioning on stem or crown age and non-extinction of the
+phylogeny \cr
+cond == 2 : conditioning on stem or crown age and on the total
+number of extant taxa (including missing species) \cr
+cond == 3 : conditioning on the total number of extant taxa (including missing species)\cr
+Note: cond == 3 assumes a uniform prior on stem age, as is the standard
 in constant-rate birth-death models, see e.g. D. Aldous & L. Popovic 2004.
 Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J. Theor. Biol. 261:
 58-66.}
@@ -91,6 +96,9 @@ does not converge}
 \item{optimmethod}{Method used in optimization of the likelihood. Current
 default is 'subplex'. Alternative is 'simplex' (default of previous
 versions)}
+
+\item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
+do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{methode}{The method used to solve the master equation, default is
 'analytical' which uses matrix exponentiation; alternatively numerical ODE

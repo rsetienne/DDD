@@ -11,7 +11,7 @@ expn_dd_sp = function(pars1,pars2)
     probs[1 + (cond == 0) * soc] = 1
     expn = rep(soc,res)
     times = seq(from = -abs(ca),to = 0,length.out = res)
-    y = lsoda(probs,times,dd_loglik_rhs,c(pars1[1:min(4,length(pars1))],(cond == 1) * soc,tdmodel - 3),rtol = 1E-10,atol = 1E-16)
+    y = deSolve::lsoda(probs,times,dd_loglik_rhs,c(pars1[1:min(4,length(pars1))],(cond == 1) * soc,tdmodel - 3),rtol = 1E-10,atol = 1E-16)
     probs = y[1:res,2:(lx + 1)]
     if(cond == 1)
     {
@@ -27,19 +27,19 @@ expn_dd_sp = function(pars1,pars2)
     }
     expn = probs %*% (soc:(lx + soc - 1))
     expn2 = probs %*% (soc:(lx + soc - 1))^2
-    expn_sp = smooth.spline(times,expn,df = 100)
-    expn2_sp = smooth.spline(times,expn2,df = 100)
+    expn_sp = stats::smooth.spline(times,expn,df = 100)
+    expn2_sp = stats::smooth.spline(times,expn2,df = 100)
     if(plotit == 1)
     {
-       plot(times,expn,type = 'p')
-       lines(expn_sp,lty = 1,col = 2)
+       graphics::plot(times,expn,type = 'p')
+       graphics::lines(expn_sp,lty = 1,col = 2)
     }
     return(list(expn_sp,expn2_sp))
 }
 
 predictsp = function(sp,t)
 {
-   pred = predict(sp,-abs(t))
+   pred = stats::predict(sp,-abs(t))
    return(pred$y)
 }
 

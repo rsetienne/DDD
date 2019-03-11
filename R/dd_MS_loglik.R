@@ -255,12 +255,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               y = ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               y = deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                probs = y[2,2:(lx2 + 1)]
                dim(probs) = c(lx,lx)
                
                #k1 = i + (soc - 2)
-               #y = lsoda(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol)
+               #y = desolve::ode(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, methode = 'lsoda')
                #probs2 = y[2,2:(lx+1)]              
                
                if(t2 < 0 & t2 != tinn1)
@@ -338,7 +338,7 @@ if(pars2[5] == 1)
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
@@ -483,7 +483,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                #mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                #mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                #mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               #y = ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               #y = deSolve::ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                #probs2 = y[2,2:(lx2 + 1)]
                #print(as.numeric(probs2[1:10]))
                probs = dd_loglik_M3(pars1,lx,ddep,tt = abs(t2 - t1),p = probs,kM,kS)
@@ -571,7 +571,7 @@ if(pars2[5] == 1)
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))

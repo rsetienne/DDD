@@ -213,7 +213,7 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
       {
         for(i in 1:S)
         {
-          PtT[i] = (1 + integrate(PtTint, lower = t[i], upper = TT, t1 = t[i], pars = pars1, subdivisions = 10000L)$value)^(-1)
+          PtT[i] = (1 + stats::integrate(PtTint, lower = t[i], upper = TT, t1 = t[i], pars = pars1, subdivisions = 10000L)$value)^(-1)
           ux[i] = 1 - PtT[i] * exp(rhotaut(TT,t[i],pars1))
         }
       } else if(tdmodel == 2)
@@ -259,7 +259,7 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
            t1 = brts2[k - 1]
            t2 = brts2[k]
            variables[lx + k - 1] = 0
-           #y2 = ode(variables, c(t1, t2), td_loglik_rhs, c(pars1[1:min(4, length(pars1))], tdmodel - 3, lx), rtol = 1e-10, atol = 1e-16, method = methode)
+           #y2 = deSolve::ode(variables, c(t1, t2), td_loglik_rhs, c(pars1[1:min(4, length(pars1))], tdmodel - 3, lx), rtol = 1e-10, atol = 1e-16, method = methode)
            parsvec = c(dd_loglik_rhs_precomp(pars = c(la0,mu0,K,0,1),rep(0,lx)),k - 1) # This gives a vector of lavec, muvec, nn and k - 1
            y = dd_ode_FORTRAN(initprobs = variables[1:(lx + k - 1)],tvec = c(t1, t2),parsvec = parsvec,rtol = 1e-10, atol = 1e-16,methode = methode,runmod = "dd_runmodtd")
            variables = y[2, 2:(lx + k)]
@@ -418,7 +418,7 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
         }
         s2 = sprintf(', Loglikelihood: %f',loglik)
         cat(s1,s2,"\n",sep = "")
-        flush.console()
+        utils::flush.console()
       } 
     }
     loglik = as.numeric(loglik)

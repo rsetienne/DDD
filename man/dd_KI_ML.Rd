@@ -15,7 +15,7 @@ dd_KI_ML(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 +
   sum(missnumspec)), ddmodel = 1, missnumspec = 0, cond = 1,
   soc = 2, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000 *
   round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", methode = "analytical",
+  optimmethod = "subplex", num_cycles = 1, methode = "analytical",
   correction = FALSE)
 }
 \arguments{
@@ -55,36 +55,41 @@ lambda and mu have the same values before and after tshift}
 \item{res}{sets the maximum number of species for which a probability must
 be computed, must be larger than 1 + max(length(brtsM),length(brtsS))}
 
-\item{ddmodel}{sets the model of diversity-dependence: \cr \code{ddmodel ==
-1} : linear dependence in speciation rate with parameter K (= diversity
-where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
+\item{ddmodel}{sets the model of diversity-dependence: \cr
+\code{ddmodel == 1} : linear dependence in speciation rate with parameter K (= diversity
+where speciation = extinction)\cr
+\code{ddmodel == 1.3} : linear dependence
 in speciation rate with parameter K' (= diversity where speciation = 0)\cr
 \code{ddmodel == 2} : exponential dependence in speciation rate with
-parameter K (= diversity where speciation = extinction)\cr \code{ddmodel ==
-2.1} : variant of exponential dependence in speciation rate with offset at
-infinity\cr \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
+parameter K (= diversity where speciation = extinction)\cr
+\code{ddmodel == 2.1} : variant of exponential dependence in speciation rate with offset at
+infinity\cr
+\code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
 \code{ddmodel == 2.3} : exponential dependence in speciation rate with
 parameter x (= exponent)\cr \code{ddmodel == 3} : linear dependence in
-extinction rate \cr \code{ddmodel == 4} : exponential dependence in
-extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
-dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
-4.2} : 1/n dependence in extinction rate with offset at infinity \cr}
+extinction rate \cr
+\code{ddmodel == 4} : exponential dependence in
+extinction rate \cr
+\code{ddmodel == 4.1} : variant of exponential
+dependence in extinction rate with offset at infinity \cr
+\code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at infinity \cr}
 
 \item{missnumspec}{The number of species that are in the clade but missing
 in the phylogeny. One can specify the sum of the missing species in main
 clade and subclade or a vector c(missnumspec_M,missnumspec_S) with missing
 species in main clade and subclade respectively.}
 
-\item{cond}{Conditioning: \cr cond == 0 : no conditioning \cr cond == 1 :
-conditioning on non-extinction of the phylogeny \cr}
+\item{cond}{Conditioning: \cr
+cond == 0 : no conditioning \cr
+cond == 1 : conditioning on non-extinction of the phylogeny \cr}
 
 \item{soc}{Sets whether stem or crown age should be used (1 or 2); stem age
 only works when cond = 0}
 
-\item{tol}{Sets the tolerances in the optimization. Consists of: \cr reltolx
-= relative tolerance of parameter values in optimization \cr reltolf =
-relative tolerance of function value in optimization \cr abstolx = absolute
-tolerance of parameter values in optimization}
+\item{tol}{Sets the tolerances in the optimization. Consists of: \cr
+reltolx = relative tolerance of parameter values in optimization \cr
+reltolf = relative tolerance of function value in optimization \cr
+abstolx = absolute tolerance of parameter values in optimization}
 
 \item{maxiter}{Sets the maximum number of iterations in the optimization}
 
@@ -94,6 +99,9 @@ does not converge}
 \item{optimmethod}{Method used in optimization of the likelihood. Current
 default is 'subplex'. Alternative is 'simplex' (default of previous
 versions)}
+
+\item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
+do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{methode}{The method used to solve the master equation, default is
 'analytical' which uses matrix exponentiation; alternatively numerical ODE

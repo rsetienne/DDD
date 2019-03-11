@@ -15,7 +15,7 @@ dd_MS_ML(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 +
   missnumspec = 0, cond = 0, soc = 2, tol = c(0.001, 1e-04, 1e-06),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE, optimmethod = "subplex",
-  methode = "analytical", correction = FALSE)
+  num_cycles = 1, methode = "analytical", correction = FALSE)
 }
 \arguments{
 \item{brtsM}{A set of branching times of the main clade in a phylogeny, all
@@ -33,13 +33,13 @@ optimized}
 \item{parsfix}{The values of the parameters that should not be optimized}
 
 \item{idparsopt}{The ids of the parameters that must be optimized, e.g. 1:7
-for all parameters.  The ids are defined as follows: \cr id == 1 corresponds
-to lambda_M (speciation rate) of the main clade \cr id == 2 corresponds to
-mu_M (extinction rate) of the main clade \cr id == 3 corresponds to K_M
-(clade-level carrying capacity) of the main clade \cr id == 4 corresponds to
-lambda_S (speciation rate) of the subclade \cr id == 5 corresponds to mu_S
-(extinction rate) of the subclade \cr id == 6 corresponds to t_d (the time
-of the key innovation)}
+for all parameters.  The ids are defined as follows: \cr
+id == 1 corresponds to lambda_M (speciation rate) of the main clade \cr
+id == 2 corresponds to mu_M (extinction rate) of the main clade \cr
+id == 3 corresponds to K_M (clade-level carrying capacity) of the main clade \cr id == 4 corresponds to
+lambda_S (speciation rate) of the subclade \cr
+id == 5 corresponds to mu_S (extinction rate) of the subclade \cr
+id == 6 corresponds to t_d (the time of the key innovation)}
 
 \item{idparsfix}{The ids of the parameters that should not be optimized,
 e.g. c(1,3,4,6) if lambda and K should not be optimized, but only mu. In
@@ -53,20 +53,24 @@ lambda and mu have the same values before and after tshift}
 \item{res}{sets the maximum number of species for which a probability must
 be computed, must be larger than 1 + max(length(brtsM),length(brtsS))}
 
-\item{ddmodel}{sets the model of diversity-dependence: \cr \code{ddmodel ==
-1} : linear dependence in speciation rate with parameter K (= diversity
-where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
-in speciation rate with parameter K' (= diversity where speciation = 0)\cr
+\item{ddmodel}{sets the model of diversity-dependence: \cr
+\code{ddmodel == 1} : linear dependence in speciation rate with parameter K (= diversity
+where speciation = extinction)\cr
+\code{ddmodel == 1.3} : linear dependence in speciation rate with parameter K' (= diversity where speciation = 0)\cr
 \code{ddmodel == 2} : exponential dependence in speciation rate with
-parameter K (= diversity where speciation = extinction)\cr \code{ddmodel ==
-2.1} : variant of exponential dependence in speciation rate with offset at
-infinity\cr \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
+parameter K (= diversity where speciation = extinction)\cr 
+\code{ddmodel == 2.1} : variant of exponential dependence in speciation rate with offset at
+infinity\cr
+\code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr
 \code{ddmodel == 2.3} : exponential dependence in speciation rate with
-parameter x (= exponent)\cr \code{ddmodel == 3} : linear dependence in
-extinction rate \cr \code{ddmodel == 4} : exponential dependence in
-extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
-dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
-4.2} : 1/n dependence in extinction rate with offset at infinity \cr}
+parameter x (= exponent)\cr
+\code{ddmodel == 3} : linear dependence in extinction rate \cr
+\code{ddmodel == 4} : exponential dependence in
+extinction rate \cr
+\code{ddmodel == 4.1} : variant of exponential dependence in extinction rate
+with offset at infinity \cr
+\code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at
+infinity \cr}
 
 \item{missnumspec}{The number of species that are in the clade but missing
 in the phylogeny. One can specify the sum of the missing species in main
@@ -92,6 +96,9 @@ does not converge}
 \item{optimmethod}{Method used in optimization of the likelihood. Current
 default is 'subplex'. Alternative is 'simplex' (default of previous
 versions)}
+
+\item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
+do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{methode}{The method used in the ode solver, default is ode45}
 
