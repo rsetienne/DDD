@@ -276,7 +276,7 @@ if(pars2[5] == 1)
     if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
     s2 = sprintf(', Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 }
 loglik = as.numeric(loglik)
@@ -355,7 +355,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
           for(k in 2:(S + 2 - soc))
           {
              k1 = k + (soc - 2)
-             #y = ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+             #y = deSolve::ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
              #probs2 = y[2,2:(lx+1)]
              probs = dd_loglik_M(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs)
              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
@@ -384,7 +384,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
           for(k in (S + 2 - soc):2)
           {
              k1 = k + (soc - 2)
-             #y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+             #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
              #probs2 = y[2,2:(lx+2)]
              probs = dd_loglik_M_bw(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs[1:lx])
              probs = c(probs,0)
@@ -417,7 +417,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              k = soc
              t1 = brts[1] 
              t2 = brts[S + 2 - soc]
-             #y = ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
+             #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
              #probsn = y[2,2:(lx+1)]
              probsn = dd_loglik_M(pars1,lx,k,ddep,tt = abs(t2 - t1),probsn)
              if(soc == 1) { aux = 1:lx }
@@ -431,7 +431,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              #probsn = rep(0,lx + 1)
              #probsn[S + missnumspec + 1] = 1 #/ (S + missnumspec)
              #TT = max(1,1/abs(la - mu)) * 100000000 * max(abs(brts)) # make this more efficient later
-             #y = ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
+             #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
              #logliknorm = log(y[2,lx + 2])
              probsn = rep(0,lx + 1)
              probsn[2] = 1
@@ -447,7 +447,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                 #probsn[1:lx] = probs[1:lx]
                 #probsn = c(flavec(ddep,la,mu,K,r,lx,1,n0),1) * probsn # speciation event
                 #probsn = c(lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]],1) * probsn # speciation event
-                #y = ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
+                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
                 #logliknorm = logliknorm - log(y[2,lx + 2])
                 probsn2 = rep(0,lx)
                 probsn2 = lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]] * probs[1:lx]
@@ -468,7 +468,7 @@ if(pars2[5] == 1)
     if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
     s2 = sprintf(', Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 }
 loglik = as.numeric(loglik)
@@ -507,11 +507,12 @@ dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
   } else
   {
-    y = ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+    y = deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
   }
   return(y)
 }
 
+#' @useDynLib DDD
 dd_ode_FORTRAN <- function(
   initprobs,
   tvec,
@@ -525,7 +526,7 @@ dd_ode_FORTRAN <- function(
   #system("R CMD SHLIB d:/data/ms/DDD/dd_loglik_rhs_FORTRAN.f")
   #dyn.load(paste("d:/data/ms/DDD/dd_loglik_rhs_FORTRAN", .Platform$dynlib.ext, sep = ""))
   N <- length(initprobs)
-  probs <- ode(y = initprobs, parms = c(N + 0.,parsvec[length(parsvec)] + 0.), rpar = parsvec[-length(parsvec)], 
+  probs <- deSolve::ode(y = initprobs, parms = c(N + 0.,parsvec[length(parsvec)] + 0.), rpar = parsvec[-length(parsvec)], 
                times = tvec, func = runmod, initfunc = "dd_initmod", 
                ynames = c("SV"), dimens = N + 2, nout = 1, outnames = c("Sum"), 
                dllname = "DDD",atol = atol, rtol = rtol, method = methode)[,1:(N + 1)]

@@ -30,10 +30,10 @@ sim = dd_sim(c(0.2,0.1,20),10)
 phy = sim$tas
 L = phylo2L(phy)
 phy2 = L2phylo(L, dropextinct = FALSE)
-par(mfrow = c(1,3))
-plot(phy)
-plot(phy2)
-plot(L2phylo(sim$L, dropextinct = FALSE))
+graphics::par(mfrow = c(1,3))
+graphics::plot(phy)
+graphics::plot(phy2)
+graphics::plot(L2phylo(sim$L, dropextinct = FALSE))
 
 }
 \references{

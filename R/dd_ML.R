@@ -171,7 +171,7 @@ cat("You are optimizing",optstr,"\n")
 if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
 cat("You are fixing",fixstr,"\n")
 cat("Optimizing the likelihood - this may take a while.","\n")
-flush.console()
+utils::flush.console()
 trparsopt = initparsopt/(1 + initparsopt)
 trparsopt[which(initparsopt == Inf)] = 1
 trparsfix = parsfix/(1 + parsfix)
@@ -180,7 +180,7 @@ pars2 = c(res,ddmodel,cond,btorph,0,soc,tol,maxiter)
 optimpars = c(tol,maxiter)
 initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
 cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
-flush.console()
+utils::flush.console()
 if(initloglik == -Inf)
 {
    cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")

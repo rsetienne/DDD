@@ -117,7 +117,7 @@ bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(
   if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
   cat("You are fixing",fixstr,"\n")
   cat("Optimizing the likelihood - this may take a while.","\n")
-  flush.console()
+  utils::flush.console()
   trparsopt = initparsopt/(1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] = 1
   trparsfix = parsfix/(1 + parsfix)

@@ -40,7 +40,7 @@ if(soc != 2)
    for(i in 1:endmc)
    {
       cat('Simulated data set',i,'out of',endmc,'\n')
-      flush.console()
+      utils::flush.console()
       simbrts = dd_sim(pars = c(MLpars), age = max(abs(brts)), ddmodel = ddmodel)
       trees[[i]] = brts2phylo(simbrts)
    }

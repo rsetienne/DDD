@@ -177,7 +177,7 @@ cat("You are fixing",fixstr,"\n")
 if(length(namepars[idparsnoshift]) == 0) { noshiftstr = "anything" } else { noshiftstr = namepars[idparsnoshift] }
 cat("You are not shifting",noshiftstr,"\n")
 cat("Optimizing the likelihood - this may take a while.","\n")
-flush.console()
+utils::flush.console()
 trparsopt = initparsopt/(1 + initparsopt)
 trparsopt[which(initparsopt == Inf)] = 1
 trparsfix = parsfix/(1 + parsfix)
