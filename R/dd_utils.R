@@ -1,7 +1,24 @@
+#' Function to convert a set of branching times into a
+#' phylogeny with random topology
+#' This code is taken from the package TESS by Sebastian Hoehna, where the function
+#' is called tess.create.phylo
+#' 
+#' Converting a set of branching times to a phylogeny
+#' 
+#' 
+#' @param times Set of branching times
+#' @param root When root is FALSE, the largest branching time will be assumed to be
+#' the crown age. When root is TRUE, it will be the stem age. 
+#' @param tip.label Tip labels. If set to NULL, the labels will be t1, t2, etc.
+#' @return \item{ phy }{ A phylogeny of the phylo type }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @export brts2phylo
 brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 {
-# This code is taken from the package TESS by Sebastian Hoehna, where the function is called tess.create.phylo
-# It takes a set of branching times and adds a random topology.
   times = sort(times)
   n <- as.integer(length(times))+1
   if ( root ) {
@@ -475,6 +492,28 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
     return(sam)
 }
 
+#' Carries out optimization using a simplex algorithm (finding a minimum)
+#' 
+#' Function to optimize target function using a
+#' simplex method adopted from Matlab
+#' 
+#' @param fun Function to be optimized
+#' @param trparsopt Initial guess of the parameters to be optimized
+#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' of the optimization routine
+#' @param optimpars Parameters of the optimization: relative tolerance in
+#' function arguments, relative tolerance in function value, absolute tolerance
+#' in function arguments, and maximum number of iterations
+#' @return \item{out}{ A list containing optimal function arguments
+#' (\code{par}, the optimal function value (\code{fvalues}) and whether the
+#' optimization converged (\code{conv})}.
+#' @author Rampal S. Etienne
+#' @keywords models
+#' @examples
+#' 
+#' cat("No examples")
+#' 
+#' @export simplex
 simplex = function(fun,trparsopt,optimpars,...)
 {
   numpar = length(trparsopt)
@@ -632,8 +671,6 @@ simplex = function(fun,trparsopt,optimpars,...)
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
 }
-
-
 
 #' Carries out optimization (finding a minimum)
 #' 
