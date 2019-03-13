@@ -718,11 +718,12 @@ optimizer = function(
   }
   cy <- 1
   fvalue <- rep(-Inf,max_cycles)
+  out <- NULL
   while(cy <= max_cycles)
   {
     if(optimmethod == 'simplex')
     {
-      out = simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...)
+      outnew = simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...)
     }
     if(optimmethod == 'subplex')
     {
@@ -730,11 +731,19 @@ optimizer = function(
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      out = subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...)
-      out = list(par = out$par, fvalues = -out$value, conv = out$convergence)
+      outnew = subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...)
+      outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
-    trparsopt <- out$par
-    fvalue[cy + 1] <- out$fvalues
+    if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
+    {
+       warning('The last cycle failed; second last cycle result is returned.')
+       return(out) 
+    } else
+    {
+       out <- outnew
+       trparsopt <- out$par
+       fvalue[cy + 1] <- out$fvalues
+    }  
     if(num_cycles == Inf)
     {
       if(abs(fvalue[cy + 1] - fvalue[cy]) < optimpars[3])
