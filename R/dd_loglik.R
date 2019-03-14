@@ -255,7 +255,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              probsc = probsn/aux
              if(sum(probsc) <= 0)
              {
-               if(verbose) cat('Probabilities smaller than 0 encountered in the conditioning.')
+               if(verbose) warning('Probabilities smaller than 0 encountered in the conditioning.')
                loglik = -Inf
                break
              }               
@@ -278,7 +278,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                 logliknorm = logliknorm - log(y[2,lx + 2])
              }
           }
-          if(is.na(logliknorm) | is.nan(logliknorm))
+          if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
           {
             if(verbose) warning('The normalization did not yield a number.')
             loglik = -Inf
