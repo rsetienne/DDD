@@ -11,7 +11,8 @@ bd_ML(brts, initparsopt = c(0.1, 0.05 * (tdmodel <= 1) + 10 *
   4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1,
   btorph = 1, soc = 2, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000
   * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", num_cycles = 1, methode = "lsoda")
+  optimmethod = "subplex", num_cycles = 1, methode = "lsoda",
+  verbose = FALSE)
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
@@ -80,6 +81,9 @@ do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{methode}{The method used to solve the master equation under tdmodel =
 4, default is 'lsoda'.}
+
+\item{verbose}{Show the parameters and loglikelihood for every call to the
+loglik function}
 }
 \value{
 A dataframe with the following elements:\cr

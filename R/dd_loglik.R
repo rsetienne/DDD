@@ -135,6 +135,7 @@ if(length(pars2) == 4)
 ddep = pars2[2]
 cond = pars2[3]
 btorph = pars2[4]
+verbose = pars2[5]
 soc = pars2[6]
 if(cond == 3) { soc = 2 }
 la = pars1[1]
@@ -166,6 +167,7 @@ if(sum(brts == 0) == 0)
 S = length(brts) + (soc - 2)
 if(min(pars1) < 0)
 {
+    if(verbose) warning('The parameters are negative')
     loglik = -Inf
 } else {
 if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
@@ -175,6 +177,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
 } else {
     if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
     {
+       cat("The parameters are incompatible.")
        loglik = -Inf
     } else {
        loglik = (btorph == 0) * lgamma(S)
@@ -198,6 +201,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                  probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
                  if(sum(probs) <= 0)
                  {
+                    if(verbose) warning('Probabilities smaller than 0 encountered')
                     loglik = -Inf
                     break
                  } else {
@@ -219,6 +223,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                  probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
                  if(sum(probs[1:lx]) <= 0)
                  {
+                    if(verbose) warning('Probabilities smaller than 0 encountered')
                     loglik = -Inf
                     break
                  } else {
@@ -230,6 +235,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
        }
        if(probs[1 + missnumspec] <= 0 | loglik == -Inf)
        {
+          if(verbose) warning('Probabilities smaller than 0 encountered in final result.')
           loglik = -Inf
        } else  {        
           loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
@@ -270,7 +276,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
        }
     }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
     if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
