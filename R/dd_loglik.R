@@ -235,7 +235,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
        }
        if(probs[1 + missnumspec] <= 0 | loglik == -Inf)
        {
-          if(verbose) warning('Probabilities smaller than 0 encountered in final result.')
+          if(verbose) warning('Probabilities smaller than 0 are encountered in final result.')
           loglik = -Inf
        } else  {        
           loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
