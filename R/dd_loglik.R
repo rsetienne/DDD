@@ -177,7 +177,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
 } else {
     if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
     {
-       cat("The parameters are incompatible.")
+       if(verbose) warning('The parameters are incompatible.')
        loglik = -Inf
     } else {
        loglik = (btorph == 0) * lgamma(S)
@@ -272,7 +272,14 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                 logliknorm = logliknorm - log(y[2,lx + 2])
              }
           }
-          loglik = loglik - logliknorm
+          if(is.na(logliknorm) | is.nan(logliknorm))
+          {
+            if(verbose) warning('The normalization did not yield a number.')
+            loglik = -Inf
+          } else
+          {
+            loglik = loglik - logliknorm
+          }
        }
     }
 }}
