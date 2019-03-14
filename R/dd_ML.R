@@ -107,6 +107,8 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
 #' package before version 3.1.
+#' @param verbose Show the parameters and loglikelihood for every call to the
+#' loglik function 
 #' @return \item{lambda}{ gives the maximum likelihood estimate of lambda}
 #' \item{mu}{ gives the maximum likelihood estimate of mu} \item{K}{ gives the
 #' maximum likelihood estimate of K} \item{r}{ (only if ddmodel == 5) gives the
@@ -147,7 +149,8 @@ dd_ML = function(
   changeloglikifnoconv = FALSE,
   optimmethod = 'subplex',
   num_cycles = 1,
-  methode = 'analytical')
+  methode = 'analytical',
+  verbose = FALSE)
 {
 options(warn=-1)
 brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
@@ -176,7 +179,7 @@ trparsopt = initparsopt/(1 + initparsopt)
 trparsopt[which(initparsopt == Inf)] = 1
 trparsfix = parsfix/(1 + parsfix)
 trparsfix[which(parsfix == Inf)] = 1
-pars2 = c(res,ddmodel,cond,btorph,0,soc,tol,maxiter)
+pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter)
 optimpars = c(tol,maxiter)
 initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
 cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
