@@ -167,7 +167,7 @@ if(sum(brts == 0) == 0)
 S = length(brts) + (soc - 2)
 if(min(pars1) < 0)
 {
-    if(verbose) warning('The parameters are negative')
+    if(verbose) cat('The parameters are negative.\n')
     loglik = -Inf
 } else {
 if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
@@ -177,7 +177,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
 } else {
     if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
     {
-       if(verbose) warning('The parameters are incompatible.')
+       if(verbose) cat('The parameters are incompatible.\n')
        loglik = -Inf
     } else {
        loglik = (btorph == 0) * lgamma(S)
@@ -193,7 +193,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
              {
                loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-               warning('High lambda approximation has been applied.')
+               cat('High lambda approximation has been applied.\n')
                return(loglik)
              }
              if(k < (S + 2 - soc))
@@ -201,7 +201,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                  probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
                  if(sum(probs) <= 0)
                  {
-                    if(verbose) warning('Probabilities smaller than 0 encountered')
+                    if(verbose) cat('Probabilities smaller than 0 encountered.\n')
                     loglik = -Inf
                     break
                  } else {
@@ -223,7 +223,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
                  probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
                  if(sum(probs[1:lx]) <= 0)
                  {
-                    if(verbose) warning('Probabilities smaller than 0 encountered')
+                    if(verbose) cat('Probabilities smaller than 0 encountered.\n')
                     loglik = -Inf
                     break
                  } else {
@@ -235,7 +235,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
        }
        if(probs[1 + missnumspec] <= 0 | loglik == -Inf)
        {
-          if(verbose) warning('Probabilities smaller than 0 are encountered in final result.')
+          if(verbose) cat('Probabilities smaller than 0 are encountered in final result.\n')
           loglik = -Inf
        } else  {        
           loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
@@ -255,9 +255,8 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              probsc = probsn/aux
              if(sum(probsc) <= 0)
              {
-               if(verbose) warning('Probabilities smaller than 0 encountered in the conditioning.')
+               if(verbose) cat('Probabilities smaller than 0 encountered in the conditioning.\n')
                loglik = -Inf
-               break
              }               
              if(cond == 1) { logliknorm = log(sum(probsc)) }
              if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
@@ -280,7 +279,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
           }
           if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
           {
-            if(verbose) warning('The normalization did not yield a number.')
+            if(verbose) cat('The normalization did not yield a number.\n')
             loglik = -Inf
           } else
           {
@@ -380,7 +379,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
              {
                loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-               warning('High lambda approximation has been applied.')
+               cat('High lambda approximation has been applied.\n')
                return(loglik)
              }
              if(k < (S + 2 - soc))
