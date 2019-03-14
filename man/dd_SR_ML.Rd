@@ -13,7 +13,8 @@ dd_SR_ML(brts, initparsopt = c(0.5, 0.1, 2 * (1 + length(brts) +
   ddmodel = 1, missnumspec = 0, cond = 1, btorph = 1, soc = 2,
   allbp = FALSE, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000 *
   round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", num_cycles = 1, methode = "analytical")
+  optimmethod = "subplex", num_cycles = 1, methode = "analytical",
+  verbose = FALSE)
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
@@ -101,6 +102,9 @@ do as many cycles as needed to meet the tolerance set for the target function.}
 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
 package before version 3.1.}
+
+\item{verbose}{Show the parameters and loglikelihood for every call to the
+loglik function}
 }
 \value{
 \item{lambda_1}{ gives the maximum likelihood estimate of lambda
