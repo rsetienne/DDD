@@ -200,7 +200,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(k < (S + 2 - soc))
               {
                 probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
-                if(sum(probs) <= 0)
+                sumprobs <- sum(probs)
+                if(is.na(sumprobs) | is.nan(sumprobs))
+                {
+                  sumprobs <- -1
+                }
+                if(sumprobs <= 0)
                 {
                   if(verbose) cat('Probabilities smaller than 0 encountered.\n')
                   loglik = -Inf
@@ -494,7 +499,7 @@ if(pars2[5] == 1)
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik) | loglik == Inf)
 {
-    loglik = -1000
+    loglik = -Inf
 }
 return(loglik)
 }
