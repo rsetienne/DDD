@@ -494,7 +494,7 @@ if(pars2[5] == 1)
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik) | loglik == Inf)
 {
-    loglik = -1E+160
+    loglik = -1000
 }
 return(loglik)
 }
