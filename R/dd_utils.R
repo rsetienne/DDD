@@ -795,3 +795,23 @@ untransform_pars <- function(trpars)
   pars[which(trpars == -1)] <- -Inf;
   return(pars)
 }
+
+check_probs <- function(loglik,probs,verbose)
+{
+  probs <- probs * (probs > 0)
+  if(is.na(sum(probs)) | is.nan(sum(probs)))
+  {
+    if(verbose) cat('NA or NaN issues encountered\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else if(sum(probs) <= 0)
+  {
+    if(verbose) cat('Probabilities smaller than 0 encountered\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else {
+    loglik <- loglik + log(sum(probs))
+    probs <- probs/sum(probs)
+  }   
+  return(list(loglik,probs))
+}  

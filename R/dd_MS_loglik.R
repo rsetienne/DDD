@@ -128,6 +128,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] = 0
 }
+verbose <- pars2[5]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -279,16 +280,8 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   } else {
                     if(pars2[7] == TRUE) { probs = kM/(nxt + kM) * probs }
                   }
-                  sumprobs = sum(probs)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                  }
-                  probs = probs/sumprobs
-                  
+                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+                 
                   #probs2 = flavec(ddep,laM,muM,K,0,lx,k1,n0) * probs2 # speciation event
                   #loglik2 = loglik2 + log(sum(probs2))
                   #probs2 = probs2/sum(probs2)   
@@ -333,7 +326,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
@@ -361,6 +354,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] == 0
 }
+verbose <- pars2[1]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -510,20 +504,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   dim(probs) = c(lx2,1)
                   #print(as.numeric(probs2[1:10]))  
                   #print(as.numeric(probs[seq(1,10*lx,by = lx)]))            
-                  sumprobs = sum(probs)
-                  #sumprobs2 = sum(probs2)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                     #loglik = loglik + log(sumprobs2)
-                  }
-                  probs = probs/sumprobs   
-                  #probs2 = probs2/sumprobs2
-                  #print(as.numeric(probs2[1:10]))  
-                  #print(as.numeric(probs[seq(1,10*lx,by = lx)]))   
+                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                }
                kM = kM + (brts[2,i] == 1) - (brts[2,i] == 3)
                kS = kS + (brts[2,i] >= 2)
@@ -566,7 +547,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
