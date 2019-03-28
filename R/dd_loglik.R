@@ -227,7 +227,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(k > soc)
               {
                 probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
-                if(sum(probs[1:lx]) <= 0)
+                sumprobs <- sum(probs[1:lx])
+                if(is.na(sumprobs) | is.nan(sumprobs))
+                {
+                  sumprobs <- -1
+                }
+                if(sumprobs <= 0)
                 {
                   if(verbose) cat('Probabilities smaller than 0 encountered.\n')
                   loglik = -Inf
@@ -243,7 +248,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
           {
             if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
-          } else  {        
+          } else {        
             loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             
             logliknorm = 0
@@ -259,7 +264,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(soc == 1) { aux = 1:lx }
               if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
               probsc = probsn/aux
-              if(sum(probsc) <= 0)
+              sumprobsc <- sum(probsc)
+              if(is.na(sumprobsc) | is.nan(sumprobsc))
+              {
+                sumprobsc <- -1
+              }
+              if(sumprobsc <= 0)
               {
                 if(verbose) cat('Probabilities smaller than 0 encountered in the conditioning.\n')
                 logliknorm = -Inf
@@ -393,7 +403,12 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              {
                  #probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
                  probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
-                 if(sum(probs) <= 0 | sum(is.na(probs)) > 0 | sum(is.nan(probs)) > 0)
+                 sumprobs <- sum(probs)
+                 if(is.na(sumprobs) | is.nan(sumprobs))
+                 {
+                   sumprobs <- -1
+                 }
+                 if(sumprobs <= 0)
                  {
                     loglik = -Inf
                     break
