@@ -152,7 +152,7 @@ dd_ML = function(
   methode = 'analytical',
   verbose = FALSE)
 {
-options(warn=-1)
+#options(warn = -1)
 brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
 if(is.numeric(brts) == FALSE)
 {

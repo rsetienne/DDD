@@ -107,7 +107,7 @@ bd_ML = function(brts,
     methode = 'lsoda',
     verbose = FALSE)
 {
-  options(warn = -1)
+  #options(warn = -1)
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
   out2 = invisible(data.frame(lambda0 = -1,mu0 = -1,lambda1 = -1, mu1 = -1, loglik = -1, df = -1, conv = -1))
   if(is.numeric(brts) == FALSE)

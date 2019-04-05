@@ -177,7 +177,7 @@ dd_SR_ML = function(brts,
 # - methode = the method used in the numerical solving of the set of the ode's
 
 brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
-options(warn=-1)
+#options(warn = -1)
 if(is.numeric(brts) == FALSE)
 {
    cat("The branching times should be numeric.\n")

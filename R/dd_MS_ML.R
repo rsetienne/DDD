@@ -141,7 +141,7 @@ dd_MS_ML = function(brtsM,
     correction = FALSE,
     verbose = FALSE)
 {
-options(warn = -1)
+#options(warn = -1)
 brtsM = sort(abs(as.numeric(brtsM)),decreasing = TRUE)
 brtsS = sort(abs(as.numeric(brtsS)),decreasing = TRUE)
 if(cond == 1 & soc == 1)
