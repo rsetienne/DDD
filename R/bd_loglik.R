@@ -129,6 +129,7 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
        soc = 2
     }
     btorph = pars2[3]
+    verbose = pars2[4]
     m = missnumspec
     if(is.na(pars2[6]))
     {
@@ -263,6 +264,17 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
            parsvec = c(dd_loglik_rhs_precomp(pars = c(la0,mu0,K,0,1),rep(0,lx)),k - 1) # This gives a vector of lavec, muvec, nn and k - 1
            y = dd_ode_FORTRAN(initprobs = variables[1:(lx + k - 1)],tvec = c(t1, t2),parsvec = parsvec,rtol = 1e-10, atol = 1e-16,methode = methode,runmod = "dd_runmodtd")
            variables = y[2, 2:(lx + k)]
+           if(is.na(sum(variables)) | is.nan(sum(variables)))
+           {
+             if(verbose) cat('NA or NaN issues encountered.\n')
+             loglik <- -Inf
+             variables <- rep(-Inf,length(variables))
+           } else if(sum(variables) <= 0)
+           {
+             if(verbose) cat('Probabilities smaller than 0 encountered\n')
+             loglik <- -Inf
+             variables <- rep(-Inf,length(variables))
+           } 
            #variables2 = y2[2, 2:(lx + k)]
            #if(any(variables2 != variables))
            #{ 
@@ -277,8 +289,10 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
         }
         if(sum(variables[1:lx]) < 0.99 )
         {
-           print(sum(variables[1:lx]))
-           stop('probabilities are leaking too much')
+           #print(lx)
+           #print(sum(variables[1:lx]))
+           cat('Leaking probabilities detected.')
+           loglik <- -Inf
         }
         sig = expn[1:(np - 1)] * variables[(lx + 1):(lx + np - 1)]
         PtT = 1/(1 + sig)
@@ -404,7 +418,7 @@ bd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'lsoda')
         loglik = loglik + lgamma(S + 1) + lgamma(m + 1) - lgamma(S + m + 1) + log(x[m + 1])
         #loglik = loglik - log(S + m + 1) + log(S + 1) + log(S + m - 1) - log(S - 1)
       }
-      if(pars2[4] == 1)
+      if(verbose)
       {
         if(tdmodel == 0)
         {

@@ -142,7 +142,7 @@ bd_ML = function(brts,
   pars2 = c(tdmodel,cond,btorph,verbose,soc,1000,tol,maxiter)
   optimpars = c(tol,maxiter)
   initloglik = bd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
-  cat("The loglikelihood for the inital parameter values is",initloglik,"\n")
+  cat(paste("The loglikelihood for the initial parameter values is ",initloglik,".\n",sep = ''))
   if(initloglik == -Inf)
   {
      cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
@@ -164,7 +164,7 @@ bd_ML = function(brts,
   if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
   s1 = sprintf('Maximum likelihood parameter estimates: lambda0: %f, mu0: %f, lambda1: %f, mu1: %f: ',MLpars1[1],MLpars1[2],MLpars1[3],MLpars1[4])
   s2 = sprintf('Maximum loglikelihood: %f',ML)
-  cat("\n",s1,"\n",s2,"\n")
+  cat(paste("\n",s1,"\n",s2,"\n",sep = ''))
   out2 = invisible(out2)
   return(out2)
 }

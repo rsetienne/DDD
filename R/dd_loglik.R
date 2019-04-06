@@ -192,7 +192,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
               probs = y[2,2:(lx+1)]
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
-              {
+              { 
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
                 if(verbose) cat('High lambda approximation has been applied.\n')
                 return(loglik)
@@ -200,8 +200,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(k < (S + 2 - soc))
               {
                 probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
-                cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
               }
+              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
             }    
           } else {
             probs = rep(0,lx + 1)
@@ -214,8 +214,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(k > soc)
               {
                 probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
-                cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
-              }    
+              }
+              cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
           }
           if(probs[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik))
@@ -369,8 +369,8 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              {
                  #probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
                  probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
-                 cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
              }
+             cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
           }    
        } else {
           probs = rep(0,lx + 1)
@@ -386,8 +386,8 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              {
                  #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
                  probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1,ddep)[[1]],1) * probs
-                 cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
              }    
+             cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
           }
        }
        if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)

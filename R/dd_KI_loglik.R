@@ -224,8 +224,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1,n0) * probs # speciation event
-           cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
@@ -237,8 +237,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < (S1+1))
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
-           cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -259,8 +259,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < S2)
        {
            probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
-           cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {
@@ -571,8 +571,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],0),ddep)[[1]] * probs
-           cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
@@ -586,8 +586,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
            #probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k1 - 1,c(pars1[1:3],0),ddep)[[1]] * probs
-           cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -610,8 +610,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
            #probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k,c(pars1[4:6],0),ddep)[[1]] * probs
-           cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {

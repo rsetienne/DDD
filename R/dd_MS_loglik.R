@@ -504,8 +504,8 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   dim(probs) = c(lx2,1)
                   #print(as.numeric(probs2[1:10]))  
                   #print(as.numeric(probs[seq(1,10*lx,by = lx)]))            
-                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                }
+               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                kM = kM + (brts[2,i] == 1) - (brts[2,i] == 3)
                kS = kS + (brts[2,i] >= 2)
             }    

@@ -711,7 +711,7 @@ optimizer = function(
 {
   if(num_cycles == Inf)
   {
-    max_cycles <- 5
+    max_cycles <- 10
   } else
   {
     max_cycles <- num_cycles
@@ -721,9 +721,10 @@ optimizer = function(
   out <- NULL
   while(cy <= max_cycles)
   {
+    if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      outnew = simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...)
+      outnew = suppressWarnings(simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...))
     }
     if(optimmethod == 'subplex')
     {
@@ -731,28 +732,27 @@ optimizer = function(
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      outnew = subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...)
+      outnew = suppressWarnings(subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...))
       outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-       warning('The last cycle failed; second last cycle result is returned.')
+       cat('The last cycle failed; second last cycle result is returned.\n')
        return(out) 
     } else
     {
        out <- outnew
        trparsopt <- out$par
-       fvalue[cy + 1] <- out$fvalues
+       fvalue[cy] <- out$fvalues
     }  
-    if(num_cycles == Inf)
+    if(num_cycles == Inf & cy > 1)
     {
-      if(abs(fvalue[cy + 1] - fvalue[cy]) < optimpars[3])
+      if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        warning('Not enough cycles in optimization')
-        out$conv <- -1
+        cat('Not enough cycles in optimization.\n')
       }
     }
     cy <- cy + 1
@@ -801,7 +801,7 @@ check_probs <- function(loglik,probs,verbose)
   probs <- probs * (probs > 0)
   if(is.na(sum(probs)) | is.nan(sum(probs)))
   {
-    if(verbose) cat('NA or NaN issues encountered\n')
+    if(verbose) cat('NA or NaN issues encountered.\n')
     loglik <- -Inf
     probs <- rep(-Inf,length(probs))
   } else if(sum(probs) <= 0)
