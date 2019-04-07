@@ -686,7 +686,7 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' in function arguments, and maximum number of iterations
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
-#' equal to the starting values, with a maximum of 5 cycles.
+#' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
 #' @param ... Any other arguments of the function to be optimimzed, or settings
@@ -745,14 +745,15 @@ optimizer = function(
        trparsopt <- out$par
        fvalue[cy] <- out$fvalues
     }  
-    if(num_cycles == Inf & cy > 1)
+    if(cy > 1)
     {
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
+        if(cy < max_Cycles) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        cat('Not enough cycles in optimization.\n')
+        cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
