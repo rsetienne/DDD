@@ -749,7 +749,7 @@ optimizer = function(
     {
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
-        if(cy < max_Cycles) cat('No more cycles needed.\n')
+        if(cy < max_cycles) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
