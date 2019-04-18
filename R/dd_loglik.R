@@ -127,164 +127,164 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 
 dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_name = 'dd_loglik_rhs_FORTRAN')
 {
-if(length(pars2) == 4)
-{
+  if(length(pars2) == 4)
+  {
     pars2[5] = 0
     pars2[6] = 2
-}
-ddep = pars2[2]
-cond = pars2[3]
-btorph = pars2[4]
-soc = pars2[6]
-if(cond == 3) { soc = 2 }
-la = pars1[1]
-mu = pars1[2]
-K = pars1[3]
-if(ddep == 5) {r = pars1[4]} else {r = 0}
-if(ddep == 1 | ddep == 5)
-{ 
+  }
+  ddep = pars2[2]
+  cond = pars2[3]
+  btorph = pars2[4]
+  verbose = pars2[5]
+  soc = pars2[6]
+  if(cond == 3) { soc = 2 }
+  la = pars1[1]
+  mu = pars1[2]
+  K = pars1[3]
+  if(ddep == 5) {r = pars1[4]} else {r = 0}
+  if(ddep == 1 | ddep == 5)
+  { 
     lx = min(max(1 + missnumspec,1 + ceiling(la/(la - mu) * (r + 1) * K)),ceiling(pars2[1]))
-} else {
-if(ddep == 1.3)
-{
-    lx = min(ceiling(K),ceiling(pars2[1]))
-} else {
-    lx = round(pars2[1])
-}}
-n0 = (ddep == 2 | ddep == 4)
-if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
-{
-    loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
-} else {
-abstol = 1e-16
-reltol = 1e-10 
-brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
-if(sum(brts == 0) == 0)
-{
-   brts[length(brts) + 1] = 0
-}
-S = length(brts) + (soc - 2)
-if(min(pars1) < 0)
-{
-    loglik = -Inf
-} else {
-if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
-{ 
-    cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
-    loglik = -Inf
-} else {
-    if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
+  } else {
+    if(ddep == 1.3)
     {
-       loglik = -Inf
+      lx = min(ceiling(K),ceiling(pars2[1]))
     } else {
-       loglik = (btorph == 0) * lgamma(S)
-       if(cond != 3)
-       {
-          probs = rep(0,lx)
-          probs[1] = 1 # change if other species at stem/crown age 
-          for(k in 2:(S + 2 - soc))
-          {
-             k1 = k + (soc - 2)
-             y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-             probs = y[2,2:(lx+1)]
-             if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
-             {
-               loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-               warning('High lambda approximation has been applied.')
-               return(loglik)
-             }
-             if(k < (S + 2 - soc))
-             {
-                 probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
-                 if(sum(probs) <= 0)
-                 {
-                    loglik = -Inf
-                    break
-                 } else {
-                    loglik = loglik + log(sum(probs))
-                 }
-                 probs = probs/sum(probs)
-             }
-          }    
-       } else {
-          probs = rep(0,lx + 1)
-          probs[1 + missnumspec] = 1
-          for(k in (S + 2 - soc):2)
-          {
-             k1 = k + (soc - 2)
-             y = dd_integrate(probs,-brts[k:(k-1)],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-             probs = y[2,2:(lx+2)]
-             if(k > soc)
-             {
-                 probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
-                 if(sum(probs[1:lx]) <= 0)
-                 {
-                    loglik = -Inf
-                    break
-                 } else {
-                    loglik = loglik + log(sum(probs[1:lx]))
-                 }
-                 probs[1:lx] = probs[1:lx]/sum(probs[1:lx])
-             }    
-          }
-       }
-       if(probs[1 + missnumspec] <= 0 | loglik == -Inf)
-       {
+      lx = round(pars2[1])
+    }
+  }
+  n0 = (ddep == 2 | ddep == 4)
+  if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
+  {
+    loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
+  } else {
+    abstol = 1e-16
+    reltol = 1e-10 
+    brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
+    if(sum(brts == 0) == 0)
+    {
+      brts[length(brts) + 1] = 0
+    }
+    S = length(brts) + (soc - 2)
+    if(min(pars1) < 0)
+    {
+      if(verbose) cat('The parameters are negative.\n')
+      loglik = -Inf
+    } else {
+      if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
+      { 
+        if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+        loglik = -Inf
+      } else {
+        if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
+        {
+          if(verbose) cat('The parameters are incompatible.\n')
           loglik = -Inf
-       } else  {        
-          loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
-  
-          logliknorm = 0
-          if(cond == 1 | cond == 2)
+        } else {
+          loglik = (btorph == 0) * lgamma(S)
+          if(cond != 3)
           {
-             probsn = rep(0,lx)
-             probsn[1] = 1 # change if other species at stem or crown age
-             k = soc
-             t1 = brts[1] 
-             t2 = brts[S + 2 - soc]
-             y = dd_integrate(probsn,c(t1,t2),rhs_func_name,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
-             probsn = y[2,2:(lx+1)]
-             if(soc == 1) { aux = 1:lx }
-             if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
-             probsc = probsn/aux
-             if(cond == 1) { logliknorm = log(sum(probsc)) }
-             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
+            probs = rep(0,lx)
+            probs[1] = 1 # change if other species at stem/crown age 
+            for(k in 2:(S + 2 - soc))
+            {
+              k1 = k + (soc - 2)
+              y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+              probs = y[2,2:(lx+1)]
+              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
+              { 
+                loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
+                if(verbose) cat('High lambda approximation has been applied.\n')
+                return(loglik)
+              }
+              if(k < (S + 2 - soc))
+              {
+                probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
+              }
+              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+            }    
+          } else {
+            probs = rep(0,lx + 1)
+            probs[1 + missnumspec] = 1
+            for(k in (S + 2 - soc):2)
+            {
+              k1 = k + (soc - 2)
+              y = dd_integrate(probs,-brts[k:(k-1)],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+              probs = y[2,2:(lx+2)]
+              if(k > soc)
+              {
+                probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
+              }
+              cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
+            }
           }
-          if(cond == 3)
-          { 
-             probsn = rep(0,lx + 1)
-             probsn[S + missnumspec + 1] = 1
-             TT = max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
-             y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
-             logliknorm = log(y[2,lx + 2])
-             if(soc == 2)
-             {
+          if(probs[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik))
+          {
+            if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
+            loglik = -Inf
+          } else {        
+            loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+            
+            logliknorm = 0
+            if(cond == 1 | cond == 2)
+            {
+              probsn = rep(0,lx)
+              probsn[1] = 1 # change if other species at stem or crown age
+              k = soc
+              t1 = brts[1] 
+              t2 = brts[S + 2 - soc]
+              y = dd_integrate(probsn,c(t1,t2),rhs_func_name,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
+              probsn = y[2,2:(lx+1)]
+              if(soc == 1) { aux = 1:lx }
+              if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
+              probsc = probsn/aux
+              cp <- check_probs(logliknorm,probsc,verbose); logliknorm <- cp[[1]]; probsc <- cp[[2]];
+              if(cond == 1) { logliknorm = logliknorm + log(sum(probsc)) }
+              if(cond == 2) { logliknorm = logliknorm + log(probsc[S + missnumspec - soc + 1])}             
+            }
+            if(cond == 3)
+            { 
+              probsn = rep(0,lx + 1)
+              probsn[S + missnumspec + 1] = 1
+              TT = max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
+              y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
+              logliknorm = log(y[2,lx + 2])
+              if(soc == 2)
+              {
                 probsn = rep(0,lx + 1)
                 probsn[1:lx] = probs[1:lx]
                 probsn = c(flavec(ddep,la,mu,K,r,lx,1,n0),1) * probsn # speciation event
                 y = dd_integrate(probsn,c(max(abs(brts)),TT),rhs_func_name,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
                 logliknorm = logliknorm - log(y[2,lx + 2])
-             }
+              }
+            }
+            if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
+            {
+              if(verbose) cat('The normalization did not yield a number.\n')
+              loglik = -Inf
+            } else
+            {
+              loglik = loglik - logliknorm
+            }
           }
-          loglik = loglik - logliknorm
-       }
+        }
+      }
     }
-}}
-if(pars2[5] == 1)
-{
-    s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
-    if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
-    s2 = sprintf(', Loglikelihood: %f',loglik)
-    cat(s1,s2,"\n",sep = "")
-    utils::flush.console()
-}
-}
-loglik = as.numeric(loglik)
-if(is.nan(loglik) | is.na(loglik))
-{
+    if(verbose)
+    {
+      s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
+      if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
+      s2 = sprintf(', Loglikelihood: %f',loglik)
+      cat(s1,s2,"\n",sep = "")
+      utils::flush.console()
+    }
+  }
+  loglik = as.numeric(loglik)
+  if(is.nan(loglik) | is.na(loglik))
+  {
     loglik = -Inf
-}
-return(loglik)
+  }
+  return(loglik)
 }
 
 dd_loglik2 = function(pars1,pars2,brts,missnumspec)
@@ -297,6 +297,7 @@ if(length(pars2) == 4)
 ddep = pars2[2]
 cond = pars2[3]
 btorph = pars2[4]
+verbose <- pars2[5]
 soc = pars2[6]
 if(cond == 3)
 { 
@@ -340,7 +341,7 @@ if(min(pars1) < 0)
 } else {
 if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
 { 
-    cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+    if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
     loglik = -Inf
 } else {
     if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & ((S + missnumspec) > ceiling(K))))
@@ -361,22 +362,15 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
              {
                loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-               warning('High lambda approximation has been applied.')
+               if(verbose) cat('High lambda approximation has been applied.\n')
                return(loglik)
              }
              if(k < (S + 2 - soc))
              {
                  #probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
                  probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
-                 if(sum(probs) <= 0 | sum(is.na(probs)) > 0 | sum(is.nan(probs)) > 0)
-                 {
-                    loglik = -Inf
-                    break
-                 } else {
-                    loglik = loglik + log(sum(probs))
-                 }
-                 probs = probs/sum(probs)
              }
+             cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
           }    
        } else {
           probs = rep(0,lx + 1)
@@ -392,15 +386,8 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              {
                  #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
                  probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1,ddep)[[1]],1) * probs
-                 if(sum(probs[1:lx]) <= 0 | sum(is.na(probs[1:lx])) > 0 | sum(is.nan(probs[1:lx])) > 0)
-                 {
-                    loglik = -Inf
-                    break
-                 } else {
-                    loglik = loglik + log(sum(probs[1:lx]))
-                 }
-                 probs[1:lx] = probs[1:lx]/sum(probs[1:lx])
              }    
+             cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
           }
        }
        if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)
@@ -462,7 +449,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
        }
     }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
     if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
@@ -479,6 +466,22 @@ if(is.nan(loglik) | is.na(loglik) | loglik == Inf)
 return(loglik)
 }
 
+dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
+{
+  if(method == 'analytical')
+  {
+    lp <- length(pars)
+    lx <- length(initprobs)
+    ddep <- pars[lp]
+    k1 <- pars[lp - 1]
+    pars1 <- pars[-c(lp - 1,lp)]
+    int <- dd_loglik_M(pars1,lx,k1,ddep,tvec[2] - tvec[1],initprobs)
+  } else
+  {
+    int <- dd_integrate(initprobs,tvec,rhs_func,pars,rtol,atol,method)
+  }
+  return(int)
+}
 
 dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 {

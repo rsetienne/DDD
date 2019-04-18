@@ -79,6 +79,8 @@
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
 #' package before version 3.1.
+#' @param verbose Show the parameters and loglikelihood for every call to the
+#' loglik function 
 #' @return \item{lambda_1}{ gives the maximum likelihood estimate of lambda
 #' before the shift} \item{mu_1}{ gives the maximum likelihood estimate of mu
 #' before the shift} \item{K_1}{ gives the maximum likelihood estimate of K
@@ -110,7 +112,26 @@
 #' )
 #' 
 #' @export dd_SR_ML
-dd_SR_ML = function(brts, initparsopt = c(0.5,0.1,2*(1+length(brts)+missnumspec),2*(1+length(brts)+missnumspec),max(brts)/2), parsfix = NULL, idparsopt = c(1:3,6:7), idparsfix = NULL, idparsnoshift = (1:7)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)], res = 10*(1 + length(brts) + missnumspec), ddmodel = 1, missnumspec = 0, cond = 1, btorph = 1, soc = 2, allbp = FALSE, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex', num_cycles = 1, methode = 'analytical')
+dd_SR_ML = function(brts,
+    initparsopt = c(0.5,0.1,2*(1+length(brts)+missnumspec),2*(1+length(brts)+missnumspec),max(brts)/2),
+    parsfix = NULL,
+    idparsopt = c(1:3,6:7),
+    idparsfix = NULL,
+    idparsnoshift = (1:7)[c(-idparsopt,(-1)^(length(idparsfix) != 0) * idparsfix)],
+    res = 10*(1 + length(brts) + missnumspec),
+    ddmodel = 1,
+    missnumspec = 0,
+    cond = 1,
+    btorph = 1,
+    soc = 2,
+    allbp = FALSE,
+    tol = c(1E-3, 1E-4, 1E-6),
+    maxiter = 1000 * round((1.25)^length(idparsopt)),
+    changeloglikifnoconv = FALSE,
+    optimmethod = 'subplex',
+    num_cycles = 1,
+    methode = 'analytical',
+    verbose = FALSE)
 {
 # brts = branching times (positive, from present to past)
 # - max(brts) = crown age
@@ -154,94 +175,93 @@ dd_SR_ML = function(brts, initparsopt = c(0.5,0.1,2*(1+length(brts)+missnumspec)
 # - changeloglikifnoconv = if T the loglik will be set to -Inf if ML does not converge
 # - optimmethod = 'subplex' (current default) or 'simplex' (default of previous versions)
 # - methode = the method used in the numerical solving of the set of the ode's
-
-brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
-options(warn=-1)
-if(is.numeric(brts) == FALSE)
-{
-   cat("The branching times should be numeric.\n")
-   out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
-} else {
-idparsnoshift = sort(idparsnoshift)
-idpars = sort(c(idparsopt,idparsfix,idparsnoshift))
-if((prod(idpars == (1:7)) != 1) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
-{
-   cat("The parameters to be optimized, fixed and not shifted are incoherent.\n")
-   out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
-} else {
-namepars = c("la","mu","K","la2","mu2","K2","tshift")
-if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
-cat("You are optimizing",optstr,"\n")
-if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
-cat("You are fixing",fixstr,"\n")
-if(length(namepars[idparsnoshift]) == 0) { noshiftstr = "anything" } else { noshiftstr = namepars[idparsnoshift] }
-cat("You are not shifting",noshiftstr,"\n")
-cat("Optimizing the likelihood - this may take a while.","\n")
-utils::flush.console()
-trparsopt = initparsopt/(1 + initparsopt)
-trparsopt[which(initparsopt == Inf)] = 1
-trparsfix = parsfix/(1 + parsfix)
-trparsfix[which(parsfix == Inf)] = 1
-pars2 = c(res,ddmodel,cond,btorph,0,soc,tol,maxiter)
-optimpars = c(tol,maxiter)
-initloglik = dd_SR_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
-cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
-if(initloglik == -Inf)
-{
-   cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
-   out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
-} else {
-#code up to DDD v1.6: out = optimx2(trparsopt,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
-out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
-if(out$conv != 0)
-{
-   cat("Optimization has not converged. Try again with different initial values.\n")
-   out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = unlist(out$conv))
-} else {
-MLtrpars = as.numeric(unlist(out$par))
-MLpars = MLtrpars/(1 - MLtrpars)
-out$par = list(MLpars)
-MLpars1 = rep(0,7)
-MLpars1[idparsopt] = MLpars
-ML = as.numeric(unlist(out$fvalues))
-if(sum(idparsfix == 7) == 0 && allbp == TRUE)
-{ 
-   idparsopt1 = idparsopt[1:(length(idparsopt) - 1)]
-   idparsfix1 = c(idparsfix,7)
-   for(bp in 2:length(brts))
-   {
-      for(ba in seq(-1,1,2))
+  brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
+  #options(warn = -1)
+  if(is.numeric(brts) == FALSE)
+  {
+    cat("The branching times should be numeric.\n")
+    out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
+  } else {
+    idparsnoshift = sort(idparsnoshift)
+    idpars = sort(c(idparsopt,idparsfix,idparsnoshift))
+    if((prod(idpars == (1:7)) != 1) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
+    {
+      cat("The parameters to be optimized, fixed and not shifted are incoherent.\n")
+      out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
+    } else {
+      namepars = c("la","mu","K","la2","mu2","K2","tshift")
+      if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
+      cat("You are optimizing",optstr,"\n")
+      if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
+      cat("You are fixing",fixstr,"\n")
+      if(length(namepars[idparsnoshift]) == 0) { noshiftstr = "anything" } else { noshiftstr = namepars[idparsnoshift] }
+      cat("You are not shifting",noshiftstr,"\n")
+      cat("Optimizing the likelihood - this may take a while.","\n")
+      utils::flush.console()
+      trparsopt = initparsopt/(1 + initparsopt)
+      trparsopt[which(initparsopt == Inf)] = 1
+      trparsfix = parsfix/(1 + parsfix)
+      trparsfix[which(parsfix == Inf)] = 1
+      pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter)
+      optimpars = c(tol,maxiter)
+      initloglik = dd_SR_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
+      cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
+      if(initloglik == -Inf)
       {
-         initparsopt1 = initparsopt[1:length(idparsopt1)]
-         parsfix1 = c(idparsfix,brts[bp] + ba * 1E-8)
-         trparsopt1 = initparsopt1/(1 + initparsopt1)
-         trparsfix1 = parsfix1/(1 + parsfix1)
-         #code up to DDD v1.6: out = optimx2(trparsopt1,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = 1E-10,reltol = pars2[2],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix1,idparsopt = idparsopt1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
-         out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt1,idparsopt = idparsopt1,trparsfix = trparsfix1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
-         if(as.numeric(out$fvalues) > ML)
-         {
-            MLtrpars = as.numeric(unlist(out$par))
-            MLpars = MLtrpars/(1-MLtrpars)
-            out$par = list(MLpars)
-            ML = as.numeric(unlist(out$fvalues))
-         }
+        cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
+        out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = -1)
+      } else {
+        #code up to DDD v1.6: out = optimx2(trparsopt,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
+        out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt,idparsopt = idparsopt,trparsfix = trparsfix,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
+        if(out$conv != 0)
+        {
+          cat("Optimization has not converged. Try again with different initial values.\n")
+          out2 = data.frame(row.names = "results",lambda_1 = -1, mu_1 = -1, K_1 = -1, lambda_2 = -1, mu_2 = -1, K_2 = -1, t_shift = -1, loglik = -1, df = -1, conv = unlist(out$conv))
+        } else {
+          MLtrpars = as.numeric(unlist(out$par))
+          MLpars = MLtrpars/(1 - MLtrpars)
+          out$par = list(MLpars)
+          MLpars1 = rep(0,7)
+          MLpars1[idparsopt] = MLpars
+          ML = as.numeric(unlist(out$fvalues))
+          if(sum(idparsfix == 7) == 0 && allbp == TRUE)
+          { 
+            idparsopt1 = idparsopt[1:(length(idparsopt) - 1)]
+            idparsfix1 = c(idparsfix,7)
+            for(bp in 2:length(brts))
+            {
+              for(ba in seq(-1,1,2))
+              {
+                initparsopt1 = initparsopt[1:length(idparsopt1)]
+                parsfix1 = c(idparsfix,brts[bp] + ba * 1E-8)
+                trparsopt1 = initparsopt1/(1 + initparsopt1)
+                trparsfix1 = parsfix1/(1 + parsfix1)
+                #code up to DDD v1.6: out = optimx2(trparsopt1,dd_SR_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = 1E-10,reltol = pars2[2],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix1,idparsopt = idparsopt1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,brts = brts,pars2 = pars2,missnumspec = missnumspec)
+                out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_SR_loglik_choosepar,trparsopt = trparsopt1,idparsopt = idparsopt1,trparsfix = trparsfix1,idparsfix = idparsfix1,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
+                if(as.numeric(out$fvalues) > ML)
+                {
+                  MLtrpars = as.numeric(unlist(out$par))
+                  MLpars = MLtrpars/(1-MLtrpars)
+                  out$par = list(MLpars)
+                  ML = as.numeric(unlist(out$fvalues))
+                }
+              }
+            }
+          }
+          if(length(idparsfix) != 0) {MLpars1[idparsfix] = parsfix }
+          if(length(idparsnoshift) != 0) { MLpars1[idparsnoshift] = MLpars1[idparsnoshift - 3] }
+          if(MLpars1[3] > 10^7){ MLpars1[3] = Inf}
+          if(MLpars1[6] > 10^7){ MLpars1[6] = Inf}
+          s1 = sprintf('Maximum likelihood parameter estimates: %f %f %f %f %f %f %f',MLpars1[1],MLpars1[2],MLpars1[3],MLpars1[4],MLpars1[5],MLpars1[6],MLpars1[7])
+          s2 = sprintf('Maximum loglikelihood: %f',ML)
+          cat(paste("\n",s1,"\n",s2,"\n\n",sep = ''))
+          out$par = list(MLpars1)
+          out$fvalues = list(ML)
+          out2 = data.frame(row.names = "results",lambda_1 = MLpars1[1],mu_1 = MLpars1[2],K_1 = MLpars1[3],lambda_2 = MLpars1[4],mu_2 = MLpars1[5],K_2 = MLpars1[6],t_shift = MLpars1[7],loglik = ML,df = length(initparsopt),conv = unlist(out$conv))
+          if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
+        }
       }
-   }
-}
-if(length(idparsfix) != 0) {MLpars1[idparsfix] = parsfix }
-if(length(idparsnoshift) != 0) { MLpars1[idparsnoshift] = MLpars1[idparsnoshift - 3] }
-if(MLpars1[3] > 10^7){ MLpars1[3] = Inf}
-if(MLpars1[6] > 10^7){ MLpars1[6] = Inf}
-s1 = sprintf('Maximum likelihood parameter estimates: %f %f %f %f %f %f %f',MLpars1[1],MLpars1[2],MLpars1[3],MLpars1[4],MLpars1[5],MLpars1[6],MLpars1[7])
-s2 = sprintf('Maximum loglikelihood: %f',ML)
-cat("\n",s1,"\n",s2,"\n\n")
-out$par = list(MLpars1)
-out$fvalues = list(ML)
-out2 = data.frame(row.names = "results",lambda_1 = MLpars1[1],mu_1 = MLpars1[2],K_1 = MLpars1[3],lambda_2 = MLpars1[4],mu_2 = MLpars1[5],K_2 = MLpars1[6],t_shift = MLpars1[7],loglik = ML,df = length(initparsopt),conv = unlist(out$conv))
-if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
-}
-}
-}
-}
-invisible(out2)
+    }
+  }
+  return(invisible(out2))
 }

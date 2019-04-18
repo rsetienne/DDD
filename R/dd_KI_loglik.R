@@ -137,6 +137,7 @@ if(sum(brts == 0) == 0)
 { 
    brts[length(brts) + 1] = 0
 }
+verbose <- pars2[5]
 soc = pars2[6]
 S = length(brts) + (soc - 2)
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
@@ -223,16 +224,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           { 
-              loglik = -Inf
-              break
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
@@ -244,13 +237,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < (S1+1))
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0) { loglik = -Inf } else
-           {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -271,15 +259,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < S2)
        {
            probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else  {
-              loglikS = loglikS + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {
@@ -470,7 +451,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     loglik = loglik - logliknorm - sum(lgamma(Sv + m + 1) - lgamma(Sv + 1) - lgamma(m + 1))
 }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
@@ -497,6 +478,7 @@ if(sum(brts == 0) == 0)
 { 
    brts[length(brts) + 1] = 0
 }
+verbose <- pars2[5]
 soc = pars2[6]
 S = length(brts) + (soc - 2)
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
@@ -589,16 +571,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           { 
-              loglik = -Inf
-              break
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
@@ -612,15 +586,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
            #probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k1 - 1,c(pars1[1:3],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -643,15 +610,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
            #probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k,c(pars1[4:6],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else  {
-              loglikS = loglikS + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {
@@ -768,7 +728,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     loglik = loglik - logliknorm - sum(lgamma(Sv + m + 1) - lgamma(Sv + 1) - lgamma(m + 1))
 }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)

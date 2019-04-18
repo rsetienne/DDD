@@ -17,7 +17,7 @@ in function arguments, and maximum number of iterations}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to Inf, the
 optimization will be repeated until the result is, within the tolerance,
-equal to the starting values, with a maximum of 5 cycles.}
+equal to the starting values, with a maximum of 10 cycles.}
 
 \item{fun}{Function to be optimized}
 

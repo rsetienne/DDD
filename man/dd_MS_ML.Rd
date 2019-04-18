@@ -15,7 +15,8 @@ dd_MS_ML(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 +
   missnumspec = 0, cond = 0, soc = 2, tol = c(0.001, 1e-04, 1e-06),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE, optimmethod = "subplex",
-  num_cycles = 1, methode = "analytical", correction = FALSE)
+  num_cycles = 1, methode = "analytical", correction = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{brtsM}{A set of branching times of the main clade in a phylogeny, all
@@ -104,6 +105,9 @@ do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{correction}{Sets whether the correction should be applied (TRUE) or
 not (FALSE)}
+
+\item{verbose}{Show the parameters and loglikelihood for every call to the
+loglik function}
 }
 \value{
 \item{lambda_M}{ gives the maximum likelihood estimate of lambda of

@@ -686,7 +686,7 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' in function arguments, and maximum number of iterations
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
-#' equal to the starting values, with a maximum of 5 cycles.
+#' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
 #' @param ... Any other arguments of the function to be optimimzed, or settings
@@ -711,18 +711,20 @@ optimizer = function(
 {
   if(num_cycles == Inf)
   {
-    max_cycles <- 5
+    max_cycles <- 10
   } else
   {
     max_cycles <- num_cycles
   }
   cy <- 1
   fvalue <- rep(-Inf,max_cycles)
+  out <- NULL
   while(cy <= max_cycles)
   {
+    if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      out = simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...)
+      outnew = suppressWarnings(simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...))
     }
     if(optimmethod == 'subplex')
     {
@@ -730,20 +732,28 @@ optimizer = function(
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      out = subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...)
-      out = list(par = out$par, fvalues = -out$value, conv = out$convergence)
+      outnew = suppressWarnings(subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...))
+      outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
-    trparsopt <- out$par
-    fvalue[cy + 1] <- out$fvalues
-    if(num_cycles == Inf)
+    if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-      if(abs(fvalue[cy + 1] - fvalue[cy]) < optimpars[3])
+       cat('The last cycle failed; second last cycle result is returned.\n')
+       return(out) 
+    } else
+    {
+       out <- outnew
+       trparsopt <- out$par
+       fvalue[cy] <- out$fvalues
+    }  
+    if(cy > 1)
+    {
+      if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
+        if(cy < max_cycles) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        warning('Not enough cycles in optimization')
-        out$conv <- -1
+        cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
@@ -786,3 +796,23 @@ untransform_pars <- function(trpars)
   pars[which(trpars == -1)] <- -Inf;
   return(pars)
 }
+
+check_probs <- function(loglik,probs,verbose)
+{
+  probs <- probs * (probs > 0)
+  if(is.na(sum(probs)) | is.nan(sum(probs)))
+  {
+    if(verbose) cat('NA or NaN issues encountered.\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else if(sum(probs) <= 0)
+  {
+    if(verbose) cat('Probabilities smaller than 0 encountered\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else {
+    loglik <- loglik + log(sum(probs))
+    probs <- probs/sum(probs)
+  }   
+  return(list(loglik,probs))
+}  
