@@ -148,7 +148,7 @@ while(done == 0)
     laSN = ff[3]
     muSN = ff[4]
     denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-    t[i + 1] = t[i] - log(runif(1)) / denom
+    t[i + 1] = t[i] + stats::rexp(1,denom)
     if(t[i + 1] > tinn & t[i] < tinn)
     {
          NM[i] = NM[i] - 1
@@ -162,7 +162,7 @@ while(done == 0)
          laSN = ff[3]
          muSN = ff[4]
          denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-         t[i + 1] = tinn - log(runif(1)) / denom
+         t[i + 1] = tinn + stats::rexp(1,denom)
     }
     while(t[i + 1] <= age)
     {
@@ -217,7 +217,7 @@ while(done == 0)
             laSN = ff[3]
             muSN = ff[4]
             denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-            t[i + 1] = t[i] - log(runif(1)) / denom
+            t[i + 1] = t[i] + stats::rexp(1,denom)
             if(t[i + 1] > tinn & t[i] < tinn)
             {
                NM[i] = NM[i] - 1
@@ -231,7 +231,7 @@ while(done == 0)
                laSN = ff[3]
                muSN = ff[4]
                denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-               t[i + 1] = tinn - log(runif(1)) / denom
+               t[i + 1] = tinn + stats::rexp(1,denom)
             }
         }
     }
@@ -251,9 +251,9 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
-par(mfrow = c(2,1))
-plot(tes)
-plot(tas)
+graphics::par(mfrow = c(2,1))
+graphics::plot(tes)
+graphics::plot(tas)
 cols = c("blue","red")
 names(cols) = c(0,1)
 if(length(linlistS) > 0)
@@ -266,14 +266,14 @@ if(length(linlistS) > 0)
    }
    else if(length(linlistS) > 1)
    {
-      m = getMRCA(phy = tes,tip = namesS)
-      tesS = extract.clade(phy = tes,node = m)
-      b2 = age - node.depth.edgelength(tes)[m]
+      m = ape::getMRCA(phy = tes,tip = namesS)
+      tesS = ape::extract.clade(phy = tes,node = m)
+      b2 = age - ape::node.depth.edgelength(tes)[m]
    }  
    m0 = tes$edge[which(tes$edge[,2] == m),1]
-   b1 = age - node.depth.edgelength(tes)[m0]
-   tes2 = paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[6] - b2)/(b1 - b2))
-   plotSimmap(tes2,cols,lwd = 3,pts = F)
+   b1 = age - ape::node.depth.edgelength(tes)[m0]
+   tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[6] - b2)/(b1 - b2))
+   phytools::plotSimmap(tes2,cols,lwd = 3,pts = F)
 }
 tasS = NULL
 tas2 = NULL
@@ -288,14 +288,14 @@ if(length(allS) > 0)
    }
    else if(length(allS) > 1)
    {
-      m = getMRCA(phy = tas,tip = namesS)
-      tasS = extract.clade(phy = tas,node = m)
-      b2 = age - node.depth.edgelength(tas)[m]
+      m = ape::getMRCA(phy = tas,tip = namesS)
+      tasS = ape::extract.clade(phy = tas,node = m)
+      b2 = age - ape::node.depth.edgelength(tas)[m]
    }
    m0 = tas$edge[which(tas$edge[,2] == m),1]
-   b1 = age - node.depth.edgelength(tas)[m0]
-   tas2 = paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[6] - b2)/(b1 - b2))
-   plotSimmap(tas2,cols,lwd = 3,pts = F)   
+   b1 = age - ape::node.depth.edgelength(tas)[m0]
+   tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[6] - b2)/(b1 - b2))
+   phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)   
 }
 out = list(tes = tes,tas = tas,L = L,tesS = tesS,tasS = tasS,tes2 = tes2,tas2 = tas2)
 return(out)

@@ -16,7 +16,7 @@ dd_KI_ML(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 +
   soc = 2, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000 *
   round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
   optimmethod = "subplex", num_cycles = 1, methode = "analytical",
-  correction = FALSE)
+  correction = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{brtsM}{A set of branching times of the main clade in a phylogeny, all
@@ -110,6 +110,9 @@ package before version 3.1.}
 
 \item{correction}{Sets whether the correction should be applied (TRUE) or
 not (FALSE)}
+
+\item{verbose}{Show the parameters and loglikelihood for every call to the
+loglik function}
 }
 \value{
 \item{lambda_M}{ gives the maximum likelihood estimate of lambda of

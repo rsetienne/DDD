@@ -128,6 +128,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] = 0
 }
+verbose <- pars2[5]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -255,12 +256,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               y = ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               y = deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                probs = y[2,2:(lx2 + 1)]
                dim(probs) = c(lx,lx)
                
                #k1 = i + (soc - 2)
-               #y = lsoda(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol)
+               #y = desolve::ode(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, methode = 'lsoda')
                #probs2 = y[2,2:(lx+1)]              
                
                if(t2 < 0 & t2 != tinn1)
@@ -279,16 +280,8 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   } else {
                     if(pars2[7] == TRUE) { probs = kM/(nxt + kM) * probs }
                   }
-                  sumprobs = sum(probs)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                  }
-                  probs = probs/sumprobs
-                  
+                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+                 
                   #probs2 = flavec(ddep,laM,muM,K,0,lx,k1,n0) * probs2 # speciation event
                   #loglik2 = loglik2 + log(sum(probs2))
                   #probs2 = probs2/sum(probs2)   
@@ -333,12 +326,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
@@ -361,6 +354,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] == 0
 }
+verbose <- pars2[1]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -483,7 +477,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                #mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                #mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                #mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               #y = ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               #y = deSolve::ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                #probs2 = y[2,2:(lx2 + 1)]
                #print(as.numeric(probs2[1:10]))
                probs = dd_loglik_M3(pars1,lx,ddep,tt = abs(t2 - t1),p = probs,kM,kS)
@@ -510,21 +504,8 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   dim(probs) = c(lx2,1)
                   #print(as.numeric(probs2[1:10]))  
                   #print(as.numeric(probs[seq(1,10*lx,by = lx)]))            
-                  sumprobs = sum(probs)
-                  #sumprobs2 = sum(probs2)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                     #loglik = loglik + log(sumprobs2)
-                  }
-                  probs = probs/sumprobs   
-                  #probs2 = probs2/sumprobs2
-                  #print(as.numeric(probs2[1:10]))  
-                  #print(as.numeric(probs[seq(1,10*lx,by = lx)]))   
                }
+               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                kM = kM + (brts[2,i] == 1) - (brts[2,i] == 3)
                kS = kS + (brts[2,i] >= 2)
             }    
@@ -566,12 +547,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))

@@ -1,7 +1,24 @@
+#' Function to convert a set of branching times into a
+#' phylogeny with random topology
+#' This code is taken from the package TESS by Sebastian Hoehna, where the function
+#' is called tess.create.phylo
+#' 
+#' Converting a set of branching times to a phylogeny
+#' 
+#' 
+#' @param times Set of branching times
+#' @param root When root is FALSE, the largest branching time will be assumed to be
+#' the crown age. When root is TRUE, it will be the stem age. 
+#' @param tip.label Tip labels. If set to NULL, the labels will be t1, t2, etc.
+#' @return \item{ phy }{ A phylogeny of the phylo type }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @export brts2phylo
 brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 {
-# This code is taken from the package TESS by Sebastian Hoehna, where the function is called tess.create.phylo
-# It takes a set of branching times and adds a random topology.
   times = sort(times)
   n <- as.integer(length(times))+1
   if ( root ) {
@@ -52,7 +69,7 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 
   class(phy) <- "phylo"
 
-  phy <- reorder(phy)
+  phy <- stats::reorder(phy)
   ## to avoid crossings when converting with as.hclust:
   phy$edge[phy$edge[, 2] <= n, 2] <- 1:n
 
@@ -201,8 +218,8 @@ L2phylo = function(L,dropextinct = T)
       if(nrow(linlist) == 1) { done = 1 }
    }
    linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
-   phy = read.tree(text = linlist[1,4])
-   tree = as.phylo(phy)
+   phy = ape::read.tree(text = linlist[1,4])
+   tree = ape::as.phylo(phy)
    return(tree)
 }
 
@@ -235,17 +252,17 @@ L2phylo = function(L,dropextinct = T)
 #' phy = sim$tas
 #' L = phylo2L(phy)
 #' phy2 = L2phylo(L, dropextinct = FALSE)
-#' par(mfrow = c(1,3))
-#' plot(phy)
-#' plot(phy2)
-#' plot(L2phylo(sim$L, dropextinct = FALSE))
+#' graphics::par(mfrow = c(1,3))
+#' graphics::plot(phy)
+#' graphics::plot(phy2)
+#' graphics::plot(L2phylo(sim$L, dropextinct = FALSE))
 #' 
 #' @export phylo2L
 phylo2L = function(phy)
 {
   emdata = phy
   # compute the relative branching times 
-  brt = branching.times(emdata)
+  brt = ape::branching.times(emdata)
   if(min(brt) < 0)
   {
     brt = brt + abs(min(brt))
@@ -475,6 +492,28 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
     return(sam)
 }
 
+#' Carries out optimization using a simplex algorithm (finding a minimum)
+#' 
+#' Function to optimize target function using a
+#' simplex method adopted from Matlab
+#' 
+#' @param fun Function to be optimized
+#' @param trparsopt Initial guess of the parameters to be optimized
+#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' of the optimization routine
+#' @param optimpars Parameters of the optimization: relative tolerance in
+#' function arguments, relative tolerance in function value, absolute tolerance
+#' in function arguments, and maximum number of iterations
+#' @return \item{out}{ A list containing optimal function arguments
+#' (\code{par}, the optimal function value (\code{fvalues}) and whether the
+#' optimization converged (\code{conv})}.
+#' @author Rampal S. Etienne
+#' @keywords models
+#' @examples
+#' 
+#' cat("No examples")
+#' 
+#' @export simplex
 simplex = function(fun,trparsopt,optimpars,...)
 {
   numpar = length(trparsopt)
@@ -513,7 +552,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   }
   string = paste(string, -fv[1], how, "\n", sep = " ")
   cat(string)
-  flush.console()
+  utils::flush.console()
   
   tmp = order(fv)
   if(numpar == 1)
@@ -620,7 +659,7 @@ simplex = function(fun,trparsopt,optimpars,...)
      }
      string = paste(string, -fv[1], how, "\n", sep = " ")
      cat(string)
-     flush.console()
+     utils::flush.console()
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)
@@ -632,8 +671,6 @@ simplex = function(fun,trparsopt,optimpars,...)
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
 }
-
-
 
 #' Carries out optimization (finding a minimum)
 #' 
@@ -649,7 +686,7 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' in function arguments, and maximum number of iterations
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
-#' equal to the starting values, with a maximum of 5 cycles.
+#' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
 #' @param ... Any other arguments of the function to be optimimzed, or settings
@@ -674,18 +711,20 @@ optimizer = function(
 {
   if(num_cycles == Inf)
   {
-    max_cycles <- 5
+    max_cycles <- 10
   } else
   {
     max_cycles <- num_cycles
   }
   cy <- 1
   fvalue <- rep(-Inf,max_cycles)
+  out <- NULL
   while(cy <= max_cycles)
   {
+    if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      out = simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...)
+      outnew = suppressWarnings(simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...))
     }
     if(optimmethod == 'subplex')
     {
@@ -693,20 +732,28 @@ optimizer = function(
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      out = subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...)
-      out = list(par = out$par, fvalues = -out$value, conv = out$convergence)
+      outnew = suppressWarnings(subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...))
+      outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
-    trparsopt <- out$par
-    fvalue[cy + 1] <- out$fvalues
-    if(num_cycles == Inf)
+    if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-      if(abs(fvalue[cy + 1] - fvalue[cy]) < optimpars[3])
+       cat('The last cycle failed; second last cycle result is returned.\n')
+       return(out) 
+    } else
+    {
+       out <- outnew
+       trparsopt <- out$par
+       fvalue[cy] <- out$fvalues
+    }  
+    if(cy > 1)
+    {
+      if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
+        if(cy < max_cycles) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        warning('Not enough cycles in optimization')
-        out$conv <- -1
+        cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
@@ -749,3 +796,23 @@ untransform_pars <- function(trpars)
   pars[which(trpars == -1)] <- -Inf;
   return(pars)
 }
+
+check_probs <- function(loglik,probs,verbose)
+{
+  probs <- probs * (probs > 0)
+  if(is.na(sum(probs)) | is.nan(sum(probs)))
+  {
+    if(verbose) cat('NA or NaN issues encountered.\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else if(sum(probs) <= 0)
+  {
+    if(verbose) cat('Probabilities smaller than 0 encountered\n')
+    loglik <- -Inf
+    probs <- rep(-Inf,length(probs))
+  } else {
+    loglik <- loglik + log(sum(probs))
+    probs <- probs/sum(probs)
+  }   
+  return(list(loglik,probs))
+}  

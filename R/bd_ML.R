@@ -63,6 +63,8 @@
 #' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation under tdmodel =
 #' 4, default is 'lsoda'.
+#' @param verbose Show the parameters and loglikelihood for every call to the
+#' loglik function 
 #' @return A dataframe with the following elements:\cr
 #' \item{lambda0}{ gives the maximum likelihood estimate of lambda0}
 #' \item{mu0}{ gives the maximum likelihood estimate of mu0}
@@ -88,9 +90,24 @@
 #' bd_ML(brts = brts, cond = 1)
 #' 
 #' @export bd_ML
-bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(brts) + missnumspec) * (tdmodel > 1)), idparsopt = c(1,2 + (tdmodel > 1)), idparsfix = (1:4)[-idparsopt], parsfix = rep(0,4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1, btorph = 1, soc = 2, tol = c(1E-3, 1E-4, 1E-6), maxiter = 1000 * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE, optimmethod = 'subplex',num_cycles = 1, methode = 'lsoda')
+bd_ML = function(brts,
+    initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(brts) + missnumspec) * (tdmodel > 1)),
+    idparsopt = c(1,2 + (tdmodel > 1)),
+    idparsfix = (1:4)[-idparsopt], parsfix = rep(0,4)[idparsfix],
+    missnumspec = 0,
+    tdmodel = 0,
+    cond = 1,
+    btorph = 1,
+    soc = 2,
+    tol = c(1E-3, 1E-4, 1E-6),
+    maxiter = 1000 * round((1.25)^length(idparsopt)),
+    changeloglikifnoconv = FALSE,
+    optimmethod = 'subplex',
+    num_cycles = 1,
+    methode = 'lsoda',
+    verbose = FALSE)
 {
-  options(warn = -1)
+  #options(warn = -1)
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
   out2 = invisible(data.frame(lambda0 = -1,mu0 = -1,lambda1 = -1, mu1 = -1, loglik = -1, df = -1, conv = -1))
   if(is.numeric(brts) == FALSE)
@@ -117,15 +134,15 @@ bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(
   if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
   cat("You are fixing",fixstr,"\n")
   cat("Optimizing the likelihood - this may take a while.","\n")
-  flush.console()
+  utils::flush.console()
   trparsopt = initparsopt/(1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] = 1
   trparsfix = parsfix/(1 + parsfix)
   trparsfix[which(parsfix == Inf)] = 1
-  pars2 = c(tdmodel,cond,btorph,0,soc,1000,tol,maxiter)
+  pars2 = c(tdmodel,cond,btorph,verbose,soc,1000,tol,maxiter)
   optimpars = c(tol,maxiter)
   initloglik = bd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
-  cat("The loglikelihood for the inital parameter values is",initloglik,"\n")
+  cat(paste("The loglikelihood for the initial parameter values is ",initloglik,".\n",sep = ''))
   if(initloglik == -Inf)
   {
      cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
@@ -147,7 +164,7 @@ bd_ML = function(brts, initparsopt = c(0.1,0.05 * (tdmodel <= 1) + 10 * (length(
   if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
   s1 = sprintf('Maximum likelihood parameter estimates: lambda0: %f, mu0: %f, lambda1: %f, mu1: %f: ',MLpars1[1],MLpars1[2],MLpars1[3],MLpars1[4])
   s2 = sprintf('Maximum loglikelihood: %f',ML)
-  cat("\n",s1,"\n",s2,"\n")
+  cat(paste("\n",s1,"\n",s2,"\n",sep = ''))
   out2 = invisible(out2)
   return(out2)
 }

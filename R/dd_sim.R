@@ -151,12 +151,12 @@ while(done == 0)
     laN = ff[1]
     muN = ff[2]
     denom = (laN + muN) * N[i]
-    t[i + 1] = t[i] - log(runif(1)) / denom
+    t[i + 1] = t[i] + stats::rexp(1,denom)
     while(t[i + 1] <= age)
     {
         i = i + 1
         ranL = sample2(linlist,1)
-        if((laN * N[i - 1] / denom) >= runif(1))
+        if((laN * N[i - 1] / denom) >= stats::runif(1))
         {
             # speciation event
             N[i] = N[i - 1] + 1
@@ -179,7 +179,7 @@ while(done == 0)
             laN = ff[1]
             muN = ff[2]
             denom = (laN + muN) * N[i]
-            t[i + 1] = t[i] - log(runif(1)) / denom
+            t[i + 1] = t[i] + stats::rexp(1,denom)
         } 
     }
     if(sum(linlist < 0) == 0 | sum(linlist > 0) == 0)

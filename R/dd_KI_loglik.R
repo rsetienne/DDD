@@ -137,6 +137,7 @@ if(sum(brts == 0) == 0)
 { 
    brts[length(brts) + 1] = 0
 }
+verbose <- pars2[5]
 soc = pars2[6]
 S = length(brts) + (soc - 2)
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
@@ -223,16 +224,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           { 
-              loglik = -Inf
-              break
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
@@ -244,13 +237,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < (S1+1))
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0) { loglik = -Inf } else
-           {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -271,15 +259,8 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(k < S2)
        {
            probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else  {
-              loglikS = loglikS + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {
@@ -302,7 +283,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     #   for(k in (S2 + 1):2)
     #   {
     #      k1 = k - 1
-    #      y = ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+    #      y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
     #      probs = y[2,2:(lx+2)]
     #      if(k1 > 1)
     #      {
@@ -385,7 +366,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
        probs = rep(0,lx) # probs[1] = extinction probability
        probs[2] = 1 # clade S starts with one species
-       y = ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
+       y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
        probs = y[2,2:(lx+1)]   
        PS = 1 - probs[1]
    
@@ -442,7 +423,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        probs[2,2] = 1 # clade M starts with two species
        # STEP 1: integrate from tcrown to tinn
        dim(probs) = c(lx*lx,1)
-       y = ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
+       y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
        probs = y[2,2:(lx * lx + 1)]
        dim(probs) = c(lx,lx)
        probs[1,1:lx] = 0
@@ -454,7 +435,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        probs = rbind(probs[2:lx,1:lx], rep(0,lx))
        dim(probs) = c(lx * lx,1)
        # STEP 3: integrate from tinn to tpres
-       y = ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
+       y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
        probs = y[2,2:(lx * lx + 1)]
        dim(probs) = c(lx,lx)
        PM12 = sum(probs[2:lx,2:lx])
@@ -470,12 +451,12 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     loglik = loglik - logliknorm - sum(lgamma(Sv + m + 1) - lgamma(Sv + 1) - lgamma(m + 1))
 }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
@@ -497,6 +478,7 @@ if(sum(brts == 0) == 0)
 { 
    brts[length(brts) + 1] = 0
 }
+verbose <- pars2[5]
 soc = pars2[6]
 S = length(brts) + (soc - 2)
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
@@ -581,7 +563,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     {
        k1 = k + (soc - 2)
        t1 = brtsM[k - 1]; t2 = min(c(tinn,brtsM[k]))
-       #y = ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol,method = methode)
+       #y = deSolve::ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol,method = methode)
        #probs2 = y[2,2:(lx + 1)]
        #MM = dd_loglik_M_aux(pars1[1:3],lx,k1,ddep)
        #probs3 = Matrix::expm(MM * abs(t2 - t1)) %*% probs
@@ -589,38 +571,23 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        if(t2 < tinn)
        {
            probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           { 
-              loglik = -Inf
-              break
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     for(k in (ka + 1):max(ka + 1,S1 + 1))
     {
        k1 = k + (soc - 2)
        t1 = max(tinn,brtsM[k - 1]); t2 = brtsM[k];
        if(pars2[7] == 1) { probs = probs * k1/(k1 + (0:(length(probs) - 1))) }
-       #y = ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1-1,ddep),rtol = reltol,atol = abstol,method = methode)
+       #y = deSolve::ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1-1,ddep),rtol = reltol,atol = abstol,method = methode)
        #probs = y[2,2:(lx + 1)]
        probs = dd_loglik_M(pars1[1:3],lx,k1-1,ddep,tt = abs(t2 - t1),probs)
        if(k < (S1+1))
        {
            #probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k1 - 1,c(pars1[1:3],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else {
-              loglikM = loglikM + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikM,probs,verbose); loglikM <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     { 
@@ -636,22 +603,15 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     for(k in 1:S2)
     {
        t1 = brtsS[k]; t2 = brtsS[k+1]
-       #y = ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[4:6],k,ddep),rtol = reltol,atol = abstol,method = methode)
+       #y = deSolve::ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[4:6],k,ddep),rtol = reltol,atol = abstol,method = methode)
        #probs = y[2,2:(lx+1)]
        probs = dd_loglik_M(pars1[4:6],lx,k,ddep,tt = abs(t2 - t1),probs)
        if(k < S2)
        {
            #probs = flavec(ddep,laS,muS,KS,0,lxS,k,n0) * probs # speciation event
            probs = lambdamu(0:(lx - 1) + k,c(pars1[4:6],0),ddep)[[1]] * probs
-           sumprobs = sum(probs)
-           if(sumprobs <= 0)
-           {
-              loglik = -Inf
-           } else  {
-              loglikS = loglikS + log(sumprobs)
-           }
-           probs = probs/sumprobs
        }
+       cp <- check_probs(loglikS,probs,verbose); loglikS <- cp[[1]]; probs <- cp[[2]];
     }
     if(length(m) == 1)
     {
@@ -696,7 +656,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        #m1 = lavec[1:lx] * nx[1:lx]
        #m2 = muvec[3:(lx + 2)] * nx[3:(lx + 2)]
        #m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
-       #y = ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
+       #y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
        #probs = y[2,2:(lx+1)]   
        #PS = 1 - probs[1]
        probs = dd_loglik_M(pars1[4:6],lx,0,ddep,tt = abs(tpres - tinn),probs)
@@ -723,7 +683,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        probs[2,2] = 1 # clade M starts with two species
        # STEP 1: integrate from tcrown to tinn
        dim(probs) = c(lx*lx,1)
-       #y = ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
+       #y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
        #probs = y[2,2:(lx * lx + 1)]
        #dim(probs) = c(lx,lx)
        #probs[1,1:lx] = 0                                                                           
@@ -751,7 +711,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        dim(probs) = c(lx * lx,1)
        #probs = c(probs[-c(seq(lx + 1,ly,by = lx))],rep(0,lx))
        # STEP 3: integrate from tinn to tpres
-       #y = ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
+       #y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45")
        #probs = y[2,2:(lx * lx + 1)]
        probs = dd_loglik_M2(pars = pars1[1:3],lx = lx,ddep = ddep,tt = abs(tpres - tinn),p = probs)
        dim(probs) = c(lx,lx)      
@@ -768,12 +728,12 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     loglik = loglik - logliknorm - sum(lgamma(Sv + m + 1) - lgamma(Sv + 1) - lgamma(m + 1))
 }
 }}
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
