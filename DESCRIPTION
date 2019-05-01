@@ -3,7 +3,7 @@ Type: Package
 Title: Diversity-Dependent Diversification
 Version: 4.0
 Date: 2019-04-06
-Depends: R (>= 3.5.0)
+Depends: R
 Imports: deSolve, ape, phytools, subplex, Matrix, expm, SparseM
 Suggests: testthat
 Author: Rampal S. Etienne & Bart Haegeman
