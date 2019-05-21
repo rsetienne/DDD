@@ -42,38 +42,52 @@
 #' shift in parameters.
 #' 
 #' 
-#' @param pars1 Vector of parameters: \cr \cr \code{pars1[1]} corresponds to
-#' lambda_M (speciation rate) of the main clade \cr \code{pars1[2]} corresponds
-#' to mu_M (extinction rate) of the main clade \cr \code{pars1[3]} corresponds
-#' to K_M (clade-level carrying capacity) of the main clade \cr \code{pars1[4]}
-#' corresponds to lambda_M (speciation rate) of the subclade \cr
+#' @param pars1 Vector of parameters: \cr \cr
+#' \code{pars1[1]} corresponds to
+#' lambda_M (speciation rate) of the main clade \cr
+#' \code{pars1[2]} corresponds
+#' to mu_M (extinction rate) of the main clade \cr 
+#' \code{pars1[3]} corresponds
+#' to K_M (clade-level carrying capacity) of the main clade \cr
+#' \code{pars1[4]} corresponds to lambda_M (speciation rate) of the subclade \cr
 #' \code{pars1[5]} corresponds to mu_S (extinction rate) of the subclade \cr
 #' \code{pars1[6]} corresponds to K_S (clade-level carrying capacity) of the
-#' subclade \cr \code{pars1[7]} corresponds to t_d (the time of decoupling)
-#' @param pars2 Vector of model settings: \cr \cr \code{pars2[1]} sets the
+#' subclade \cr
+#' \code{pars1[7]} corresponds to t_d (the time of decoupling)
+#' @param pars2 Vector of model settings: \cr \cr
+#' \code{pars2[1]} sets the
 #' maximum number of species for which a probability must be computed.  This
-#' must be larger than 1 + missnumspec + length(brts). \cr \cr \code{pars2[2]}
-#' sets the model of diversity-dependence: \cr - \code{pars2[2] == 1} linear
+#' must be larger than 1 + missnumspec + length(brts). \cr \cr
+#' \code{pars2[2]} sets the model of diversity-dependence: \cr
+#' - \code{pars2[2] == 1} linear
 #' dependence in speciation rate with parameter K (= diversity where speciation
-#' = extinction)\cr - \code{pars2[2] == 1.3} linear dependence in speciation
-#' rate with parameter K' (= diversity where speciation = 0)\cr -
-#' \code{pars2[2] == 2} exponential dependence in speciation rate with
-#' parameter K (= diversity where speciation = extinction)\cr - \code{pars2[2]
-#' == 2.1} variant of exponential dependence in speciation rate with offset at
-#' infinity\cr - \code{pars2[2] == 2.2} 1/n dependence in speciation rate\cr -
-#' \code{pars2[2] == 2.3} exponential dependence in speciation rate with
-#' parameter x (= exponent)\cr - \code{pars2[2] == 3} linear dependence in
-#' extinction rate \cr - \code{pars2[2] == 4} exponential dependence in
-#' extinction rate \cr - \code{pars2[2] == 4.1} variant of exponential
-#' dependence in extinction rate with offset at infinity\cr - \code{pars2[2] ==
-#' 4.2} 1/n dependence in extinction rate\cr\cr \code{pars2[3]} sets the
-#' conditioning: \cr - \code{pars2[3] == 0} no conditioning \cr -
+#' = extinction)\cr
+#' - \code{pars2[2] == 1.3} linear dependence in speciation
+#' rate with parameter K' (= diversity where speciation = 0)\cr
+#' - \code{pars2[2] == 2} exponential dependence in speciation rate with
+#' parameter K (= diversity where speciation = extinction)\cr 
+#' - \code{pars2[2] == 2.1} variant of exponential dependence in speciation rate with offset at
+#' infinity\cr'
+#' - \code{pars2[2] == 2.2} 1/n dependence in speciation rate\cr
+#' - \code{pars2[2] == 2.3} exponential dependence in speciation rate with
+#' parameter x (= exponent)\cr
+#' - \code{pars2[2] == 3} linear dependence in
+#' extinction rate \cr
+#' - \code{pars2[2] == 4} exponential dependence in
+#' extinction rate \cr
+#' - \code{pars2[2] == 4.1} variant of exponential
+#' dependence in extinction rate with offset at infinity\cr
+#' - \code{pars2[2] == 4.2} 1/n dependence in extinction rate\cr\cr
+#' \code{pars2[3]} sets the
+#' conditioning: \cr
+#' - \code{pars2[3] == 0} no conditioning \cr -
 #' \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr \cr
 #' \code{pars2[4]} sets the time of splitting of the branch that will decouple
-#' \cr \cr \code{pars2[5]} sets whether the parameters and likelihood should be
-#' shown on screen (1) or not (0) \cr \cr \code{pars2[6]} sets whether the
-#' first data point is stem age (1) or crown age (2) \cr \cr \code{pars2[7]}
-#' sets whether the old (incorrect) likelihood should be used (0), or whether
+#' \cr \cr
+#' \code{pars2[5]} sets whether the parameters and likelihood should be
+#' shown on screen (1) or not (0) \cr \cr
+#' \code{pars2[6]} sets whether the first data point is stem age (1) or crown age (2) \cr\cr
+#' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0), or whether
 #' new corrected version should be used (1)
 #' @param brtsM A set of branching times of the main clade in the phylogeny,
 #' all positive
@@ -231,10 +245,24 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     {
        k1 = k + (soc - 2)
        t1 = max(tinn,brtsM[k - 1]); t2 = brtsM[k];
-       if(pars2[7] == 0) { probs = probs * k1/(k1 + (0:(length(probs) - 1))) }
+       if(t1 == tinn)
+       {
+         if(pars2[7] == 1)
+         {
+           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
+         }
+         if(pars2[7] == 1.5)
+         {
+           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
+         }
+         if(pars2[7] == 2)
+         {
+           probs = probs * (0:(length(probs) - 1))/(k1 + (0:(length(probs) - 1))) 
+         }
+       } 
        y = dd_integrate(probs,c(t1,t2),'dd_loglik_rhs',c(pars1[1:3],k1-1,ddep),rtol = reltol,atol = abstol,method = methode)
        probs = y[2,2:(lx + 1)]
-       if(k < (S1+1))
+       if(k < (S1 + 1))
        {
            probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event
        }
@@ -578,10 +606,24 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
     {
        k1 = k + (soc - 2)
        t1 = max(tinn,brtsM[k - 1]); t2 = brtsM[k];
-       if(pars2[7] == 1) { probs = probs * k1/(k1 + (0:(length(probs) - 1))) }
+       if(t1 == tinn)
+       {
+         if(pars2[7] == 1)
+         {
+           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
+         }
+         if(pars2[7] == 1.5)
+         {
+           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
+         }
+         if(pars2[7] == 2)
+         {
+           probs = probs * (0:(length(probs) - 1))/(k1 + (0:(length(probs) - 1))) 
+         }
+       } 
        #y = deSolve::ode(probs,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1-1,ddep),rtol = reltol,atol = abstol,method = methode)
        #probs = y[2,2:(lx + 1)]
-       probs = dd_loglik_M(pars1[1:3],lx,k1-1,ddep,tt = abs(t2 - t1),probs)
+       probs = dd_loglik_M(pars1[1:3],lx,k1 - 1,ddep,tt = abs(t2 - t1),probs)
        if(k < (S1+1))
        {
            #probs = flavec(ddep,laM,muM,KM,0,lxM,k1-1,n0) * probs # speciation event

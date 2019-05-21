@@ -41,7 +41,8 @@ species)
 extant taxa (including missing species)
 \cr \cr \code{pars2[3]} sets whether
 the likelihood is for the branching times (0) or the phylogeny (1)
-\cr \cr \code{pars2[4]} sets whether the parameters and likelihood should be shown
+\cr \cr \code{pars2[4]} sets whether the parameters and likelihood should be 
+shown
 on screen (1) or not (0)
 \cr \cr \code{pars2[5]} sets whether the first data
 point is stem age (1) or crown age (2)}
@@ -63,7 +64,8 @@ diversification model for a given set of branching times and parameter
 values.
 }
 \examples{
-bd_loglik(pars1 = c(0.5,0.1), pars2 = c(0,1,1,0,2), brts = 1:10, missnumspec = 0) 
+bd_loglik(pars1 = c(0.5,0.1), pars2 = c(0,1,1,0,2), brts = 1:10, 
+missnumspec = 0)
 }
 \references{
 - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
