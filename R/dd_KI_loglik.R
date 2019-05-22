@@ -87,8 +87,8 @@
 #' \code{pars2[5]} sets whether the parameters and likelihood should be
 #' shown on screen (1) or not (0) \cr \cr
 #' \code{pars2[6]} sets whether the first data point is stem age (1) or crown age (2) \cr\cr
-#' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0), or whether
-#' new corrected version should be used (1)
+#' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0),
+#' or whether the new corrected likelihood should be used (1).
 #' @param brtsM A set of branching times of the main clade in the phylogeny,
 #' all positive
 #' @param brtsS A set of branching times of the subclade in the phylogeny, all
@@ -250,11 +250,11 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
          if(pars2[7] == 1)
          {
            probs = probs * k1/(k1 + (0:(length(probs) - 1)))
-         }
+         } else
          if(pars2[7] == 1.5)
          {
            probs = probs * 1/(k1 + (0:(length(probs) - 1)))
-         }
+         } else
          if(pars2[7] == 2)
          {
            probs = probs * (0:(length(probs) - 1))/(k1 + (0:(length(probs) - 1))) 
@@ -611,11 +611,11 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
          if(pars2[7] == 1)
          {
            probs = probs * k1/(k1 + (0:(length(probs) - 1)))
-         }
+         } else
          if(pars2[7] == 1.5)
          {
            probs = probs * 1/(k1 + (0:(length(probs) - 1)))
-         }
+         } else
          if(pars2[7] == 2)
          {
            probs = probs * (0:(length(probs) - 1))/(k1 + (0:(length(probs) - 1))) 

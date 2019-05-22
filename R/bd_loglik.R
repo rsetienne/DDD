@@ -331,6 +331,9 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "lsoda"){
           lavec <- la0 * (1 - (1 - mu0 / la0) / (K * ff(t[2:S], pars1)))
         } else if(tdmodel == 4) {
           lavec <- latd[1:(np - 1)]
+        } else
+        {
+          stop('The tdmodel you selected does not exist. Please check pars2.')
         }
         if (S > soc){
           loglik <- loglik + sum(log(lavec[soc:length(lavec)])) 
