@@ -45,6 +45,54 @@ test_that("DDD works", {
 
   r11 <- bd_loglik(pars1 = c(0.4,0.1,20),pars2 = c(4,0,1,0,2), brts = 1:10, missnumspec = 0)
   testthat::expect_equal(r11,-27.7337684064852610,tolerance = 1E-16)
+  
+  pars <- c(0.4, 0.1, 0.6, 0.2)
+  brts <- list(10:6, 3:2)
+  #sls_test <- sls::loglik_sls_p(
+  #  pars = pars,
+  #  brts = brts,
+  #  cond = 0,
+  #  n_max = 1e3
+  #);
+  high_k <- 1e7
+  pars1 <- c(pars[1], pars[2], high_k, pars[3], pars[4], high_k, brts[[2]][1])
+  pars2 <- c(200,1,0,brts[[2]][1],0,2,1)
+  brtsM <- brts[[1]]
+  brtsS <- brts[[2]][-1]
+  ddd_test <- DDD::dd_KI_loglik(
+    pars1 = pars1,
+    pars2 = pars2,
+    brtsM = brtsM,
+    brtsS = brtsS,
+    missnumspec = 0,
+    methode = 'ode45'
+  ); 
+  testthat::expect_equal(ddd_test,-24.4172040142037936,tolerance = .000001)
+  
+  pars <- c(0.35, 0.15, 0.7, 0.25)
+  brts <- list(c(10:5,2), c(4,3,1))
+  # sls_test <- sls::loglik_sls_p(
+  #   pars = pars,
+  #   brts = brts,
+  #   cond = 0,
+  #   n_max = 1e3
+  # );
+  t_d <- brts[[2]][1]
+  tsplit <- min(abs(brts[[1]][abs(brts[[1]]) > t_d]))
+  high_k <- 1e7
+  pars1 <- c(pars[1], pars[2], high_k, pars[3], pars[4], high_k, t_d)
+  pars2 <- c(200,1,0,brts[[2]][1],0,2,1)
+  brtsM <- brts[[1]]
+  brtsS <- brts[[2]][-1]
+  ddd_test <- DDD::dd_KI_loglik(
+    pars1 = pars1,
+    pars2 = pars2,
+    brtsM = brtsM,
+    brtsS = brtsS,
+    missnumspec = 0,
+    methode = 'analytical'
+  );
+  testthat::expect_equal(ddd_test,-29.5449889636434051,tolerance = .000001)
 })
 
 
