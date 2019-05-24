@@ -249,11 +249,11 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
          if(pars2[7] == 1)
          {
-           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
+           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
          } else
          if(pars2[7] == 1.5)
          {
-           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
+           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
          } else
          if(pars2[7] == 2)
          {
@@ -610,11 +610,11 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        {
          if(pars2[7] == 1)
          {
-           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
+           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
          } else
          if(pars2[7] == 1.5)
          {
-           probs = probs * 1/(k1 + (0:(length(probs) - 1)))
+           probs = probs * k1/(k1 + (0:(length(probs) - 1)))
          } else
          if(pars2[7] == 2)
          {

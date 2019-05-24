@@ -287,6 +287,10 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   } else {
                     if(pars2[7] == 1)
                     {
+                      probs = 1/(nxt + kM) * probs
+                    } else
+                    if(pars2[7] == 1.5)
+                    {
                       probs = kM/(nxt + kM) * probs
                     } else
                     if(pars2[7] == 2)
