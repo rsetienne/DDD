@@ -487,6 +487,14 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
     { 
         x = c(x,x)
         prob = c(prob,prob)
+        if(is.null(size))
+        {
+          size = 1
+        }
+        if(replace == FALSE & size > 1)
+        {
+          stop('It is not possible to sample without replacement multiple times from a single item.')
+        }
     }
     sam = sample(x,size,replace,prob)
     return(sam)
