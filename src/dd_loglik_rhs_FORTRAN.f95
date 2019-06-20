@@ -224,7 +224,7 @@
       DOUBLE PRECISION  :: nn((N - kk) + 2)
       DOUBLE PRECISION  :: FF1, FF2, FF3, En
       DOUBLE PRECISION  :: c, t1, y
-      REAL(16)           :: Envec(N - kk)
+      REAL(16)          :: Envec(N - kk)
 
 ! parameters - named here
       DOUBLE PRECISION rn(2)
