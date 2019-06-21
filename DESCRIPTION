@@ -5,7 +5,7 @@ Version: 4.1
 Date: 2019-06-20
 Depends: R (>= 3.5.0)
 Imports: deSolve, ape, phytools, subplex, Matrix, expm, SparseM
-Suggests: testthat
+Suggests: testthat, testit
 Author: Rampal S. Etienne & Bart Haegeman
 Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
 License: GPL-3
