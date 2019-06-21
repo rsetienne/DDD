@@ -835,13 +835,13 @@ check_probs <- function(loglik,probs,verbose)
 #'   
 #'   # Do normal sampling
 #'   set.seed(42)
-#'   draws_1 <- DAISIE:::rng_respecting_sample(
+#'   draws_1 <- DDD:::rng_respecting_sample(
 #'     1:3, size = n, replace = TRUE, prob = c(1.0, 1.0, 1.0)
 #'   )
 #'   
 #'   # Do a sampling with one element of probability zero
 #'   set.seed(42)
-#'   draws_2 <- DAISIE:::rng_respecting_sample(
+#'   draws_2 <- DDD:::rng_respecting_sample(
 #'     1:4, size = n, replace = TRUE, prob = c(1.0, 1.0, 1.0, 0.0)
 #'   )
 #'   testit::assert(sum(draws_2 == 4) == 0)
@@ -859,6 +859,7 @@ check_probs <- function(loglik,probs,verbose)
 #' @author Richel J.C. Bilderbeek
 #' @seealso See \code{\link[base]{sample}} for more details
 #' @note thanks to Pedro Neves for finding this feature in base::sample
+#' @export
 rng_respecting_sample <- function(x, size, replace, prob) {
   which_non_zero <- prob > 0.0
   non_zero_prob <- prob[which_non_zero]

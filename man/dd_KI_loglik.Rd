@@ -55,8 +55,8 @@ conditioning: \cr
 \code{pars2[5]} sets whether the parameters and likelihood should be
 shown on screen (1) or not (0) \cr \cr
 \code{pars2[6]} sets whether the first data point is stem age (1) or crown age (2) \cr\cr
-\code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0), or whether
-new corrected version should be used (1)}
+\code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0),
+or whether the new corrected likelihood should be used (1).}
 
 \item{brtsM}{A set of branching times of the main clade in the phylogeny,
 all positive}
