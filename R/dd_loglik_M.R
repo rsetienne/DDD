@@ -23,7 +23,7 @@ lambdamu = function(n,pars,ddep)
        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 2.3)
     {
-       y = K
+       y = -K
        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 3)
     {
@@ -136,7 +136,7 @@ lambdamu2 = function(n,pars,ddep)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 2.3)
     { 
-        x = KM
+        x = -KM
         lavec = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 3)
@@ -206,7 +206,7 @@ lambdamu3 = function(n,pars,ddep,kM,kS)
         lavecS = pmax(matrix(0,lnn,lnn),laS * (1 - nxt/K))
     } else if(ddep == 2.3)
     { 
-        x = K
+        x = -K
         lavecM = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         lavecS = pmax(matrix(0,lnn,lnn),laS * (nxt + n0)^x)
     }     

@@ -134,7 +134,7 @@ flavec = function(ddep,la,mu,K,r,lx,kk,n0)
    }
    if(ddep == 2.3)
    {
-       x = K
+       x = -K
        lavec = pmax(rep(0,lx),la * (nn + n0)^x)
    }
    if(ddep == 3 | ddep == 4 | ddep == 4.1 | ddep == 4.2)
