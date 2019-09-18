@@ -51,3 +51,11 @@ test_that("use, two non-zero probabilities", {
   testit::assert(sum(draws_2 == 2) > 0)
   expect_equal(draws_1, draws_2)
 })
+
+test_that("if only one element is non-zero, pick that element", {
+  expect_silent(
+    rng_respecting_sample(
+      x = 1:4, size = 1, replace = TRUE, prob = c(0.0, 0.4, 0.0, 0.0)
+    )
+  )
+})
