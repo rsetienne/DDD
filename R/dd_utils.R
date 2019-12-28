@@ -864,5 +864,7 @@ rng_respecting_sample <- function(x, size, replace, prob) {
   which_non_zero <- prob > 0.0
   non_zero_prob <- prob[which_non_zero]
   non_zero_x <- x[which_non_zero]
+  testit::assert(length(non_zero_x) == length(non_zero_prob))
+  if (length(non_zero_x) == 1) return (non_zero_x)
   return(sample(x = non_zero_x, size = size, replace = replace, prob = non_zero_prob))
 }
