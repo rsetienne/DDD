@@ -153,6 +153,10 @@ dd_ML = function(
   verbose = FALSE)
 {
   #options(warn = -1)
+  if(length(tol) != 3)
+  {
+    stop('Please specify a tolerance vector with three values') 
+  }
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
   if(is.numeric(brts) == FALSE)
   {

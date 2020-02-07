@@ -149,11 +149,9 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "lsoda"){
     }
     
     if (soc == 1 & tdmodel == 2){
-      cat(
-        "Stem age and conditioning on extant taxa only have not yet been 
-        implemented for this model. Use dd_loglik instead\n"
-      )
-      loglik <- Inf
+      pars1new <- c(pars1[1],1e-10,pars1[3])
+      pars2new <- c(min(10 * (1 + missnumspec + length(brts)),1000),1,pars2[2:5])
+      loglik <- dd_loglik(pars1 = pars1new, pars2 = pars2new, brts = brts, missnumspec = missnumspec, methode = methode)
       return(as.numeric(loglik))
     } else {        
       brts <- sort(abs(as.numeric(brts)), decreasing = TRUE)
