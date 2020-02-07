@@ -179,7 +179,13 @@ while(done == 0)
             laN = ff[1]
             muN = ff[2]
             denom = (laN + muN) * N[i]
-            t[i + 1] = t[i] + stats::rexp(1,denom)
+            if(denom == 0)
+            {
+              t[i + 1] = Inf
+            } else
+            {
+              t[i + 1] = t[i] + stats::rexp(1,rate = denom)
+            }
         } 
     }
     if(sum(linlist < 0) == 0 | sum(linlist > 0) == 0)
