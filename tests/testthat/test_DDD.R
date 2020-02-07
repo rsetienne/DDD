@@ -105,6 +105,14 @@ test_that("DDD works", {
     methode = 'analytical'
   );
   testthat::expect_equal(ddd_test,-29.5449889636434051,tolerance = .000001)
+  
+  brts <- 1:10
+  pars1 <- c(0.8,0,40)
+  pars2 <- c(2,1,1,1,1)
+  missnumspec <- 0
+  result1 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec)
+  result2 <- DDD::dd_loglik(pars1 = pars1,pars2 = c(min(1000,10 * (length(brts) + missnumspec)),1,pars2[2:5]),brts = brts,missnumspec = 0)
+  testthat::expect_equal(result1,result2)
 })
 
 

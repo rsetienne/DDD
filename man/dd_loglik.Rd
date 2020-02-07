@@ -7,43 +7,64 @@
 dd_loglik(pars1, pars2, brts, missnumspec, methode = "analytical")
 }
 \arguments{
-\item{pars1}{Vector of parameters: \cr \cr \code{pars1[1]} corresponds to
-lambda (speciation rate) \cr \code{pars1[2]} corresponds to mu (extinction
-rate) \cr \code{pars1[3]} corresponds to K (clade-level carrying capacity)}
+\item{pars1}{Vector of parameters: 
+\cr \cr \code{pars1[1]} corresponds to
+lambda (speciation rate)
+\cr \code{pars1[2]} corresponds to mu (extinction
+rate)
+\cr \code{pars1[3]} corresponds to K (clade-level carrying capacity)}
 
-\item{pars2}{Vector of model settings: \cr \cr \code{pars2[1]} sets the
+\item{pars2}{Vector of model settings: 
+\cr \cr \code{pars2[1]} sets the
 maximum number of species for which a probability must be computed.  This
-must be larger than 1 + missnumspec + length(brts). \cr \cr \code{pars2[2]}
-sets the model of diversity-dependence: \cr - \code{pars2[2] == 1} linear
+must be larger than 1 + missnumspec + length(brts).
+\cr \cr \code{pars2[2]}
+sets the model of diversity-dependence:
+\cr - \code{pars2[2] == 1} linear
 dependence in speciation rate with parameter K (= diversity where speciation
-= extinction)\cr - \code{pars2[2] == 1.3} linear dependence in speciation
-rate with parameter K' (= diversity where speciation = 0)\cr -
-\code{pars2[2] == 1.4} : positive diversity-dependence in speciation rate
+= extinction)
+\cr - \code{pars2[2] == 1.3} linear dependence in speciation
+rate with parameter K' (= diversity where speciation = 0)
+\cr - \code{pars2[2] == 1.4} : positive diversity-dependence in speciation rate
 with parameter K' (= diversity where speciation rate reaches half its
-maximum); lambda = lambda0 * S/(S + K') where S is species richness\cr -
-\code{pars2[2] == 1.5} : positive and negative diversity-dependence in
+maximum); lambda = lambda0 * S/(S + K') where S is species richness
+\cr - \code{pars2[2] == 1.5} : positive and negative diversity-dependence in
 speciation rate with parameter K' (= diversity where speciation = 0); lambda
-= lambda0 * S/K' * (1 - S/K') where S is species richness\cr -
-\code{pars2[2] == 2} exponential dependence in speciation rate with
-parameter K (= diversity where speciation = extinction)\cr - \code{pars2[2]
+= lambda0 * S/K' * (1 - S/K') where S is species richness
+\cr - \code{pars2[2] == 2} exponential dependence in speciation rate with
+parameter K (= diversity where speciation = extinction)
+\cr - \code{pars2[2]
 == 2.1} variant of exponential dependence in speciation rate with offset at
-infinity\cr - \code{pars2[2] == 2.2} 1/n dependence in speciation rate\cr -
-\code{pars2[2] == 2.3} exponential dependence in speciation rate with
-parameter x (= exponent)\cr - \code{pars2[2] == 3} linear dependence in
-extinction rate \cr - \code{pars2[2] == 4} exponential dependence in
-extinction rate \cr - \code{pars2[2] == 4.1} variant of exponential
-dependence in extinction rate with offset at infinity\cr - \code{pars2[2] ==
-4.2} 1/n dependence in extinction rate\cr - \code{pars2[2] == 5} linear
-dependence in speciation and extinction rate \cr \cr \code{pars2[3]} sets
-the conditioning: \cr - \code{pars2[3] == 0} conditioning on stem or crown
-age \cr - \code{pars2[3] == 1} conditioning on stem or crown age and
-non-extinction of the phylogeny \cr - \code{pars2[3] == 2} conditioning on
+infinity
+\cr - \code{pars2[2] == 2.2} 1/n dependence in speciation rate
+\cr - \code{pars2[2] == 2.3} exponential dependence in speciation rate with
+parameter x (= exponent)
+\cr - \code{pars2[2] == 3} linear dependence in
+extinction rate
+\cr - \code{pars2[2] == 4} exponential dependence in
+extinction rate
+\cr - \code{pars2[2] == 4.1} variant of exponential
+dependence in extinction rate with offset at infinity
+\cr - \code{pars2[2] ==
+4.2} 1/n dependence in extinction rate
+\cr - \code{pars2[2] == 5} linear
+dependence in speciation and extinction rate
+\cr \cr \code{pars2[3]} sets
+the conditioning:
+\cr - \code{pars2[3] == 0} conditioning on stem or crown
+age
+\cr - \code{pars2[3] == 1} conditioning on stem or crown age and
+non-extinction of the phylogeny
+\cr - \code{pars2[3] == 2} conditioning on
 stem or crown age and on the total number of extant taxa (including missing
-species) \cr - \code{pars2[3] == 3} conditioning on the total number of
-extant taxa (including missing species) \cr \cr \code{pars2[4]} sets whether
-the likelihood is for the branching times (0) or the phylogeny (1) \cr \cr
-\code{pars2[5]} sets whether the parameters and likelihood should be shown
-on screen (1) or not (0)\cr \cr \code{pars2[6]} sets whether the first data
+species)
+\cr - \code{pars2[3] == 3} conditioning on the total number of
+extant taxa (including missing species)
+\cr \cr \code{pars2[4]} sets whether
+the likelihood is for the branching times (0) or the phylogeny (1)
+\cr \cr \code{pars2[5]} sets whether the parameters and likelihood should be shown
+on screen (1) or not (0)
+\cr \cr \code{pars2[6]} sets whether the first data
 point is stem age (1) or crown age (2)}
 
 \item{brts}{A set of branching times of a phylogeny, all positive}

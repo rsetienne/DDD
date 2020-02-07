@@ -168,7 +168,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
               for(k in 2:(kshift-1))
               {
                  k1 = k + (soc - 2)
-                 y = dd_integrate(probs,brts[(k-1):k],'dd_loglik_rhs_FOTRAN',c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
+                 y = dd_integrate(probs,brts[(k-1):k],'dd_loglik_rhs_FORTRAN',c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, method = methode)
                  probs = y[2,2:(lx+1)]
                  if(k < (S + 2 - soc))
                  {

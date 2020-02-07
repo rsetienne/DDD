@@ -215,6 +215,7 @@
        
       SUBROUTINE dd_runmodtd (neq, t, Conc, dConc, yout, ip)
       USE dd_dimmod
+      USE iso_c_binding
       IMPLICIT NONE
 !......................... declaration section.............................
       INTEGER           :: neq, ip(*), i, ii, M
@@ -224,7 +225,7 @@
       DOUBLE PRECISION  :: nn((N - kk) + 2)
       DOUBLE PRECISION  :: FF1, FF2, FF3, En
       DOUBLE PRECISION  :: c, t1, y
-      REAL(16)          :: Envec(N - kk)
+      REAL(c_intptr_t * 2)  :: Envec(N - kk)
 
 ! parameters - named here
       DOUBLE PRECISION rn(2)

@@ -248,7 +248,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                } 
                if(ddep == 2.3)
                { 
-                   x = K
+                   x = -K
                    lavec = pmax(matrix(0,lx + 2,lx + 2),(nxt2 + n0)^x)
                    muvec = matrix(1,lx + 2,lx + 2)                   
                }    
@@ -480,7 +480,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                } 
                if(ddep == 2.3)
                { 
-                   x = K
+                   x = -K
                    lavec = pmax(matrix(0,lx + 2,lx + 2),(nxt2 + n0)^x)
                    muvec = matrix(1,lx + 2,lx + 2)                   
                }    

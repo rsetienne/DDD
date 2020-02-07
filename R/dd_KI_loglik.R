@@ -374,7 +374,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        }
        if(ddep == 2.3)
        {
-           x = KS 
+           x = -KS 
            lavec = pmax(rep(0,lx + 2),laS * (nx + n0)^x)
            muvec = muS * rep(1,lx + 2)
        }       
@@ -422,7 +422,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && pars2[2] == 2) | ((pars1[1] == 0 | pars1
        }
        if(ddep == 2.3)
        { 
-           x = KM
+           x = -KM
            lavec = pmax(matrix(0,lx + 2,lx + 2),laM * (nxt + n0)^x)
            muvec = muM * matrix(1,lx + 2,lx + 2)
        }    
