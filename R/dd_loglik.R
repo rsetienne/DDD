@@ -506,32 +506,44 @@ dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 
 dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 {
-  rhs_func_name = 'no_name'
-  if(is.character(rhs_func))
+  if(method == 'analytical')
   {
-    rhs_func_name = rhs_func
-    if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN')
+    probs <- dd_loglik_M(pars = pars[1:3],
+                         lx = length(initprobs),
+                         k = pars[4],
+                         ddep = pars[5],
+                         tt = abs(tvec[2] - tvec[1]),
+                         initprobs)
+    probs <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
+  } else
+  {  
+    rhs_func_name = 'no_name'
+    if(is.character(rhs_func))
     {
-      rhs_func = match.fun(rhs_func)
+      rhs_func_name = rhs_func
+      if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN')
+      {
+        rhs_func = match.fun(rhs_func)
+      }
     }
-  }
-  if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_rhs_FORTRAN' || rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
-  {
-    parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
-  } else 
-  {
-    parsvec = pars
-  }
-  if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
-  {
-    y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
-  } else
-  if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
-  {
-    y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
-  } else
-  {
-    y = deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_rhs_FORTRAN' || rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
+    {
+      parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
+    } else 
+    {
+      parsvec = pars
+    }
+    if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
+    {
+      y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
+    } else
+    if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
+    {
+      y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
+    } else
+    {
+      y = deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+    }
   }
   return(y)
 }
