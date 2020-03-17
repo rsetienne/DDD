@@ -174,7 +174,6 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
       lx = round(pars2[1])
     }
   }
-  n0 = (ddep == 2 | ddep == 4)
   if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
@@ -220,7 +219,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               }
               if(k < (S + 2 - soc))
               {
-                probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
+                probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
               }
               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
             }    
@@ -234,7 +233,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               probs = y[2,2:(lx+2)]
               if(k > soc)
               {
-                probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
+                probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
               }
               cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
@@ -274,7 +273,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               {
                 probsn = rep(0,lx + 1)
                 probsn[1:lx] = probs[1:lx]
-                probsn = c(flavec(ddep,la,mu,K,r,lx,1,n0),1) * probsn # speciation event
+                probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
                 y = dd_integrate(probsn,c(max(abs(brts)),TT),rhs_func_name,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
                 logliknorm = logliknorm - log(y[2,lx + 2])
               }
@@ -343,7 +342,6 @@ if(ddep == 1 | ddep == 5)
 } else {
     lx = round(pars2[1])
 }
-n0 = (ddep == 2 | ddep == 4)
 if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
 {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
@@ -388,7 +386,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              }
              if(k < (S + 2 - soc))
              {
-                 #probs = flavec(ddep,la,mu,K,r,lx,k1,n0) * probs # speciation event
+                 #probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
                  probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
              }
              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
@@ -405,7 +403,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              probs = c(probs,0)
              if(k > soc)
              {
-                 #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1,n0),1) * probs # speciation event
+                 #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
                  probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1,ddep)[[1]],1) * probs
              }    
              cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
@@ -453,7 +451,7 @@ if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 |
              {
                 #probsn = rep(0,lx + 1)
                 #probsn[1:lx] = probs[1:lx]
-                #probsn = c(flavec(ddep,la,mu,K,r,lx,1,n0),1) * probsn # speciation event
+                #probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
                 #probsn = c(lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]],1) * probsn # speciation event
                 #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
                 #logliknorm = logliknorm - log(y[2,lx + 2])
@@ -504,7 +502,7 @@ dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
   return(int)
 }
 
-dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
+dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 {
   if(method == 'analytical')
   {
@@ -514,13 +512,13 @@ dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
                          ddep = pars[5],
                          tt = abs(tvec[2] - tvec[1]),
                          initprobs)
-    probs <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
+    y <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
   } else
   {  
-    rhs_func_name = 'no_name'
+    rhs_func_name <- 'no_name'
     if(is.character(rhs_func))
     {
-      rhs_func_name = rhs_func
+      rhs_func_name <- rhs_func
       if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN')
       {
         rhs_func = match.fun(rhs_func)
@@ -535,14 +533,14 @@ dd_integrate = function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     }
     if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
     {
-      y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
+      y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
     } else
     if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
     {
-      y = dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
+      y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
     } else
     {
-      y = deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+      y <- deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
     }
   }
   return(y)

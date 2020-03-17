@@ -137,7 +137,6 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
     tshift = -pars1[7]
     if(sum(abs(brts - tshift) < 1E-14) == 1) { tshift = tshift - 1E-8 }
     kshift = 1 + max(which(brts < tshift))
-    n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1) 
     { 
        lx = min(max(1 + missnumspec,1 + ceiling(max(la/(la - mu) * K,la2/(la2 - mu2) * K2))),ceiling(pars2[1]))
@@ -172,7 +171,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = y[2,2:(lx+1)]
                  if(k < (S + 2 - soc))
                  {
-                     probs = flavec(ddep,la,mu,K,0,lx,k1,n0) * probs # speciation event
+                     probs = flavec(ddep,la,mu,K,0,lx,k1) * probs # speciation event
                  }
               }
               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -185,7 +184,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            probs = y[2,2:(lx+1)] 
            if(k < (S + 2 - soc))
            {
-               probs = flavec(ddep,la2,mu2,K2,0,lx,k1,n0) * probs # speciation event
+               probs = flavec(ddep,la2,mu2,K2,0,lx,k1) * probs # speciation event
            }
            cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
            if((kshift + 1) <= (S + 2 - soc))
@@ -197,7 +196,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = y[2,2:(lx+1)]
                  if(k < (S + 2 - soc))
                  {
-                     probs = flavec(ddep,la2,mu2,K2,0,lx,k1,n0) * probs # speciation event
+                     probs = flavec(ddep,la2,mu2,K2,0,lx,k1) * probs # speciation event
                  }
                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
               }
@@ -214,7 +213,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = y[2,2:(lx+2)]
                  if(k > soc)
                  {
-                     probs = c(flavec(ddep,la2,mu2,K2,0,lx,k1-1,n0),1) * probs # speciation event
+                     probs = c(flavec(ddep,la2,mu2,K2,0,lx,k1-1),1) * probs # speciation event
                  }
                  cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
               }
@@ -227,7 +226,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            probs = y[2,2:(lx+2)]
            if(k > soc)
            {
-              probs = c(flavec(ddep,la,mu,K,0,lx,k1-1,n0),1) * probs # speciation event
+              probs = c(flavec(ddep,la,mu,K,0,lx,k1-1),1) * probs # speciation event
            }
            cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
            for(k in (kshift-1):2)
@@ -237,7 +236,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
               probs = y[2,2:(lx+2)]
               if(k > soc)
               {
-                  probs = c(flavec(ddep,la,mu,K,0,lx,k1-1,n0),1) * probs # speciation event
+                  probs = c(flavec(ddep,la,mu,K,0,lx,k1-1),1) * probs # speciation event
               }
               cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
            }
@@ -277,7 +276,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              {
                 probsn = rep(0,lx + 1)
                 probsn[1:lx] = probs[1:lx]
-                probsn = c(flavec(ddep,la,mu,K,0,lx,1,n0),1) * probsn # speciation event
+                probsn = c(flavec(ddep,la,mu,K,0,lx,1),1) * probsn # speciation event
                 y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
                 logliknorm = logliknorm - log(y[2,lx + 2])
              }
@@ -334,7 +333,6 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
     tshift = -pars1[7]
     if(sum(abs(brts - tshift) < 1E-14) == 1) { tshift = tshift - 1E-8 }
     kshift = 1 + max(which(brts < tshift))
-    n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1) 
     { 
        lx = min(max(1 + missnumspec,1 + ceiling(max(la/(la - mu) * K,la2/(la2 - mu2) * K2))),ceiling(pars2[1]))
@@ -368,7 +366,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = dd_loglik_M(pars1[1:3],lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs)
                  if(k < (S + 2 - soc))
                  {
-                     #probs = flavec(ddep,la,mu,K,0,lx,k1,n0) * probs # speciation event
+                     #probs = flavec(ddep,la,mu,K,0,lx,k1) * probs # speciation event
                      probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],0),ddep)[[1]] * probs
                  }
                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -380,7 +378,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            probs = dd_loglik_M(pars1[4:6],lx,k1,ddep,tt = abs(brts[k] - tshift),probs)
            if(k < (S + 2 - soc))
            {
-               #probs = flavec(ddep,la2,mu2,K2,0,lx,k1,n0) * probs # speciation event
+               #probs = flavec(ddep,la2,mu2,K2,0,lx,k1) * probs # speciation event
                probs = lambdamu(0:(lx - 1) + k1,c(pars1[4:6],0),ddep)[[1]] * probs
            }
            cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -392,7 +390,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = dd_loglik_M(pars1[4:6],lx,k1,ddep,tt = abs(brts[k] - brts[k - 1]),probs)
                  if(k < (S + 2 - soc))
                  {
-                     #probs = flavec(ddep,la2,mu2,K2,0,lx,k1,n0) * probs # speciation event
+                     #probs = flavec(ddep,la2,mu2,K2,0,lx,k1) * probs # speciation event
                      probs = lambdamu(0:(lx - 1) + k1,c(pars1[4:6],0),ddep)[[1]] * probs
                  }
                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -412,7 +410,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                  probs = c(probs,0) 
                  if(k > soc)
                  {
-                     #probs = c(flavec(ddep,la2,mu2,K2,0,lx,k1-1,n0),1) * probs # speciation event
+                     #probs = c(flavec(ddep,la2,mu2,K2,0,lx,k1-1),1) * probs # speciation event
                      probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1[4:6],ddep)[[1]],1) * probs
                  }
                  cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
@@ -430,7 +428,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
            probs = c(probs,0) 
            if(k > soc)
            {
-              #probs = c(flavec(ddep,la,mu,K,0,lx,k1-1,n0),1) * probs # speciation event
+              #probs = c(flavec(ddep,la,mu,K,0,lx,k1-1),1) * probs # speciation event
               probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1[1:3],ddep)[[1]],1) * probs
            }
            cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
@@ -443,7 +441,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
               probs = c(probs,0)
               if(k > soc)
               {
-                  #probs = c(flavec(ddep,la,mu,K,0,lx,k1-1,n0),1) * probs # speciation event
+                  #probs = c(flavec(ddep,la,mu,K,0,lx,k1-1),1) * probs # speciation event
                   probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1[1:3],ddep)[[1]],1) * probs
               }
               cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
@@ -493,7 +491,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              {
                 #probsn = rep(0,lx + 1)
                 #probsn[1:lx] = probs[1:lx]
-                #probsn = c(flavec(ddep,la,mu,K,0,lx,1,n0),1) * probsn # speciation event
+                #probsn = c(flavec(ddep,la,mu,K,0,lx,1),1) * probsn # speciation event
                 #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1[1:3],1,ddep),rtol = reltol,atol = abstol, method = methode)
                 #logliknorm = logliknorm - log(y[2,lx + 2])
                 #print(log(y[2,lx + 2]))
