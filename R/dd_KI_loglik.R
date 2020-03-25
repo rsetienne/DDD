@@ -155,7 +155,7 @@ dd_KI_loglik <- function(pars1,
     return(loglik)
   }
   
-  loglik <- dd_KI_loglik_multiple(pars1_list = pars1_list,
+  loglik <- dd_multiple_KI_loglik(pars1_list = pars1_list,
                                   pars2 = pars2,
                                   brts_k_list = brts_k_list,
                                   missnumspec_list = missnumspec_list,
@@ -374,6 +374,7 @@ dd_KI_logliknorm <- function(brts_k_list,
     PM2 = sum(probs[1,2:lx])
     logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) + (cond == 4) * (log(PM12 + PM2) + log(PS))
   }
+  return(logliknorm)
 }
 
 create_lx_list <- function(lmax,
@@ -408,6 +409,7 @@ create_missnumspec_list <- function(m)
   {
     missnumspec_list <- as.list(m)
   }
+  return(missnumspec_list)
 }
 
 create_S_list <- function(brts_k_list,soc)
@@ -501,7 +503,7 @@ check_for_impossible_pars <- function(pars1,
 #' create_missnumspec_list
 #' @param reltol relative tolerance in integration of the ODE system, default at 1e-14
 #' @param abstol tolerance tolerance in integration of the ODE system, default at 1e-16
-dd_KI_loglik_multiple <- function(pars1_list,
+dd_multiple_KI_loglik <- function(pars1_list,
                                   pars2,
                                   brts_k_list,
                                   missnumspec_list,
