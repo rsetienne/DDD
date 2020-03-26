@@ -230,3 +230,38 @@ test_that("DDD_KI works",
   result2 <- DDD::dd_loglik(pars1 = pars1,pars2 = c(min(1000,10 * (length(brts) + missnumspec)),1,pars2[2:5]),brts = brts,missnumspec = 0)
   testthat::expect_equal(result1,result2)
 })           
+
+test_that("conditioning_DDD_KI works",
+{          
+  if(Sys.getenv("TRAVIS") != "")
+  {
+    ts <- seq(-9,-1,2);
+    p1 <- rep(0,5);
+    p2 <- rep(0,5);
+    pars1_list <- list(c(0.5,0.4,Inf),c(0.2,0.1,Inf))
+    lx_list <- list(200,200)
+    for(i in 1:5)
+    {
+      brts_k_list <- list(rbind(c(-10,ts[i],0),c(2,1,1)),rbind(c(ts[i],0),c(1,1)))
+      p1[i] <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+                                               pars1_list = pars1_list,
+                                               pars2 = c(200,1,5,NA,1,2,3),
+                                               loglik = 0,
+                                               lx_list = lx_list,
+                                               methode = 'ode45')
+      p2[i] <- DDD::dd_KI_logliknorm(brts_k_list = brts_k_list,
+                                     pars1_list = pars1_list,
+                                     loglik = 0,
+                                     cond = 5,
+                                     ddep = 1,
+                                     lx_list = lx_list,
+                                     reltol = 1e-14,
+                                     abstol = 1e-16,
+                                     methode = 'ode45')
+    }
+    testthat::expect_equal(p1,p2)
+  } else
+  {
+    testthat::skip("Run only on Travis")
+  }
+})

@@ -39,8 +39,17 @@ dependence in extinction rate with offset at infinity\cr
 - \code{pars2[2] == 4.2} 1/n dependence in extinction rate\cr\cr
 \code{pars2[3]} sets the
 conditioning: \cr
-- \code{pars2[3] == 0} no conditioning \cr -
-\code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr \cr
+- \code{pars2[3] == 0} no conditioning (or just crown age) \cr
+- \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr
+- \code{pars2[3] == 2} conditioning on number of species and crown age;
+not yet implemented \cr
+- \code{pars2[3] == 3} conditioning on number of species only;
+not yet implemented \cr
+- \code{pars2[3] == 4} conditioning on survival of the subclade \cr
+- \code{pars2[3] == 5} conditioning on survival of all subclades
+and of both crown lineages in the main clade. This assumes that subclades
+that have already shifted do not undergo another shift, i.e. shifts only
+occur in the main clade. \cr \cr
 \code{pars2[4]} Obsolete. \cr \cr
 \code{pars2[5]} sets whether the parameters and likelihood should be
 shown on screen (1) or not (0) \cr \cr

@@ -46,8 +46,17 @@
 #' - \code{pars2[2] == 4.2} 1/n dependence in extinction rate\cr\cr
 #' \code{pars2[3]} sets the
 #' conditioning: \cr
-#' - \code{pars2[3] == 0} no conditioning \cr -
-#' \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr \cr
+#' - \code{pars2[3] == 0} no conditioning (or just crown age) \cr
+#' - \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr
+#' - \code{pars2[3] == 2} conditioning on number of species and crown age;
+#' not yet implemented \cr
+#' - \code{pars2[3] == 3} conditioning on number of species only;
+#' not yet implemented \cr
+#' - \code{pars2[3] == 4} conditioning on survival of the subclade \cr
+#' - \code{pars2[3] == 5} conditioning on survival of all subclades
+#' and of both crown lineages in the main clade. This assumes that subclades
+#' that have already shifted do not undergo another shift, i.e. shifts only
+#' occur in the main clade. \cr \cr
 #' \code{pars2[4]} Obsolete. \cr \cr
 #' \code{pars2[5]} sets whether the parameters and likelihood should be
 #' shown on screen (1) or not (0) \cr \cr
@@ -149,7 +158,7 @@ dd_KI_loglik <- function(pars1,
                                                       missnumspec_list = missnumspec_list,
                                                       pars1_list = pars1_list,
                                                       pars2 = pars2)
-  if(are_pars_impossible | tinn >= 0 | tinn <= min(brtsM))
+  if(are_pars_impossible || tinn >= 0 || tinn <= min(brtsM))
   {
     loglik <- -Inf
     return(loglik)
@@ -171,7 +180,7 @@ dd_KI_loglik <- function(pars1,
     utils::flush.console()
   }
   loglik = as.numeric(loglik)
-  if(is.nan(loglik) | is.na(loglik))
+  if(is.nan(loglik) || is.na(loglik))
   {
     loglik = -Inf
   }
@@ -180,18 +189,24 @@ dd_KI_loglik <- function(pars1,
 
 shift <- function(probs,pars2,k1)
 {
+  lp <- length(probs)
   if(pars2[7] == 1)
   {
-    probs = probs * 1/(k1 + (0:(length(probs) - 1)))
+    probs = probs * 1/(k1 + (0:(lp - 1)))
   } else
     if(pars2[7] == 1.5)
     {
-      probs = probs * k1/(k1 + (0:(length(probs) - 1)))
+      probs <- probs * k1/(k1 + (0:(lp - 1)))
     } else
       if(pars2[7] == 2)
       {
-        probs = probs * (0:(length(probs) - 1))/(k1 + (0:(length(probs) - 1))) 
-      }
+        probs <- probs * (0:(lp - 1))/(k1 + (0:(lp - 1))) 
+      } else
+        if(pars2[7] == 3)
+        {
+          probs[1:(lp - 1)] <- probs[2:lp] * (1:(lp - 1))/(k1 + (1:(lp - 1))) 
+          probs[lp] <- 0
+        }
   return(probs)
 }
 
@@ -203,7 +218,8 @@ dd_KI_loglik_partial <- function(brts_k,
                                  lx,
                                  reltol = 1e-14,
                                  abstol = 1e-16,
-                                 methode)
+                                 methode,
+                                 log = TRUE)
 {  
   ddep <- pars2[2]
   verbose <- pars2[5]
@@ -232,7 +248,7 @@ dd_KI_loglik_partial <- function(brts_k,
                       r = 0,
                       lx,
                       k1) * probs # speciation event
-    } else if(k2 < k1)
+    } else if(k2 <= k1 && t2 != 0)
     {
       probs <- shift(probs = probs,
                      pars2 = pars2,
@@ -243,8 +259,14 @@ dd_KI_loglik_partial <- function(brts_k,
                       verbose = verbose)
   }
   loglik <- cp[[1]]
-  probs <- cp[[2]]  
-  loglik <- loglik + log(probs[1 + m])
+  probs <- cp[[2]]
+  if(log == TRUE)
+  {
+    loglik <- loglik + log(probs[1 + m])
+  } else 
+  {
+    loglik <- exp(loglik) * probs[1 + m] 
+  }
   return(loglik)
 }
 
@@ -268,7 +290,7 @@ convolve_logliks <- function(missnumspec_list,loglik_list)
     }
     loglik <- loglik + log(convolve_lik[max(missnumspec_list[[1]]) + 1])
   }
-  if(is.nan(loglik) | is.na(loglik))
+  if(is.nan(loglik) || is.na(loglik))
   {
     loglik <- -Inf
   }   
@@ -285,13 +307,17 @@ dd_KI_logliknorm <- function(brts_k_list,
                              abstol = 1e-16,
                              methode)
 {
-  if(cond == 0 | loglik == -Inf)
+  if(cond == 0 || loglik == -Inf)
   {
     logliknorm = 0
   } else {
-    if(length(brts_k_list) > 2 & cond == 1)
+    if(length(brts_k_list) > 2 && cond == 1)
     {
       stop('Conditioning on survival not implemented for more than 1 shift')
+    }
+    if(cond == 2 || cond == 3)
+    {
+      stop('Conditioning on number of species not implemented')
     }
     tcrown <- min(brts_k_list[[1]][1,])
     ln <- length(brts_k_list[[1]][1,])
@@ -372,7 +398,9 @@ dd_KI_logliknorm <- function(brts_k_list,
     dim(probs) = c(lx,lx)
     PM12 = sum(probs[2:lx,2:lx])
     PM2 = sum(probs[1,2:lx])
-    logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) + (cond == 4) * (log(PM12 + PM2) + log(PS))
+    logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) +
+                          (cond == 4) * (log(PM12 + PM2) + log(PS)) +
+                          (cond == 5) * (log(PM12) + log(PS))
   }
   return(logliknorm)
 }
@@ -445,8 +473,8 @@ check_for_impossible_pars_KI <- function(S_list,
       m <- missnumspec_list[[i]]
     }
     are_pars_impossible <- 
-      ((ddep == 1 & ceiling(pars1_list[[i]][1]/(pars1_list[[i]][1] - pars1_list[[i]][2]) * pars1_list[[i]][3]) < S_list[[i]] + m) |
-         (ddep == 1.3 & ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
+      ((ddep == 1 && ceiling(pars1_list[[i]][1]/(pars1_list[[i]][1] - pars1_list[[i]][2]) * pars1_list[[i]][3]) < S_list[[i]] + m) ||
+       (ddep == 1.3 && ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
     if(are_pars_impossible)
     {
       return(are_pars_impossible)
@@ -454,7 +482,7 @@ check_for_impossible_pars_KI <- function(S_list,
     sumK <- sumK + ceiling(pars1_list[[i]][3])
     sumSm <- sumSm + S_list[[i]]
   }
-  are_pars_impossible <- (ddep == 1.3 & sumK < sumSm)
+  are_pars_impossible <- (ddep == 1.3 && sumK < sumSm)
   return(are_pars_impossible)
 }
 
@@ -468,9 +496,9 @@ check_for_impossible_pars <- function(pars1,
   } else
   { 
     are_pars_impossible <-   
-      (pars1[2] == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) |
-      (pars1[1] == 0 & (ddep == 4 | ddep == 4.1)) |
-      (pars1[1] <= pars1[2] & (ddep == 1 | ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 3 | ddep == 4 | ddep == 4.1))
+      (pars1[2] == 0 && (ddep == 2 || ddep == 2.1 || ddep == 2.2)) ||
+      (pars1[1] == 0 && (ddep == 4 || ddep == 4.1)) ||
+      (pars1[1] <= pars1[2] && (ddep == 1 || ddep == 2 || ddep == 2.1 || ddep == 2.2 || ddep == 3 || ddep == 4 || ddep == 4.1))
     if(are_pars_impossible)
     {
       cat('These parameters are incompatible with the chosen model')
@@ -516,7 +544,7 @@ dd_multiple_KI_loglik <- function(pars1_list,
                             missnumspec_list = missnumspec_list,
                             pars1_list = pars1_list)
   llist <- length(pars1_list)
-  if(llist != length(brts_k_list) | llist != length(missnumspec_list))
+  if(llist != length(brts_k_list) || llist != length(missnumspec_list))
   {
     stop('The length of the lists of parameters, branching times and missing species is not the same.')
   }
@@ -561,4 +589,56 @@ dd_multiple_KI_loglik <- function(pars1_list,
   }
   loglik <- loglik - sum(lgamma(Sv + m + 1) - lgamma(Sv + 1) - lgamma(m + 1))
   return(loglik)
+}
+
+dd_multiple_KI_logliknorm <- function(brts_k_list,
+                                      pars1_list,
+                                      pars2,
+                                      loglik,
+                                      lx_list,
+                                      reltol = 1e-14,
+                                      abstol = 1e-16,
+                                      methode)
+{
+  if(pars2[3] == 0 || loglik == -Inf)
+  {
+    logliknorm <- 0
+  } else
+  {
+    llist <- length(pars1_list)
+    loglik_list <- as.list(rep(0,llist))
+    logliknorm <- 0
+    for(i in 1:llist)
+    {
+      probs <- rep(0,lx_list[[i]])
+      probs[1] <- 1
+      tstart <- min(brts_k_list[[i]][1,])
+      ln <- length(brts_k_list[[i]][1,])
+      kinn <- 1 + (which(brts_k_list[[i]][2,2:ln] - brts_k_list[[i]][2,1:(ln - 1)] < 0)) 
+      tinn <- brts_k_list[[i]][1,kinn]
+      tpres <- 0
+      brts_k <- rbind(c(tstart,tinn,tpres),rep(brts_k_list[[i]][2,1],length(tinn) + 2))
+      lp <- length(probs)
+      if(brts_k_list[[i]][2,1] == 1)
+      {
+        aux <- 1:lp
+      }
+      if(brts_k_list[[i]][2,1] == 2)
+      {
+        aux <- (2:(lp + 1)) * (3:(lp + 2))/6
+      }
+      loglik_list[[i]] <- dd_KI_loglik_partial(brts_k = brts_k,
+                                               m = 0:(lp - 1),
+                                               cp = list(0,probs),
+                                               pars1 = pars1_list[[i]],
+                                               pars2 = pars2,
+                                               lx = lx_list[[i]],
+                                               reltol = reltol,
+                                               abstol = abstol,
+                                               methode = methode,
+                                               log = FALSE)/aux
+      logliknorm <- logliknorm + log(sum(loglik_list[[i]]))
+    }
+  }
+  return(logliknorm)
 }
