@@ -398,6 +398,9 @@ dd_KI_logliknorm <- function(brts_k_list,
     dim(probs) = c(lx,lx)
     PM12 = sum(probs[2:lx,2:lx])
     PM2 = sum(probs[1,2:lx])
+    #print(log(2) + log(PM12 + PS * PM2))
+    #print(log(2) + (log(PM12 + PM2) + log(PS)))
+    #print(log(2) + (log(PM12) + log(PS)))
     logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) +
                           (cond == 4) * (log(PM12 + PM2) + log(PS)) +
                           (cond == 5) * (log(PM12) + log(PS))
@@ -568,15 +571,29 @@ dd_multiple_KI_loglik <- function(pars1_list,
                                              methode = methode)
   }
   loglik <- convolve_logliks(missnumspec_list,loglik_list)
-  logliknorm <- dd_KI_logliknorm(brts_k_list = brts_k_list,
-                                 pars1_list = pars1_list,
-                                 loglik = loglik,
-                                 cond = pars2[3],
-                                 ddep = pars2[2],
-                                 lx_list = lx_list,
-                                 reltol = reltol,
-                                 abstol = abstol,
-                                 methode = methode)
+  if(pars2[3] != 5)
+  {  
+    logliknorm <- dd_KI_logliknorm(brts_k_list = brts_k_list,
+                                   pars1_list = pars1_list,
+                                   loglik = loglik,
+                                   cond = pars2[3],
+                                   ddep = pars2[2],
+                                   lx_list = lx_list,
+                                   reltol = reltol,
+                                   abstol = abstol,
+                                   methode = methode)
+  } else
+  {
+    pars2[7] <- 3
+    logliknorm <- dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+                                            pars1_list = pars1_list,
+                                            pars2 = pars2,
+                                            loglik = loglik,
+                                            lx_list = lx_list,
+                                            reltol = 1e-14,
+                                            abstol = 1e-16,
+                                            methode = methode)
+  }
   loglik <- loglik - logliknorm
   S_list <- create_S_list(brts_k_list = brts_k_list,
                           soc = pars2[6])
