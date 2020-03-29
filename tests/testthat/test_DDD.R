@@ -286,29 +286,20 @@ test_that("conditioning_DDD_KI works",
                                      reltol = reltol,
                                      abstol = abstol,
                                      methode = 'ode45')
-      print(exp(p1[i]))
-      print(exp(p2[i]))
+      #print(exp(p1[i]))
+      #print(exp(p2[i]))
     }
-    testthat::expect_equal(p1,p2)
+    testthat::expect_equal(p1,p2,tolerance = 1e-4)
   } else
   {
     testthat::skip("Run only on Travis")
   }
 
-  pars <- c(0.4, 0.1, 0.6, 0.2)
-  brts <- list(c(10:6,1), 3:2)
-  #sls_test <- sls::loglik_sls_p(
-  #  pars = pars,
-  #  brts = brts,
-  #  cond = 0,
-  #  n_max = 1e3
-  #);
-  pars1_list <- list(c(pars[1], pars[2], Inf), c(pars[3], pars[4], Inf))
+  pars1_list <- list(c(0.4,0.1,30),c(0.2,0.1,20))
   pars2 <- c(500,1,5,NA,1,2,3)
   lx_list <- list(pars2[1],pars2[1])
   brts_k_list <- list(rbind(sort(c(-brts[[1]],-3,0)),c(2,3,4,5,6,5,6,6)),rbind(c(-brts[[2]],0),c(1,2,2)))
-  brts_k_list <- list(rbind(c(-10,-3,0),c(2,1,1)),rbind(c(-3,0),c(1,1)))
-  pars1_list <- list(c(0.5,0.4,Inf),c(0.2,0.1,Inf))
+  #brts_k_list <- list(rbind(c(-10,-3,0),c(2,1,1)),rbind(c(-3,0),c(1,1)))
   
   logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
                                   pars1_list = pars1_list,
@@ -329,5 +320,5 @@ test_that("conditioning_DDD_KI works",
                                            methode = 'ode45')
   print(logliknorm1)
   print(logliknorm2)
-  #testthat::expect_equal(logliknorm1,logliknorm2)
+  testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-2)
 })
