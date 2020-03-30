@@ -328,7 +328,7 @@ dd_KI_logliknorm <- function(brts_k_list,
     # compute survival probability of clade S
     lx = lx_list[[2]]
     nx = -1:lx
-    lambdamu_nk <- lambdamu(nx,pars = c(pars1_list[[2]],0),0)
+    lambdamu_nk <- lambdamu(nx,pars = c(pars1_list[[2]],0),ddep = ddep)
     lavec <- lambdamu_nk[[1]]
     muvec <- lambdamu_nk[[2]]
     probs = rep(0,lx) # probs[1] = extinction probability
