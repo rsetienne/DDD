@@ -299,26 +299,24 @@ test_that("conditioning_DDD_KI works",
   pars2 <- c(500,1,5,NA,1,2,3)
   lx_list <- list(pars2[1],pars2[1])
   brts_k_list <- list(rbind(sort(c(-brts[[1]],-3,0)),c(2,3,4,5,6,5,6,6)),rbind(c(-brts[[2]],0),c(1,2,2)))
-  #brts_k_list <- list(rbind(c(-10,-3,0),c(2,1,1)),rbind(c(-3,0),c(1,1)))
-  
   logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
-                                  pars1_list = pars1_list,
-                                  loglik = 0,
-                                  cond = 5,
-                                  ddep = 1,
-                                  lx_list = lx_list,
-                                  reltol = reltol,
-                                  abstol = abstol,
-                                  methode = 'ode45')
+                                        pars1_list = pars1_list,
+                                        loglik = 0,
+                                        cond = 5,
+                                        ddep = 1,
+                                        lx_list = lx_list,
+                                        reltol = reltol,
+                                        abstol = abstol,
+                                        methode = 'ode45')
   logliknorm2 <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
-                                           pars1_list = pars1_list,
-                                           pars2 = pars2,
-                                           loglik = 0,
-                                           lx_list = lx_list,
-                                           reltol = reltol,
-                                           abstol = abstol,
-                                           methode = 'ode45')
-  print(logliknorm1)
-  print(logliknorm2)
+                                                 pars1_list = pars1_list,
+                                                 pars2 = pars2,
+                                                 loglik = 0,
+                                                 lx_list = lx_list,
+                                                 reltol = reltol,
+                                                 abstol = abstol,
+                                                 methode = 'ode45')
+  #print(logliknorm1)
+  #print(logliknorm2)
   testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-2)
 })
