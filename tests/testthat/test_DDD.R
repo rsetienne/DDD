@@ -316,7 +316,28 @@ test_that("conditioning_DDD_KI works",
                                                  reltol = reltol,
                                                  abstol = abstol,
                                                  methode = 'ode45')
-  #print(logliknorm1)
-  #print(logliknorm2)
-  testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-2)
+  testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-4)
+  
+  pars1_list <- list(c(0.4,0.1,20),c(0.2,0.1,20))
+  pars2 <- c(500,1,5,NA,1,2,3)
+  lx_list <- list(pars2[1],pars2[1])
+  brts_k_list <- list(rbind(c(-10:-6,-3,-1,0),c(2,3,4,5,6,5,6,6)),rbind(c(-3,-2,0),c(1,2,2)))
+  logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
+                                        pars1_list = pars1_list,
+                                        loglik = 0,
+                                        cond = 5,
+                                        ddep = 1,
+                                        lx_list = lx_list,
+                                        reltol = reltol,
+                                        abstol = abstol,
+                                        methode = 'ode45')
+  logliknorm2 <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+                                                 pars1_list = pars1_list,
+                                                 pars2 = pars2,
+                                                 loglik = 0,
+                                                 lx_list = lx_list,
+                                                 reltol = reltol,
+                                                 abstol = abstol,
+                                                 methode = 'ode45')
+  testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-4)
 })
