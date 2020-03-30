@@ -298,7 +298,7 @@ test_that("conditioning_DDD_KI works",
   pars1_list <- list(c(0.4,0.1,30),c(0.2,0.1,20))
   pars2 <- c(500,1,5,NA,1,2,3)
   lx_list <- list(pars2[1],pars2[1])
-  brts_k_list <- list(rbind(sort(c(-brts[[1]],-3,0)),c(2,3,4,5,6,5,6,6)),rbind(c(-brts[[2]],0),c(1,2,2)))
+  brts_k_list <- list(rbind(sort(c(-10:-6,-3,-1,0)),c(2,3,4,5,6,5,6,6)),rbind(c(-3,-2,0),c(1,2,2)))
   logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
                                         pars1_list = pars1_list,
                                         loglik = 0,
