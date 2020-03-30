@@ -73,7 +73,7 @@ test_that("DDD_KI works",
   #);
   high_k <- 1e7
   pars1 <- c(pars[1], pars[2], high_k, pars[3], pars[4], high_k, brts[[2]][1])
-  pars2 <- c(200,1,0,brts[[2]][1],0,2,1.5)
+  pars2 <- c(500,1,0,brts[[2]][1],0,2,1.5)
   brtsM <- brts[[1]]
   brtsS <- brts[[2]][-1]
   ddd_test <- DDD::dd_KI_loglik(
@@ -84,7 +84,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test,-24.4172040142037936,tolerance = .000001)
+  testthat::expect_equal(ddd_test,-24.4171970357049624,tolerance = .000001)
   ddd_test2 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
@@ -105,7 +105,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test,-21.1781625776025777,tolerance = .000001)
+  testthat::expect_equal(ddd_test,-21.1781625797899231,tolerance = .000001)
   ddd_test2 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
@@ -134,7 +134,7 @@ test_that("DDD_KI works",
     missnumspec = c(0,3),
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test03,-21.4981352311200737,tolerance = .000001)
+  testthat::expect_equal(ddd_test03,-21.4981352311200595,tolerance = .000001)
   
   ddd_test12 <- DDD::dd_KI_loglik(
     pars1 = pars1,
@@ -144,7 +144,7 @@ test_that("DDD_KI works",
     missnumspec = c(1,2),
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test12,-20.7167138427128954,tolerance = .000001)
+  testthat::expect_equal(ddd_test12,-20.7167138427128776,tolerance = .000001)
   
   ddd_test21 <- DDD::dd_KI_loglik(
     pars1 = pars1,
@@ -154,7 +154,7 @@ test_that("DDD_KI works",
     missnumspec = c(2,1),
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test21,-20.0405933298709051,tolerance = .000001)
+  testthat::expect_equal(ddd_test21,-20.0405933298708874,tolerance = .000001)
   
   ddd_test30 <- DDD::dd_KI_loglik(
     pars1 = pars1,
@@ -164,9 +164,10 @@ test_that("DDD_KI works",
     missnumspec = c(3,0),
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test30,-19.4834201422017017,tolerance = .000001)
+  testthat::expect_equal(ddd_test30,-19.4834201422017124,tolerance = .000001)
   
   #testthat::expect_equal(ddd_test3,log(exp(ddd_test03) + exp(ddd_test12) + exp(ddd_test21) + exp(ddd_test30)),tolerance = .000001)
+  #not identical due to additional combinatorial factors
   
   pars2[3] <- 1
   ddd_test <- DDD::dd_KI_loglik(
@@ -177,7 +178,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test,-20.5299241171191973,tolerance = .000001)
+  testthat::expect_equal(ddd_test,-20.5299241171281643,tolerance = .000001)
   ddd_test2 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
@@ -197,7 +198,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test,-20.2509115410971532,tolerance = .000001)
+  testthat::expect_equal(ddd_test,-20.2509115267895616,tolerance = .000001)
 
   pars2[3] <- 5
   ddd_test <- DDD::dd_KI_loglik(
@@ -208,7 +209,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'ode45'
   ); 
-  testthat::expect_equal(ddd_test,-20.1686905596579962,tolerance = .000001)
+  testthat::expect_equal(ddd_test,-20.1686905596579997,tolerance = .000001)
 
   pars <- c(0.35, 0.15, 0.7, 0.25)
   brts <- list(c(10:5,2), c(4,3,1))
@@ -233,8 +234,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'analytical'
   );
-  testthat::expect_equal(ddd_test,-29.5449889636434051,tolerance = .000001)
-
+  testthat::expect_equal(ddd_test,-29.5449838542774543,tolerance = .000001)
   ddd_test2 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
