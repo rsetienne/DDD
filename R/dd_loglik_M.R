@@ -12,8 +12,7 @@ lambdamu = function(n,pars,ddep)
     n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1)
     {
-       Kprime = la / (la - mu) * K
-       lavec = pmax(zeros,la * (1 - n/Kprime))
+       lavec = pmax(zeros,la - (la - mu) * n / K)
     } else if(ddep == 1.3)
     {
        lavec = pmax(zeros,la * (1 - n/K))
