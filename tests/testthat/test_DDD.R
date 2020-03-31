@@ -254,6 +254,8 @@ test_that("DDD_KI works",
   testthat::expect_equal(result1,result2)
 })           
 
+context("test_DDD_KI_conditioning")
+
 test_that("conditioning_DDD_KI works",
 {          
   if(Sys.getenv("TRAVIS") != "")
