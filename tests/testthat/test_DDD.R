@@ -8,7 +8,7 @@ test_that("DDD works", {
        result <- testthat::expect_equal(object = object, expected = expected,...)
     } else
     {
-      result <- NULL
+       result <- NULL
     }
     return(invisible(result))
   }
@@ -40,7 +40,7 @@ test_that("DDD works", {
   
   testthat::expect_equal(r5,r6,tolerance = .00001)
   testthat::expect_equal(r5,r7,tolerance = .01)
-  expect_equal_x64(-8.582413,r7,tolerance = .00001)
+  expect_equal_x64(-8.579058,r7,tolerance = .00001) #was -8.582413 before
 
   pars1 = c(0.2,0.05,1000000)
   pars2 = c(1000,1,1,0,0,2)
