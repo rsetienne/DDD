@@ -8,7 +8,7 @@ test_that("DDD works", {
        result <- testthat::expect_equal(object = object, expected = expected,...)
     } else
     {
-      result <- NULL
+       result <- NULL
     }
     return(invisible(result))
   }
@@ -40,7 +40,7 @@ test_that("DDD works", {
   
   testthat::expect_equal(r5,r6,tolerance = .00001)
   testthat::expect_equal(r5,r7,tolerance = .01)
-  expect_equal_x64(-8.582413,r7,tolerance = .00001)
+  expect_equal_x64(-8.579058,r7,tolerance = .00001) #was -8.582413 before
 
   pars1 = c(0.2,0.05,1000000)
   pars2 = c(1000,1,1,0,0,2)
@@ -253,6 +253,8 @@ test_that("DDD_KI works",
   result2 <- DDD::dd_loglik(pars1 = pars1,pars2 = c(min(1000,10 * (length(brts) + missnumspec)),1,pars2[2:5]),brts = brts,missnumspec = 0)
   testthat::expect_equal(result1,result2)
 })           
+
+context("test_DDD_KI_conditioning")
 
 test_that("conditioning_DDD_KI works",
 {          
