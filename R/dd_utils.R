@@ -108,7 +108,14 @@ conv = function(x,y)
    return(cvxy[2:lxy])
 }
 
-flavec = function(ddep,la,mu,K,r,lx,kk,n0)
+flavec <- function(ddep,la,mu,K,r,lx,kk)
+{
+  nn <- (0:(lx - 1)) + kk
+  lambdamu_nk <- lambdamu(nn,c(la,mu,K,r),ddep)
+  return(lambdamu_nk[[1]])
+}
+
+flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
 {
    nn = (0:(lx - 1)) + kk
    if(ddep == 1 | ddep == 5)

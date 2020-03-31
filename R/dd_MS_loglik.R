@@ -300,7 +300,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   }
                   cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                  
-                  #probs2 = flavec(ddep,laM,muM,K,0,lx,k1,n0) * probs2 # speciation event
+                  #probs2 = flavec(ddep,laM,muM,K,0,lx,k1) * probs2 # speciation event
                   #loglik2 = loglik2 + log(sum(probs2))
                   #probs2 = probs2/sum(probs2)   
                }
