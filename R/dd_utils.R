@@ -704,6 +704,9 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
+#' @param jitter Perturbation of an initial parameter value when precisely equal to 0.5;
+#' this is only relevant when subplex is chosen. The default value is 0, so no jitter
+#' is applied. A recommended value when using it is 1E-5.
 #' @param ... Any other arguments of the function to be optimimzed, or settings
 #' of the optimization routine
 #' @return \item{out}{ A list containing optimal function arguments
