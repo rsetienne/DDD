@@ -716,12 +716,13 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' cat("No examples")
 #' 
 #' @export optimizer
-optimizer = function(
+optimizer <- function(
   optimmethod = 'simplex',
   optimpars = c(1E-4,1E-4,1E-6,1000),
   num_cycles = 1,
   fun,
   trparsopt,
+  jitter = 0,
   ...)
 {
   if(num_cycles == Inf)
@@ -739,16 +740,37 @@ optimizer = function(
     if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      outnew = suppressWarnings(simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...))
-    }
+      outnew <- suppressWarnings(simplex(fun = fun,
+                                         trparsopt = trparsopt,
+                                         optimpars = optimpars,
+                                         ...))
+    } else
     if(optimmethod == 'subplex')
     {
-      minfun = function(fun,trparsopt,...)
+      minfun <- function(fun,trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      outnew = suppressWarnings(subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...))
-      outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+      trparsopt[trparsopt == 0.5] <- 0.5 - jitter
+      outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
+                                                  fn = minfun,
+                                                  control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else
+    if(optimmethod == 'nloptr') # this does not work yet
+    {
+      minfun <- function(fun,trparsopt,...)
+      {           
+        return(-fun(trparsopt = trparsopt,...))
+      }
+      outnew <- suppressWarnings(nloptr::nloptr(x0 = trparsopt,
+                                                eval_f = minfun,
+                                                opts = list('algorithm' = optimmethod,"xtol_abs" = optimpars[3],"xtol_rel" = optimpars[1],"ftol_rel" = optimpars[2],"maxeval" = optimpars[4]),
+                                                fun = fun,
+                                                ...))
+      outnew <- list(par = outnew$solution, fvalues = -outnew$objective, conv = outnew$status)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
