@@ -704,6 +704,9 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
+#' @param jitter Perturbation of an initial parameter value when precisely equal to 0.5;
+#' this is only relevant when subplex is chosen. The default value is 0, so no jitter
+#' is applied. A recommended value when using it is 1E-5.
 #' @param ... Any other arguments of the function to be optimimzed, or settings
 #' of the optimization routine
 #' @return \item{out}{ A list containing optimal function arguments
@@ -716,12 +719,13 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' cat("No examples")
 #' 
 #' @export optimizer
-optimizer = function(
+optimizer <- function(
   optimmethod = 'simplex',
   optimpars = c(1E-4,1E-4,1E-6,1000),
   num_cycles = 1,
   fun,
   trparsopt,
+  jitter = 0,
   ...)
 {
   if(num_cycles == Inf)
@@ -739,16 +743,24 @@ optimizer = function(
     if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      outnew = suppressWarnings(simplex(fun = fun,trparsopt = trparsopt,optimpars = optimpars,...))
-    }
+      outnew <- suppressWarnings(simplex(fun = fun,
+                                         trparsopt = trparsopt,
+                                         optimpars = optimpars,
+                                         ...))
+    } else
     if(optimmethod == 'subplex')
     {
-      minfun = function(fun,trparsopt,...)
+      minfun <- function(fun,trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
-      outnew = suppressWarnings(subplex::subplex(par = trparsopt,fn = minfun,control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),fun = fun,...))
-      outnew = list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+      trparsopt[trparsopt == 0.5] <- 0.5 - jitter
+      outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
+                                                  fn = minfun,
+                                                  control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {

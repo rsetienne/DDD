@@ -5,8 +5,7 @@
 \title{Loglikelihood for macro-evolutionary succession under diversity-dependent
 diversification with the key innovation at time t = t_d}
 \usage{
-dd_MS_loglik(pars1, pars2, brtsM, brtsS, missnumspec,
-  methode = "analytical")
+dd_MS_loglik(pars1, pars2, brtsM, brtsS, missnumspec, methode = "analytical")
 }
 \arguments{
 \item{pars1}{Vector of parameters: \cr \cr

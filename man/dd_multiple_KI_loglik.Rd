@@ -5,8 +5,15 @@
 \title{Loglikelihood for diversity-dependent diversification models with multiple
 decoupling (rate shift) events}
 \usage{
-dd_multiple_KI_loglik(pars1_list, pars2, brts_k_list, missnumspec_list,
-  reltol = 1e-14, abstol = 1e-16, methode = "lsoda")
+dd_multiple_KI_loglik(
+  pars1_list,
+  pars2,
+  brts_k_list,
+  missnumspec_list,
+  reltol = 1e-14,
+  abstol = 1e-16,
+  methode = "lsoda"
+)
 }
 \arguments{
 \item{pars1_list}{list of paramater sets one for each rate regime (subclade).
