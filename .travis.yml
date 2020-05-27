@@ -13,7 +13,6 @@ cache: packages
 
 r_packages:
   - deSolve
-  - doMC
   - knitr
 
 r_github_packages:

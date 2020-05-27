@@ -4,8 +4,15 @@
 \alias{optimizer}
 \title{Carries out optimization (finding a minimum)}
 \usage{
-optimizer(optimmethod = "simplex", optimpars = c(1e-04, 1e-04, 1e-06,
-  1000), num_cycles = 1, fun, trparsopt, ...)
+optimizer(
+  optimmethod = "simplex",
+  optimpars = c(1e-04, 1e-04, 1e-06, 1000),
+  num_cycles = 1,
+  fun,
+  trparsopt,
+  jitter = 0,
+  ...
+)
 }
 \arguments{
 \item{optimmethod}{The method to use for optimization, either 'simplex' or
@@ -22,6 +29,10 @@ equal to the starting values, with a maximum of 10 cycles.}
 \item{fun}{Function to be optimized}
 
 \item{trparsopt}{Initial guess of the parameters to be optimized}
+
+\item{jitter}{Perturbation of an initial parameter value when precisely equal to 0.5;
+this is only relevant when subplex is chosen. The default value is 0, so no jitter
+is applied. A recommended value when using it is 1E-5.}
 
 \item{...}{Any other arguments of the function to be optimimzed, or settings
 of the optimization routine}
