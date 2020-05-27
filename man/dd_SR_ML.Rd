@@ -5,16 +5,29 @@
 \title{Maximization of the loglikelihood under a diversity-dependent
 diversification model with a shift in the parameters}
 \usage{
-dd_SR_ML(brts, initparsopt = c(0.5, 0.1, 2 * (1 + length(brts) +
-  missnumspec), 2 * (1 + length(brts) + missnumspec), max(brts)/2),
-  parsfix = NULL, idparsopt = c(1:3, 6:7), idparsfix = NULL,
-  idparsnoshift = (1:7)[c(-idparsopt, (-1)^(length(idparsfix) != 0) *
-  idparsfix)], res = 10 * (1 + length(brts) + missnumspec),
-  ddmodel = 1, missnumspec = 0, cond = 1, btorph = 1, soc = 2,
-  allbp = FALSE, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000 *
-  round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", num_cycles = 1, methode = "analytical",
-  verbose = FALSE)
+dd_SR_ML(
+  brts,
+  initparsopt = c(0.5, 0.1, 2 * (1 + length(brts) + missnumspec), 2 * (1 + length(brts)
+    + missnumspec), max(brts)/2),
+  parsfix = NULL,
+  idparsopt = c(1:3, 6:7),
+  idparsfix = NULL,
+  idparsnoshift = (1:7)[c(-idparsopt, (-1)^(length(idparsfix) != 0) * idparsfix)],
+  res = 10 * (1 + length(brts) + missnumspec),
+  ddmodel = 1,
+  missnumspec = 0,
+  cond = 1,
+  btorph = 1,
+  soc = 2,
+  allbp = FALSE,
+  tol = c(0.001, 1e-04, 1e-06),
+  maxiter = 1000 * round((1.25)^length(idparsopt)),
+  changeloglikifnoconv = FALSE,
+  optimmethod = "subplex",
+  num_cycles = 1,
+  methode = "analytical",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
@@ -137,9 +150,9 @@ starting values to search for the global optimum.
 }
 \examples{
 
-cat("This will estimate parameters for a sets of branching times brts without conditioning.\\n")
-cat("The tolerance of the optimization is set ridiculously high to make runtime fast.\\n")
-cat("In real applications, use the default or more stringent settings for tol.\\n")
+cat("This will estimate parameters for a sets of branching times brts without conditioning.\n")
+cat("The tolerance of the optimization is set ridiculously high to make runtime fast.\n")
+cat("In real applications, use the default or more stringent settings for tol.\n")
 brts = 1:10
 dd_SR_ML(brts = brts, initparsopt = c(0.4581, 1E-6, 17.69, 11.09, 8.9999), idparsopt = c(1:3,6,7),
          idparsfix = NULL, parsfix = NULL, idparsnoshift = c(4,5), cond = 0,

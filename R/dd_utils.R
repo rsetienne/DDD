@@ -761,19 +761,6 @@ optimizer <- function(
                                                   fun = fun,
                                                   ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
-    } else
-    if(optimmethod == 'nloptr') # this does not work yet
-    {
-      minfun <- function(fun,trparsopt,...)
-      {           
-        return(-fun(trparsopt = trparsopt,...))
-      }
-      outnew <- suppressWarnings(nloptr::nloptr(x0 = trparsopt,
-                                                eval_f = minfun,
-                                                opts = list('algorithm' = optimmethod,"xtol_abs" = optimpars[3],"xtol_rel" = optimpars[1],"ftol_rel" = optimpars[2],"maxeval" = optimpars[4]),
-                                                fun = fun,
-                                                ...))
-      outnew <- list(par = outnew$solution, fvalues = -outnew$objective, conv = outnew$status)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {

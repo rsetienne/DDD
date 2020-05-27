@@ -23,4 +23,4 @@ Description:
  <DOI:10.1111/2041-210X.12565>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0

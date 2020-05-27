@@ -6,17 +6,30 @@
 diversification model with decoupling of a subclade's diversication dynamics
 from the main clade's dynamics}
 \usage{
-dd_MS_ML(brtsM, brtsS, tsplit, initparsopt = c(0.5, 0.1, 2 * (1 +
-  length(brtsM) + length(brtsS) + sum(missnumspec)), (tsplit +
-  max(brtsS))/2), parsfix = NULL, idparsopt = c(1:3, 6),
-  idparsfix = NULL, idparsnoshift = (1:6)[c(-idparsopt,
-  (-1)^(length(idparsfix) != 0) * idparsfix)], res = 10 * (1 +
-  length(c(brtsM, brtsS)) + sum(missnumspec)), ddmodel = 1.3,
-  missnumspec = 0, cond = 0, soc = 2, tol = c(0.001, 1e-04, 1e-06),
+dd_MS_ML(
+  brtsM,
+  brtsS,
+  tsplit,
+  initparsopt = c(0.5, 0.1, 2 * (1 + length(brtsM) + length(brtsS) + sum(missnumspec)),
+    (tsplit + max(brtsS))/2),
+  parsfix = NULL,
+  idparsopt = c(1:3, 6),
+  idparsfix = NULL,
+  idparsnoshift = (1:6)[c(-idparsopt, (-1)^(length(idparsfix) != 0) * idparsfix)],
+  res = 10 * (1 + length(c(brtsM, brtsS)) + sum(missnumspec)),
+  ddmodel = 1.3,
+  missnumspec = 0,
+  cond = 0,
+  soc = 2,
+  tol = c(0.001, 1e-04, 1e-06),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
-  changeloglikifnoconv = FALSE, optimmethod = "subplex",
-  num_cycles = 1, methode = "analytical", correction = FALSE,
-  verbose = FALSE)
+  changeloglikifnoconv = FALSE,
+  optimmethod = "subplex",
+  num_cycles = 1,
+  methode = "analytical",
+  correction = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{brtsM}{A set of branching times of the main clade in a phylogeny, all
@@ -144,10 +157,10 @@ starting values to search for the global optimum.
 }
 \examples{
 
-cat("This will estimate parameters for two sets of branching times brtsM, brtsS\\n")
-cat("without conditioning.\\n")
-cat("The tolerance of the optimization is set high so runtime is fast in this example.\\n")
-cat("In real applications, use the default or more stringent settins for tol.\\n")
+cat("This will estimate parameters for two sets of branching times brtsM, brtsS\n")
+cat("without conditioning.\n")
+cat("The tolerance of the optimization is set high so runtime is fast in this example.\n")
+cat("In real applications, use the default or more stringent settins for tol.\n")
 brtsM = 4:10
 brtsS = seq(0.1,3.5,0.7)
 tsplit = 5

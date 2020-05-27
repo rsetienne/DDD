@@ -5,14 +5,26 @@
 \title{Maximization of the loglikelihood under the diversity-independent, possibly
 time-dependent diversification model}
 \usage{
-bd_ML(brts, initparsopt = c(0.1, 0.05 * (tdmodel <= 1) + 10 *
-  (length(brts) + missnumspec) * (tdmodel > 1)), idparsopt = c(1, 2 +
-  (tdmodel > 1)), idparsfix = (1:4)[-idparsopt], parsfix = rep(0,
-  4)[idparsfix], missnumspec = 0, tdmodel = 0, cond = 1,
-  btorph = 1, soc = 2, tol = c(0.001, 1e-04, 1e-06), maxiter = 1000
-  * round((1.25)^length(idparsopt)), changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", num_cycles = 1, methode = "lsoda",
-  verbose = FALSE)
+bd_ML(
+  brts,
+  initparsopt = c(0.1, 0.05 * (tdmodel <= 1) + 10 * (length(brts) + missnumspec) *
+    (tdmodel > 1)),
+  idparsopt = c(1, 2 + (tdmodel > 1)),
+  idparsfix = (1:4)[-idparsopt],
+  parsfix = rep(0, 4)[idparsfix],
+  missnumspec = 0,
+  tdmodel = 0,
+  cond = 1,
+  btorph = 1,
+  soc = 2,
+  tol = c(0.001, 1e-04, 1e-06),
+  maxiter = 1000 * round((1.25)^length(idparsopt)),
+  changeloglikifnoconv = FALSE,
+  optimmethod = "subplex",
+  num_cycles = 1,
+  methode = "lsoda",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
