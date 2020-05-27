@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+src/*.mod
 src/*.o
 src/*.so
 src/*.dll
+src-i386
+src-x64

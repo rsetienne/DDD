@@ -1,13 +1,5 @@
-C_OBJS = R_init_DDD.o
-FT_OBJS = dd_loglik_rhs_FORTRAN.o
- 
-all : $(SHLIB)
- 
-$(SHLIB) : $(FT_OBJS) $(C_OBJS)
- 
-dd_dimmod.mod : dd_loglik_rhs_FORTRAN.o
-
-.PHONY : clean
+all : clean
 
 clean :
 	@rm -rf *.mod *.o
+

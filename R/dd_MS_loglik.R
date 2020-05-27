@@ -29,6 +29,89 @@
 # missnumspec = number of missing species in main clade M and subclade S
 # methode = the method used in the numerical solving of the set of the ode's
 
+
+
+#' Loglikelihood for macro-evolutionary succession under diversity-dependent
+#' diversification with the key innovation at time t = t_d
+#' 
+#' This function computes the loglikelihood of a diversity-dependent
+#' diversification model for a given set of branching times and parameter
+#' values where the diversity-dependent dynamics of an innovative subclade have
+#' different parameters from the dynamics of the main clade from time t_d, but
+#' both are governed by the same carrying capacity and experience each other's
+#' diversity.
+#' 
+#' 
+#' @param pars1 Vector of parameters: \cr \cr
+#' \code{pars1[1]} corresponds to lambda_M (speciation rate) of the main clade \cr
+#' \code{pars1[2]} corresponds to mu_M (extinction rate) of the main clade \cr
+#' \code{pars1[3]} corresponds to K_M (clade-level carrying capacity) of
+#' the main clade \cr
+#' \code{pars1[4]} corresponds to lambda_M (speciation rate) of the subclade \cr
+#' \code{pars1[5]} corresponds to mu_S (extinction rate) of the subclade \cr
+#' \code{pars1[6]} corresponds to t_d (the time of the key innovation)
+#' @param pars2 Vector of model settings: \cr \cr
+#' \code{pars2[1]} sets the
+#' maximum number of species for which a probability must be computed. This
+#' must be larger than 1 + missnumspec + length(brts). \cr \cr
+#' \code{pars2[2]} sets the model of diversity-dependence: \cr
+#' - \code{pars2[2] == 1} linear dependence in speciation rate with parameter K
+#' (= diversity where speciation = extinction)\cr
+#' - \code{pars2[2] == 1.3} linear dependence in speciation rate with parameter
+#' K' (= diversity where speciation = 0)\cr
+#' - \code{pars2[2] == 2} exponential dependence in speciation rate with
+#' parameter K (= diversity where speciation = extinction)\cr
+#' - \code{pars2[2] == 2.1} variant of exponential dependence in speciation rate with offset at
+#' infinity\cr
+#'  - \code{pars2[2] == 2.2} 1/n dependence in speciation rate\cr
+#'  - \code{pars2[2] == 2.3} exponential dependence in speciation rate with
+#' parameter x (= exponent)\cr
+#' - \code{pars2[2] == 3} linear dependence in extinction rate \cr
+#' - \code{pars2[2] == 4} exponential dependence in extinction rate \cr
+#' - \code{pars2[2] == 4.1} variant of exponential dependence in extinction rate
+#' with offset at infinity\cr
+#' - \code{pars2[2] == 4.2} 1/n dependence in extinction rate\cr\cr
+#' \code{pars2[3]} sets the conditioning: \cr
+#' - \code{pars2[3] == 0} no conditioning \cr
+#' - \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr \cr
+#' \code{pars2[4]} sets the time of splitting of the branch that will undergo
+#' the key innovation leading to different parameters \cr \cr
+#' \code{pars2[5]} sets whether the parameters and likelihood should be shown on
+#' screen (1) or not (0) \cr \cr
+#' \code{pars2[6]} sets whether the first data point is stem age (1) or crown
+#' age (2)
+#' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0)
+#' or whether new corrected version should be used (1)
+#' @param brtsM A set of branching times of the main clade in the phylogeny,
+#' all positive
+#' @param brtsS A set of branching times of the subclade in the phylogeny, all
+#' positive
+#' @param missnumspec The number of species that are in the clade but missing
+#' in the phylogeny. One can specify the sum of the missing species in main
+#' clade and subclade or a vector c(missnumspec_M,missnumspec_S) with missing
+#' species in main clade and subclade respectively.
+#' @param methode The method used to solve the master equation, default is
+#' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
+#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' package before version 3.1.
+#' @return The loglikelihood
+#' @author Rampal S. Etienne & Bart Haegeman
+#' @seealso \code{\link{dd_MS_ML}}, \code{\link{dd_loglik}},
+#' \code{\link{dd_KI_loglik}}, \code{\link{dd_SR_loglik}}
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' pars1 = c(0.2,0.1,40,1.0,0.1,9.8)
+#' pars2 = c(200,1,0,18.8,1,2)
+#' missnumspec = 0
+#' brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
+#' brtsS = c(9.6,8.6,7.4,4.9,2.5)
+#' dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'ode45')
+#' 
+#' @export dd_MS_loglik
 dd_MS_loglik = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
 {
    if(methode == 'analytical')
@@ -52,6 +135,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] = 0
 }
+verbose <- pars2[5]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -164,7 +248,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                } 
                if(ddep == 2.3)
                { 
-                   x = K
+                   x = -K
                    lavec = pmax(matrix(0,lx + 2,lx + 2),(nxt2 + n0)^x)
                    muvec = matrix(1,lx + 2,lx + 2)                   
                }    
@@ -179,41 +263,44 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               y = ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               y = deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                probs = y[2,2:(lx2 + 1)]
                dim(probs) = c(lx,lx)
                
                #k1 = i + (soc - 2)
-               #y = lsoda(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol)
+               #y = desolve::ode(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, methode = 'lsoda')
                #probs2 = y[2,2:(lx+1)]              
                
-               if(t2 < 0 & t2 != tinn1)
+               if(t2 < 0)
                {
                   if(t2 != tinn1)
                   {  
                     if(brts[2,i] == 1)
                     { 
                       lavec = laMvec
-                    }
+                    } else
                     if(brts[2,i] == 2)
                     { 
                       lavec = laSvec
                     }
                     probs = lavec[2:(lx+1),2:(lx+1)] * probs # speciation event
                   } else {
-                    if(pars2[7] == TRUE) { probs = kM/(nxt + kM) * probs }
+                    if(pars2[7] == 1)
+                    {
+                      probs = 1/(nxt + kM) * probs
+                    } else
+                    if(pars2[7] == 1.5)
+                    {
+                      probs = kM/(nxt + kM) * probs
+                    } else
+                    if(pars2[7] == 2)
+                    {
+                      probs = nxt/(nxt + kM) * probs
+                    }
                   }
-                  sumprobs = sum(probs)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                  }
-                  probs = probs/sumprobs
-                  
-                  #probs2 = flavec(ddep,laM,muM,K,0,lx,k1,n0) * probs2 # speciation event
+                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+                 
+                  #probs2 = flavec(ddep,laM,muM,K,0,lx,k1) * probs2 # speciation event
                   #loglik2 = loglik2 + log(sum(probs2))
                   #probs2 = probs2/sum(probs2)   
                }
@@ -257,12 +344,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))
@@ -285,6 +372,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] == 0
 }
+verbose <- pars2[1]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -392,7 +480,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                } 
                if(ddep == 2.3)
                { 
-                   x = K
+                   x = -K
                    lavec = pmax(matrix(0,lx + 2,lx + 2),(nxt2 + n0)^x)
                    muvec = matrix(1,lx + 2,lx + 2)                   
                }    
@@ -407,7 +495,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                #mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                #mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                #mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               #y = ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+               #y = deSolve::ode(probs2,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
                #probs2 = y[2,2:(lx2 + 1)]
                #print(as.numeric(probs2[1:10]))
                probs = dd_loglik_M3(pars1,lx,ddep,tt = abs(t2 - t1),p = probs,kM,kS)
@@ -434,21 +522,8 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                   dim(probs) = c(lx2,1)
                   #print(as.numeric(probs2[1:10]))  
                   #print(as.numeric(probs[seq(1,10*lx,by = lx)]))            
-                  sumprobs = sum(probs)
-                  #sumprobs2 = sum(probs2)
-                  if(sumprobs <= 0)
-                  { 
-                     loglik = -Inf
-                     break
-                  } else {
-                     loglik = loglik + log(sumprobs)
-                     #loglik = loglik + log(sumprobs2)
-                  }
-                  probs = probs/sumprobs   
-                  #probs2 = probs2/sumprobs2
-                  #print(as.numeric(probs2[1:10]))  
-                  #print(as.numeric(probs[seq(1,10*lx,by = lx)]))   
                }
+               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                kM = kM + (brts[2,i] == 1) - (brts[2,i] == 3)
                kS = kS + (brts[2,i] >= 2)
             }    
@@ -490,12 +565,12 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(pars2[5] == 1)
+if(verbose)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
-    flush.console()
+    utils::flush.console()
 }
 loglik = as.numeric(loglik)
 if(is.nan(loglik) | is.na(loglik))

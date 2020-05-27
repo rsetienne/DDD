@@ -12,8 +12,7 @@ lambdamu = function(n,pars,ddep)
     n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1)
     {
-       Kprime = la / (la - mu) * K
-       lavec = pmax(zeros,la * (1 - n/Kprime))
+       lavec = pmax(zeros,la - (la - mu) * n / K)
     } else if(ddep == 1.3)
     {
        lavec = pmax(zeros,la * (1 - n/K))
@@ -23,7 +22,7 @@ lambdamu = function(n,pars,ddep)
        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 2.3)
     {
-       y = K
+       y = -K
        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 3)
     {
@@ -110,17 +109,13 @@ dd_loglik_M_bw = function(pars,lx,k,ddep,tt,p)
     return(p)
 }
 
-lambdamu2 = function(n,pars,ddep)
+lambdamu2 = function(nxt,pars,ddep)
 {
-    lnn = length(n)
+    lnn <- length(nxt[1,])
     laM = pars[1]
     muM = pars[2]
     KM = pars[3]
     n0 = (ddep == 2 | ddep == 4)
-    nx1 = rep(0:(lnn - 1),lnn)
-    dim(nx1) = c(lnn,lnn) # row index = number of species in first group 
-    nx2 = t(nx1) # column index = number of species in second group
-    nxt = nx1 + nx2
     if(ddep == 1) 
     { 
         lavec = pmax(matrix(0,lnn,lnn),laM - (laM-muM)/KM * nxt)
@@ -136,7 +131,7 @@ lambdamu2 = function(n,pars,ddep)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 2.3)
     { 
-        x = KM
+        x = -KM
         lavec = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 3)
@@ -154,8 +149,12 @@ lambdamu2 = function(n,pars,ddep)
 
 dd_loglik_M2_aux = function(pars,lx,ddep)
 {
-    nvec = 0:(lx - 1);
-    lambdamu_n = lambdamu2(nvec,pars,ddep)
+    n = 0:(lx - 1);
+    nx1 = rep(n,lx)
+    dim(nx1) = c(lx,lx) # row index = number of species in first group 
+    nx2 = t(nx1) # column index = number of species in second group
+    nxt = nx1 + nx2
+    lambdamu_n = lambdamu2(nxt,pars,ddep)
     lambda_n = lambdamu_n[[1]]
     mu_n = lambdamu_n[[2]];
     ly = lx^2
@@ -206,7 +205,7 @@ lambdamu3 = function(n,pars,ddep,kM,kS)
         lavecS = pmax(matrix(0,lnn,lnn),laS * (1 - nxt/K))
     } else if(ddep == 2.3)
     { 
-        x = K
+        x = -K
         lavecM = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         lavecS = pmax(matrix(0,lnn,lnn),laS * (nxt + n0)^x)
     }     

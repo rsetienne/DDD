@@ -26,6 +26,60 @@ dd_MS_lamuN = function(ddmodel,pars,N)
     return(c(laMN,muMN,laSN,muSN))
 }
 
+
+
+#' Function to simulate the macro-evolutionary succession process assuming
+#' diversity-dependent diversification
+#' 
+#' Simulating a diversity-dependent diversification process where at a given
+#' time a new clade emerges with different inherent speciation rate and
+#' extinction rate
+#' 
+#' 
+#' @param pars Vector of parameters: \cr \cr \code{pars[1]} corresponds to
+#' lambda_M (speciation rate of the main clade) \cr \code{pars[2]} corresponds
+#' to mu_M (extinction rate of the main clade) \cr \code{pars[3]} corresponds
+#' to K' (maximum number of species or a proxy for it in case of exponential
+#' decline in speciation rate) \code{pars[4]} corresponds to lambda_S
+#' (speciation rate of the novel subclade) \cr \code{pars[5]} corresponds to
+#' mu_S (extinction rate) \cr \code{pars[6]} tinn, the time the shift in rates
+#' occurs in the lineage leading to the subclade
+#' @param age Sets the crown age for the simulation
+#' @param ddmodel Sets the model of diversity-dependence: \cr \code{ddmodel ==
+#' 1.3} : linear dependence in speciation rate with parameter K' (= diversity
+#' where speciation = 0); ddmodel = 1 will be interpreted as this model \cr
+#' \code{ddmodel == 2.1} : variant of exponential dependence in speciation rate
+#' with offset at infinity; ddmodel = 2 will be interpreted as this model \cr
+#' \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr \code{ddmodel
+#' == 2.3} : exponential dependence in speciation rate with parameter x (=
+#' exponent)
+#' @return \item{ out }{ A list with the following elements: The first element
+#' is the tree of extant species in phylo format \cr The second element is the
+#' tree of all species, including extinct species, in phylo format \cr The
+#' third element is a matrix of all species where \cr - the first column is the
+#' time at which a species is born \cr - the second column is the label of the
+#' parent of the species; positive and negative values only indicate whether
+#' the species belongs to the left or right crown lineage \cr - the third
+#' column is the label of the daughter species itself; positive and negative
+#' values only indicate whether the species belongs to the left or right crown
+#' lineage \cr - the fourth column is the time of extinction of the species \cr
+#' If the fourth element equals -1, then the species is still extant.\cr - the
+#' fifth column indicates whether the species belong to the main clade (0) or
+#' the subclade (1)\cr The fourth element is the subclade tree of extant
+#' species (without stem) \cr The fifth element is the subclade tree of all
+#' species (without stem) \cr The sixth element is the same as the first,
+#' except that it has attributed 0 for the main clade and 1 for the subclade\cr
+#' The seventh element is the same as the Second, except that it has attributed
+#' 0 for the main clade and 1 for the subclade\cr The sixth and seventh element
+#' will be NULL if the subclade does not exist (because it went extinct).  }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#'  dd_MS_sim(c(0.2,0.1,20,0.1,0.05,4),10) 
+#' @export dd_MS_sim
 dd_MS_sim = function(pars,age,ddmodel = 1.3)
 {
 # Simulation of diversity-dependent process
@@ -94,7 +148,7 @@ while(done == 0)
     laSN = ff[3]
     muSN = ff[4]
     denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-    t[i + 1] = t[i] - log(runif(1)) / denom
+    t[i + 1] = t[i] + stats::rexp(1,denom)
     if(t[i + 1] > tinn & t[i] < tinn)
     {
          NM[i] = NM[i] - 1
@@ -108,7 +162,7 @@ while(done == 0)
          laSN = ff[3]
          muSN = ff[4]
          denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-         t[i + 1] = tinn - log(runif(1)) / denom
+         t[i + 1] = tinn + stats::rexp(1,denom)
     }
     while(t[i + 1] <= age)
     {
@@ -163,7 +217,7 @@ while(done == 0)
             laSN = ff[3]
             muSN = ff[4]
             denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-            t[i + 1] = t[i] - log(runif(1)) / denom
+            t[i + 1] = t[i] + stats::rexp(1,denom)
             if(t[i + 1] > tinn & t[i] < tinn)
             {
                NM[i] = NM[i] - 1
@@ -177,7 +231,7 @@ while(done == 0)
                laSN = ff[3]
                muSN = ff[4]
                denom = (laMN + muMN) * NM[i] + (laSN + muSN) * NS[i]
-               t[i + 1] = tinn - log(runif(1)) / denom
+               t[i + 1] = tinn + stats::rexp(1,denom)
             }
         }
     }
@@ -197,9 +251,9 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
-par(mfrow = c(2,1))
-plot(tes)
-plot(tas)
+graphics::par(mfrow = c(2,1))
+graphics::plot(tes)
+graphics::plot(tas)
 cols = c("blue","red")
 names(cols) = c(0,1)
 if(length(linlistS) > 0)
@@ -212,14 +266,14 @@ if(length(linlistS) > 0)
    }
    else if(length(linlistS) > 1)
    {
-      m = getMRCA(phy = tes,tip = namesS)
-      tesS = extract.clade(phy = tes,node = m)
-      b2 = age - node.depth.edgelength(tes)[m]
+      m = ape::getMRCA(phy = tes,tip = namesS)
+      tesS = ape::extract.clade(phy = tes,node = m)
+      b2 = age - ape::node.depth.edgelength(tes)[m]
    }  
    m0 = tes$edge[which(tes$edge[,2] == m),1]
-   b1 = age - node.depth.edgelength(tes)[m0]
-   tes2 = paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[6] - b2)/(b1 - b2))
-   plotSimmap(tes2,cols,lwd = 3,pts = F)
+   b1 = age - ape::node.depth.edgelength(tes)[m0]
+   tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[6] - b2)/(b1 - b2))
+   phytools::plotSimmap(tes2,cols,lwd = 3,pts = F)
 }
 tasS = NULL
 tas2 = NULL
@@ -234,14 +288,14 @@ if(length(allS) > 0)
    }
    else if(length(allS) > 1)
    {
-      m = getMRCA(phy = tas,tip = namesS)
-      tasS = extract.clade(phy = tas,node = m)
-      b2 = age - node.depth.edgelength(tas)[m]
+      m = ape::getMRCA(phy = tas,tip = namesS)
+      tasS = ape::extract.clade(phy = tas,node = m)
+      b2 = age - ape::node.depth.edgelength(tas)[m]
    }
    m0 = tas$edge[which(tas$edge[,2] == m),1]
-   b1 = age - node.depth.edgelength(tas)[m0]
-   tas2 = paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[6] - b2)/(b1 - b2))
-   plotSimmap(tas2,cols,lwd = 3,pts = F)   
+   b1 = age - ape::node.depth.edgelength(tas)[m0]
+   tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[6] - b2)/(b1 - b2))
+   phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)   
 }
 out = list(tes = tes,tas = tas,L = L,tesS = tesS,tasS = tasS,tes2 = tes2,tas2 = tas2)
 return(out)
