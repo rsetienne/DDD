@@ -3,9 +3,7 @@
 os: linux
 language: r
 dist: bionic
-language: R
-
-matrix:
+jobs:
   include:
   - r: release
     os: linux
