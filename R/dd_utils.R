@@ -885,3 +885,395 @@ rng_respecting_sample <- function(x, size, replace, prob) {
   non_zero_x <- x[which_non_zero]
   return(sample(x = non_zero_x, size = size, replace = replace, prob = non_zero_prob))
 }
+
+#' @name L2Phi
+#' @title Converting a table with speciation and extinction events to a phylogenetic
+#' diversity metric
+#' @description Function to convert a table with speciation and extinction events to a
+#' phylogenetic diversity metric
+#' @param L Matrix of events as produced by pdd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param t Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @param metric specifies which phylogenetic diversity metric should be used
+#' @return a value of one of the phylogenetic diversity metrices
+#' @author Tianjian Qin
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @export L2Phi
+L2Phi <- function(L, t, metric) {
+  # reverse time scale
+  L[, 1] <- t - c(L[, 1])
+  notmin1 <- which(L[, 4] != -1)
+  L[notmin1, 4] <- t - c(L[notmin1, 4])
+  L[which(L[, 4] == t + 1), 4] <- -1
+  
+  # metrics
+  if (metric == "pd") {
+    return(sum(DDD::L2phylo(L, dropextinct = T)$edge.length))
+  } else if (metric == "mpd") {
+    phy <- DDD::L2phylo(L, dropextinct = T)
+    n <- length(phy$tip.label)
+    dist <- dist.nodes(phy)[1:n, 1:n]
+    return(mean(dist[lower.tri(dist)]))
+  }
+}
+
+#' @name L2ED
+#' @title Converting a table with speciation and extinction events to evolutionary 
+#' distances
+#' @description Function to convert a table with speciation and extinction events to 
+#' mean evolutionary distances between each species and the rest of the community
+#' @param L Matrix of events as produced by pdd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @return a named vector of evolutionary distances
+#' @author Tianjian Qin
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @export L2ED
+L2ED <- function(L, t) {
+  require(gtools)
+  require(ape)
+
+  # reverse time scale
+  L[, 1] <- t - c(L[, 1])
+  notmin1 <- which(L[, 4] != -1)
+  L[notmin1, 4] <- t - c(L[notmin1, 4])
+  L[which(L[, 4] == t + 1), 4] <- -1
+  
+  dist.tips <- cophenetic.phylo(L2phylo(L, dropextinct = T))
+  diag(dist.tips) <- NA
+  dist.means <- rowMeans(dist.tips, na.rm = T)
+  dist.means.sorted <- dist.means[mixedorder(names(dist.means))]
+  return(range01(dist.means.sorted))
+}
+
+#' @name range01
+#' @title standardizing data to the range from 0 to 1
+#' @description Function to standardize data to the range from 0 to 1 while retaining 
+#' the relative size
+#' @param x Data to be standardized
+#' @author Tianjian Qin
+#' @keywords standardize
+#' @export range01
+range01 <- function(x) {
+  if (max(x) < 0) {
+    stop("ED < 0")
+  } else if (max(x) == 0) {
+    sapply(x, function(x) {
+      1
+    })
+  } else{
+    maxval <- max(x)
+    sapply(x, function(x) {
+      x / maxval
+    })
+  }
+}
+
+#' @name phylo2mpd
+#' @title Converting a phylogenetic tree of phylo object to mean pairwise distance
+#' among all tips
+#' @description Function to convert a phylogenetic tree with extant species to mean pairwise
+#' distance
+#' @param phy a phylo object that only contains extant species
+#' extinct at the present
+#' @return a numeric value of mean pairwise distance
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export phylo2mpd
+phylo2mpd <- function(phy) {
+  n <- length(phy$tip.label)
+  dist <- dist.nodes(phy)[1:n, 1:n]
+  return(mean(dist[lower.tri(dist)]))
+}
+
+#' @name phylo2pd
+#' @title Converting a phylogenetic tree of phylo object to total lengths of all
+#' branches in the tree
+#' @description Function to convert a phylogenetic tree with extant species to
+#' phylogenetic diversity
+#' @param phy
+#' @param a phylo object that only contains extant species
+#' extinct at the present
+#' @return a numeric value of phylogenetic diversity
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export phylo2pd
+phylo2pd <- function(phy) {
+  return(sum(phy$edge.length))
+}
+
+#' @name extract_pdd_result
+#' @title Extracting all results generated in simulation
+#' @description Function to extract all results generated in pdd simulation
+#' @param result a list generated by pdd simulation function
+#' @param nrep the number of replication used in the simulation
+#' @return a list of extracted results
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export extract_pdd_result
+extract_pdd_result <- function(result, nrep, which, nlist = 5) {
+  out <-
+    return(result[seq(which, nlist * nrep, by = nlist)])
+}
+
+#' @name bind_result
+#' @title Binding extracted results in simulation
+#' @description Function to bind all results extracted from pdd simulation
+#' @param result a list generated by pdd simulation function
+#' @return a binded list of extracted results
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export bind_result
+bind_result <- function(result) {
+  out <- lapply(result, as.data.frame)
+  n <- length(out)
+  
+  for (i in 1:n) {
+    out[[i]]["rep"] <- rep(i, times = nrow(out[[i]]))
+  }
+  
+  return(dplyr::bind_rows(out))
+}
+
+#' @name pdd_simulation_replicated
+#' @title Running a replicated pdd simulation
+#' @description Function to automatically run a replicated pdd simulation
+#' @param rep the number of replication
+#' @param pars parameters used in a pdd simulation
+#' @param age the total running time of a pdd simulation
+#' @param model the type of model used in a pdd simulation
+#' @param metric the metric used in a pdd simulation
+#' @param offset the offset method for Phi used in a pdd simulation
+#' @return a list of simulation results
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export pdd_simulation_replicated
+pdd_simulation_replicated <-
+  function(rep, pars, age, model, metric, offset) {
+    require(tidyverse)
+    results <- replicate(rep, {
+      pdd_sim(pars,
+              age,
+              model,
+              metric,
+              offset)
+    })
+    result_pars <- extract_pdd_result(results, 10, 5)
+    result_pars_binded <- bind_result(result_pars)
+    
+    return(list(result_pars = result_pars, result_pars_binded = result_pars_binded))
+  }
+
+#' @name pdd_simulation_plot
+#' @title Plotting results of a replicated pdd simulation
+#' @description Function to automatically produce several plots from the results
+#' of a replicated pdd simulation
+#' @param result a list of extracted results
+#' @param pars the parameters used in simulation being plotted
+#' @param age the total simulation time
+#' @param model the model used in the simulation
+#' @return a plot grid generated by cow_plot
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export pdd_simulation_plot
+pdd_simulation_plot <- function(result, pars, age, model, offset) {
+  require(tidyverse)
+  require(cowplot)
+  
+  plotN <-
+    ggplot(result[[2]], aes(time, N, group = rep, color = rep)) + geom_line() +
+    theme(legend.position = "none") + xlab("age")
+  
+  if (model == "dsce1" | model == "dsde1") {
+    plotPhi <-
+      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
+      theme(legend.position = "none") + xlab("age") + geom_hline(yintercept = pars[3])
+    title <-
+      ggdraw() + draw_label(
+        paste(
+          model,
+          ", ",
+          "lambda = ",
+          pars[1],
+          ", ",
+          "mu = ",
+          pars[2],
+          ", ",
+          "K = ",
+          pars[3],
+          ", ",
+          "age = ",
+          age,
+          ", ",
+          "offset = ",
+          offset
+        ),
+        fontface = 'bold'
+      )
+  } else if (model == "dsde2") {
+    plotPhi <-
+      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
+      theme(legend.position = "none") + xlab("age")
+    title <-
+      ggdraw() + draw_label(
+        paste(
+          model,
+          ", ",
+          "lambda = ",
+          pars[1],
+          ", ",
+          "mu = ",
+          pars[2],
+          ", ",
+          "betaN = ",
+          pars[3],
+          ", ",
+          "betaPhi = ",
+          pars[4],
+          ", ",
+          "gammaN = ",
+          pars[5],
+          ", ",
+          "gammaPhi = ",
+          pars[6],
+          ", ",
+          "age = ",
+          age,
+          ", ",
+          "offset = ",
+          offset
+        ),
+        fontface = 'bold'
+      )
+  } else if (model == "dsce2"){
+    plotPhi <-
+      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
+      theme(legend.position = "none") + xlab("age")
+    title <-
+      ggdraw() + draw_label(
+        paste(
+          model,
+          ", ",
+          "lambda = ",
+          pars[1],
+          ", ",
+          "mu = ",
+          pars[2],
+          ", ",
+          "betaN = ",
+          pars[3],
+          ", ",
+          "betaPhi = ",
+          pars[4],
+          ", ",
+          "age = ",
+          age,
+          ", ",
+          "offset = ",
+          offset
+        ),
+        fontface = 'bold'
+      )
+  }
+  
+  plotla <-
+    ggplot(result[[2]], aes(time, lambda, group = rep, color = rep)) + geom_line() +
+    theme(legend.position = "none") + xlab("age")
+  plotmu <-
+    ggplot(result[[2]], aes(time, mu, group = rep, color = rep)) + geom_line() +
+    theme(legend.position = "none") + xlab("age")
+  plotall <- cowplot::plot_grid(plotN, plotPhi, plotla, plotmu)
+  
+  plotwithtitle <-
+    plot_grid(title,
+              plotall,
+              ncol = 1,
+              rel_heights = c(0.1, 1))
+  
+  return(plotwithtitle)
+}
+
+#' @name pdd_simulation_wrapper
+#' @title Conducting a simulation and plotting the results
+#' @description Function to automatically run a replicated pdd simulation and then
+#' produce several plots from the results
+#' @param rep the number of replication
+#' @param pars parameters used in a pdd simulation
+#' @param age the total running time of a pdd simulation
+#' @param model the type of model used in a pdd simulation
+#' @param metric the metric used in a pdd simulation
+#' @param offset the offset method for Phi used in a pdd simulation
+#' @author Tianjian Qin
+#' @keywords phylogenetics
+#' @export pdd_simulation_wrapper
+pdd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
+  result <-
+    pdd_simulation_replicated(
+      rep = rep,
+      pars = pars,
+      age = age,
+      model = model,
+      metric = metric,
+      offset = offset
+    )
+  
+  if (model == "dsce1" | model == "dsde1") {
+    if (is.null(pars[3])) {
+      stop("missing K")
+    }
+  }
+  pdd_simulation_plot(result, pars, age, model, offset)
+}
+
+edd_simulation_replicated <-
+  function(rep, pars, age, model, metric, offset) {
+    require(tidyverse)
+    results <- replicate(rep, {
+      edd_sim(pars,
+              age,
+              model,
+              metric,
+              offset)
+    })
+    result_pars <- extract_pdd_result(results, 10, 5)
+    result_pars_binded <- bind_result(result_pars)
+    
+    return(list(result_pars = result_pars, result_pars_binded = result_pars_binded))
+  }
+
+edd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
+  result <-
+    edd_simulation_replicated(
+      rep = rep,
+      pars = pars,
+      age = age,
+      model = model,
+      metric = metric,
+      offset = offset
+    )
+  
+  if (model == "dsce1" | model == "dsde1") {
+    if (is.null(pars[3])) {
+      stop("missing K")
+    }
+  }
+  pdd_simulation_plot(result, pars, age, model, offset)
+}
