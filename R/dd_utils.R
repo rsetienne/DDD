@@ -917,6 +917,8 @@ L2Phi <- function(L, t, metric) {
   L[which(L[, 4] == t + 1), 4] <- -1
   
   # metrics
+  require(ape)
+  
   if (metric == "pd") {
     return(sum(DDD::L2phylo(L, dropextinct = T)$edge.length))
   } else if (metric == "mpd") {
