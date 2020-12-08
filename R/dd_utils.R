@@ -1212,7 +1212,7 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
 }
 
 #' @name pdd_simulation_wrapper
-#' @title Conducting a simulation and plotting the results
+#' @title Conducting a pdd simulation and plotting the results
 #' @description Function to automatically run a replicated pdd simulation and then
 #' produce several plots from the results
 #' @param rep the number of replication
@@ -1243,6 +1243,19 @@ pdd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
   pdd_simulation_plot(result, pars, age, model, offset)
 }
 
+#' @name edd_simulation_replicated
+#' @title Running a replicated edd simulation
+#' @description Function to automatically run a replicated edd simulation
+#' @param rep the number of replication
+#' @param pars parameters used in a edd simulation
+#' @param age the total running time of a edd simulation
+#' @param model the type of model used in a edd simulation
+#' @param metric the metric used in a edd simulation
+#' @param offset the offset method for Phi used in a edd simulation
+#' @return a list of simulation results
+#' @author Tianjian Qin
+#' @keywords phylogenetics evolutionary distinctiveness
+#' @export pdd_simulation_replicated
 edd_simulation_replicated <-
   function(rep, pars, age, model, metric, offset) {
     require(tidyverse)
@@ -1259,6 +1272,19 @@ edd_simulation_replicated <-
     return(list(result_pars = result_pars, result_pars_binded = result_pars_binded))
   }
 
+#' @name edd_simulation_wrapper
+#' @title Conducting a edd simulation and plotting the results
+#' @description Function to automatically run a replicated edd simulation and then
+#' produce several plots from the results
+#' @param rep the number of replication
+#' @param pars parameters used in a edd simulation
+#' @param age the total running time of a edd simulation
+#' @param model the type of model used in a edd simulation
+#' @param metric the metric used in a edd simulation
+#' @param offset the offset method for Phi used in a edd simulation
+#' @author Tianjian Qin
+#' @keywords phylogenetics evolutionary distinctiveness
+#' @export edd_simulation_wrapper
 edd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
   result <-
     edd_simulation_replicated(
