@@ -55,7 +55,6 @@ edd_sample_event <- function(lamu, ED, i) {
     rspec <- lamu[i , 1] * ED
     rfake_spec <- 0
   }
-  # extinction should be a reversed process compared to speciation
   if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
     rext <- lamu[i, 2] / ED
     rfake_ext <- (lamu[i - 1, 2] - lamu[i, 2]) / ED
