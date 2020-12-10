@@ -917,14 +917,12 @@ L2Phi <- function(L, t, metric) {
   L[which(L[, 4] == t + 1), 4] <- -1
   
   # metrics
-  require(ape)
-  
   if (metric == "pd") {
-    return(sum(DDD::L2phylo(L, dropextinct = T)$edge.length))
+    return(sum(L2phylo(L, dropextinct = T)$edge.length))
   } else if (metric == "mpd") {
-    phy <- DDD::L2phylo(L, dropextinct = T)
+    phy <- L2phylo(L, dropextinct = T)
     n <- length(phy$tip.label)
-    dist <- dist.nodes(phy)[1:n, 1:n]
+    dist <- ape::dist.nodes(phy)[1:n, 1:n]
     return(mean(dist[lower.tri(dist)]))
   }
 }
@@ -950,19 +948,17 @@ L2Phi <- function(L, t, metric) {
 #' @keywords models
 #' @export L2ED
 L2ED <- function(L, t) {
-  require(gtools)
-  require(ape)
-
-  # reverse time scale
+# reverse time scale
   L[, 1] <- t - c(L[, 1])
   notmin1 <- which(L[, 4] != -1)
   L[notmin1, 4] <- t - c(L[notmin1, 4])
   L[which(L[, 4] == t + 1), 4] <- -1
   
-  dist.tips <- cophenetic.phylo(L2phylo(L, dropextinct = T))
+  dist.tips <- ape::cophenetic.phylo(L2phylo(L, dropextinct = T))
   diag(dist.tips) <- NA
   dist.means <- rowMeans(dist.tips, na.rm = T)
-  dist.means.sorted <- dist.means[mixedorder(names(dist.means))]
+  dist.means.sorted <- dist.means[gtools::mixedorder(names(dist.means))]
+  
   return(range01(dist.means.sorted))
 }
 
@@ -1002,7 +998,7 @@ range01 <- function(x) {
 #' @export phylo2mpd
 phylo2mpd <- function(phy) {
   n <- length(phy$tip.label)
-  dist <- dist.nodes(phy)[1:n, 1:n]
+  dist <- ape::dist.nodes(phy)[1:n, 1:n]
   return(mean(dist[lower.tri(dist)]))
 }
 
@@ -1070,7 +1066,6 @@ bind_result <- function(result) {
 #' @export pdd_simulation_replicated
 pdd_simulation_replicated <-
   function(rep, pars, age, model, metric, offset) {
-    require(tidyverse)
     results <- replicate(rep, {
       pdd_sim(pars,
               age,
@@ -1097,19 +1092,16 @@ pdd_simulation_replicated <-
 #' @keywords phylogenetics
 #' @export pdd_simulation_plot
 pdd_simulation_plot <- function(result, pars, age, model, offset) {
-  require(tidyverse)
-  require(cowplot)
-  
   plotN <-
-    ggplot(result[[2]], aes(time, N, group = rep, color = rep)) + geom_line() +
-    theme(legend.position = "none") + xlab("age")
+    ggplot2::ggplot(result[[2]], aes(time, N, group = rep, color = rep)) + ggplot2::geom_line() +
+    ggplot2::theme(legend.position = "none") + xlab("age")
   
   if (model == "dsce1" | model == "dsde1") {
     plotPhi <-
-      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
-      theme(legend.position = "none") + xlab("age") + geom_hline(yintercept = pars[3])
+      ggplot2::ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + ggplot2::geom_line() +
+      ggplot2::theme(legend.position = "none") + xlab("age") + ggplot2::geom_hline(yintercept = pars[3])
     title <-
-      ggdraw() + draw_label(
+      ggplot2::ggdraw() + ggplot2::draw_label(
         paste(
           model,
           ", ",
@@ -1132,10 +1124,10 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
       )
   } else if (model == "dsde2") {
     plotPhi <-
-      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
-      theme(legend.position = "none") + xlab("age")
+      ggplot2::ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + ggplot2::geom_line() +
+      ggplot2::theme(legend.position = "none") + xlab("age")
     title <-
-      ggdraw() + draw_label(
+      ggplot2::ggdraw() + ggplot2::draw_label(
         paste(
           model,
           ", ",
@@ -1165,12 +1157,12 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
         ),
         fontface = 'bold'
       )
-  } else if (model == "dsce2"){
+  } else if (model == "dsce2") {
     plotPhi <-
-      ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + geom_line() +
-      theme(legend.position = "none") + xlab("age")
+      ggplot2::ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + ggplot2::geom_line() +
+      ggplot2::theme(legend.position = "none") + xlab("age")
     title <-
-      ggdraw() + draw_label(
+      ggplot2::ggdraw() + ggplot2::draw_label(
         paste(
           model,
           ", ",
@@ -1197,18 +1189,18 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
   }
   
   plotla <-
-    ggplot(result[[2]], aes(time, lambda, group = rep, color = rep)) + geom_line() +
-    theme(legend.position = "none") + xlab("age")
+    ggplot2::ggplot(result[[2]], aes(time, lambda, group = rep, color = rep)) + ggplot2::geom_line() +
+    ggplot2::theme(legend.position = "none") + xlab("age")
   plotmu <-
-    ggplot(result[[2]], aes(time, mu, group = rep, color = rep)) + geom_line() +
-    theme(legend.position = "none") + xlab("age")
+    ggplot2::ggplot(result[[2]], aes(time, mu, group = rep, color = rep)) + ggplot2::geom_line() +
+    ggplot2::theme(legend.position = "none") + xlab("age")
   plotall <- cowplot::plot_grid(plotN, plotPhi, plotla, plotmu)
   
   plotwithtitle <-
-    plot_grid(title,
-              plotall,
-              ncol = 1,
-              rel_heights = c(0.1, 1))
+    cowplot::plot_grid(title,
+                       plotall,
+                       ncol = 1,
+                       rel_heights = c(0.1, 1))
   
   return(plotwithtitle)
 }
@@ -1260,7 +1252,6 @@ pdd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
 #' @export pdd_simulation_replicated
 edd_simulation_replicated <-
   function(rep, pars, age, model, metric, offset) {
-    require(tidyverse)
     results <- replicate(rep, {
       edd_sim(pars,
               age,
