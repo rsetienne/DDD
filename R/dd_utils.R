@@ -1101,7 +1101,7 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
       ggplot2::ggplot(result[[2]], aes(time, Phi, group = rep, color = rep)) + ggplot2::geom_line() +
       ggplot2::theme(legend.position = "none") + xlab("age") + ggplot2::geom_hline(yintercept = pars[3])
     title <-
-      ggplot2::ggdraw() + ggplot2::draw_label(
+      cowplot::ggdraw() + cowplot::draw_label(
         paste(
           model,
           ", ",
