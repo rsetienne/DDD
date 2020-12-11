@@ -116,6 +116,12 @@ pdd_sim <- function (pars,
                 i <- i + 1
                 ranL <- sample2(linlist, 1)
                 
+                # new algorithm to deal with non-constant rates
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                
+                if (t_new <= t[i])
+                    t[i] <- t_new
+                
                 if (offset == "none") {
                     Phi[i] <- L2Phi(L, t[i], metric)
                 } else if (offset == "simtime") {
@@ -219,6 +225,12 @@ pdd_sim <- function (pars,
             while (t[i + 1] <= age) {
                 i <- i + 1
                 ranL <- sample2(linlist, 1)
+                
+                # new algorithm to deal with non-constant rates
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                
+                if (t_new <= t[i])
+                    t[i] <- t_new
                 
                 if (offset == "none") {
                     Phi[i] <- L2Phi(L, t[i], metric)
@@ -324,6 +336,12 @@ pdd_sim <- function (pars,
             while (t[i + 1] <= age) {
                 i <- i + 1
                 ranL <- sample2(linlist, 1)
+                
+                # new algorithm to deal with non-constant rates
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                
+                if (t_new <= t[i])
+                    t[i] <- t_new
 
                 if (offset == "none") {
                     Phi[i] <- L2Phi(L, t[i], metric)
@@ -357,10 +375,6 @@ pdd_sim <- function (pars,
                         
                     } else {
                         Phi[i] <- L2Phi(L, t[i], metric)
-                        ## test different Phi metrics ##
-                        #temp<-L2Phi(L,t[i],metric)
-                        #Phi[i] <- temp / N[i-1]
-                        
                         lamu[i,] <-
                             pdd_update_lamu(lamu, Phi[i], c(mu0, K), model)
                     }
@@ -433,6 +447,12 @@ pdd_sim <- function (pars,
                 i <- i + 1
                 ranL <- sample2(linlist, 1)
                 
+                # new algorithm to deal with non-constant rates
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                
+                if (t_new <= t[i])
+                    t[i] <- t_new
+                
                 if (offset == "none") {
                     Phi[i] <- L2Phi(L, t[i], metric)
                 } else if (offset == "simtime") {
@@ -465,10 +485,6 @@ pdd_sim <- function (pars,
                         
                     } else {
                         Phi[i] <- L2Phi(L, t[i], metric)
-                        ## test different Phi metrics ##
-                        #temp<-L2Phi(L,t[i],metric)
-                        #Phi[i] <- temp / N[i-1]
-                        
                         lamu[i,] <-
                             pdd_update_lamu(lamu, Phi[i], Nbg, model)
                     }
