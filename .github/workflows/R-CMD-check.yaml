@@ -7,6 +7,7 @@ on:
       - master
       - develop
       - gha
+      - richel
 
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
       - master
       - develop
       - gha
+      - richel
 
 name: R-CMD-check
 
@@ -90,7 +92,7 @@ jobs:
       - name: Install covr and test coverage
         if: matrix.config.r == 'devel'
         run: |
-          remotes::install_cran("covr")
+          remotes::install_cran("covr", dependencies = TRUE, upgrade = always)
           covr::codecov()
         shell: Rscript {0}
 
