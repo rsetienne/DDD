@@ -192,7 +192,7 @@ shift <- function(probs,pars2,k1)
   lp <- length(probs)
   if(pars2[7] == 1)
   {
-    probs = probs * 1/(k1 + (0:(lp - 1)))
+    probs <- probs * 1/(k1 + (0:(lp - 1)))
   } else
     if(pars2[7] == 1.5)
     {

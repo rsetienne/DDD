@@ -143,7 +143,7 @@ dd_KI_ML = function(brtsM,
     optimmethod = 'subplex',
     num_cycles = 1,
     methode = 'analytical',
-    correction = FALSE,
+    correction = TRUE,
     verbose = FALSE)
 {
   #options(warn = -1)
