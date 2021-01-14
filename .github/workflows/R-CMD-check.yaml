@@ -45,6 +45,9 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
+          
+      - name: Install libcurl4-openssl-dev
+        run: if [[matrix.config.r == 'devel']]; sudo apt install -qq libcurl4-openssl-dev; fi
 
       - uses: r-lib/actions/setup-pandoc@v1
 
@@ -92,7 +95,7 @@ jobs:
       - name: Install covr and test coverage
         if: matrix.config.r == 'devel'
         run: |
-          remotes::install_cran("covr", dependencies = TRUE, upgrade = always)
+          remotes::install_cran("covr", dependencies = TRUE, upgrade = "always")
           covr::codecov()
         shell: Rscript {0}
 
