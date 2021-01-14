@@ -47,7 +47,8 @@ jobs:
           r-version: ${{ matrix.config.r }}
           
       - name: Install libcurl4-openssl-dev
-        run: if [[matrix.config.r == 'devel']]; sudo apt install -qq libcurl4-openssl-dev; fi
+        if: matrix.config.r == 'devel'
+        run: sudo apt install -qq libcurl4-openssl-dev
 
       - uses: r-lib/actions/setup-pandoc@v1
 
