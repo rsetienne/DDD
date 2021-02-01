@@ -259,8 +259,7 @@ context("test_DDD_KI_conditioning")
 
 test_that("conditioning_DDD_KI works",
 {          
-  if(Sys.getenv("TRAVIS") != "")
-  {
+  skip_if(Sys.getenv("CI") == "", message = "Run only on CI")
     ts <- seq(-9,-1,2);
     p1 <- rep(0,5);
     p2 <- rep(0,5);
@@ -293,10 +292,7 @@ test_that("conditioning_DDD_KI works",
       #print(exp(p2[i]))
     }
     testthat::expect_equal(p1,p2,tolerance = 1e-4)
-  } else
-  {
-    testthat::skip("Run only on Travis")
-  }
+
 
   pars1_list <- list(c(0.4,0.1,30),c(0.2,0.1,20))
   pars2 <- c(500,1,5,NA,1,2,3)
