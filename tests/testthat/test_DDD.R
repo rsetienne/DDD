@@ -211,19 +211,20 @@ test_that("DDD_KI works",
   ); 
   testthat::expect_equal(ddd_test,-20.1686905596579997,tolerance = .000001)
 
+  cond <- 1
   pars <- c(0.35, 0.15, 0.7, 0.25)
   brts <- list(c(10:5,2), c(4,3,1))
   # sls_test <- sls::loglik_sls_p(
   #   pars = pars,
   #   brts = brts,
-  #   cond = 0,
+  #   cond = cond,
   #   n_max = 1e3
   # );
   t_d <- brts[[2]][1]
   tsplit <- min(abs(brts[[1]][abs(brts[[1]]) > t_d]))
   high_k <- 1e7
   pars1 <- c(pars[1], pars[2], high_k, pars[3], pars[4], high_k, t_d)
-  pars2 <- c(200,1,0,brts[[2]][1],0,2,1.5)
+  pars2 <- c(200,1,cond,brts[[2]][1],0,2,1.5)
   brtsM <- brts[[1]]
   brtsS <- brts[[2]][-1]
   ddd_test <- DDD::dd_KI_loglik(
