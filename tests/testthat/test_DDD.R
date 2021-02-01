@@ -235,7 +235,7 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'analytical'
   );
-  testthat::expect_equal(ddd_test,-28.5415506633517460,tolerance = .000001)
+  testthat::expect_equal(ddd_test1,-28.5415506633517460,tolerance = .000001)
   cond <- 0
   pars2 <- c(200,1,cond,brts[[2]][1],0,2,1.5)
   ddd_test0 <- DDD::dd_KI_loglik(
