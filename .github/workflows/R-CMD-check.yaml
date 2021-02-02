@@ -79,6 +79,7 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+          remotes::install_cran("crayon")
           if (.Platform$OS.type == "unix") remotes::install_cran("doMC")
         shell: Rscript {0}
 
