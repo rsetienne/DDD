@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r
+      - uses: r-lib/actions/setup-r@a761969
         with:
           r-version: ${{ matrix.config.r }}
           
