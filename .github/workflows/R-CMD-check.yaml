@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@a76196994633e92987350cb0bce04050a89d3f50
         with:
           r-version: ${{ matrix.config.r }}
           
@@ -79,6 +79,7 @@ jobs:
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
+          remotes::install_cran("crayon")
           if (.Platform$OS.type == "unix") remotes::install_cran("doMC")
         shell: Rscript {0}
 
