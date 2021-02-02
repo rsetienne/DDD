@@ -78,7 +78,7 @@ jobs:
 
       - name: Force gfortran under mac
         if: runner.os == 'macOS'
-        run: /usr/local/bin/brew install gfortran
+        run: /usr/local/bin/brew install gfortran-8
 
       - name: Install dependencies
         run: |
