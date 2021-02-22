@@ -82,7 +82,7 @@
 #' versions)
 #' @param num_cycles the number of cycles of opimization. If set at Inf, it will
 #' do as many cycles as needed to meet the tolerance set for the target function.
-#' @param methode The method used in the ode solver, default is ode45
+#' @param methode The method used in the ode solver.
 #' @param correction Sets whether the correction should be applied (TRUE) or
 #' not (FALSE)
 #' @param verbose Show the parameters and loglikelihood for every call to the

@@ -114,17 +114,6 @@
 #' @export dd_MS_loglik
 dd_MS_loglik = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
 {
-   if(methode == 'analytical')
-   {
-       out = dd_MS_loglik2(pars1,pars2,brtsM,brtsS,missnumspec)
-   } else {
-       out = dd_MS_loglik1(pars1,pars2,brtsM,brtsS,missnumspec,methode = methode)
-   }
-   return(out)
-}
-
-dd_MS_loglik1 = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
-{
 if(length(pars2) == 4)
 {
   pars2[5] = 0
@@ -205,11 +194,11 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       lmax = pars2[1]
       ddep = pars2[2]
       cond = pars2[3]
-      tsplit = -abs(pars2[4])
+      #tsplit = -abs(pars2[4])
       soc = pars2[6]
       if(ddep != 1.3 & ddep != 2.3)
       {
-          cat("This only works for ddmodel = 1.2 or ddmodel == 1.3.\n")
+          cat("This only works for ddmodel = 1.3 or ddmodel == 2.3.\n")
           loglik = -Inf
       } else {
          lx = ceiling(min(max(1 + m[1],1 + K),lmax))
@@ -263,8 +252,13 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                mm[[4]] = laSvec[2:(lx+1),1:lx] * (nx2[2:(lx+1),1:lx] + 2 * kS)
                mm[[5]] = muSvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
                mm[[6]] = (laSvec[2:(lx+1),2:(lx+1)] + muSvec[2:(lx+1),2:(lx+1)]) * (nx2[2:(lx+1),2:(lx+1)] + kS)
-               y = deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
-               probs = y[2,2:(lx2 + 1)]
+               if(methode == 'analytical')
+               {
+                  probs <- dd_loglik_M3(pars1,lx,ddep,tt = abs(t2 - t1),p = probs,kM,kS)
+               } else {
+                  y <- deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+                  probs <- y[2,2:(lx2 + 1)]
+               }
                dim(probs) = c(lx,lx)
                
                #k1 = i + (soc - 2)
@@ -285,17 +279,18 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                     }
                     probs = lavec[2:(lx+1),2:(lx+1)] * probs # speciation event
                   } else {
+                    nxt2 <- nxt[2:(lx + 1),2:(lx + 1)]
                     if(pars2[7] == 1)
                     {
-                      probs = 1/(nxt + kM) * probs
+                      probs = 1/(nxt2 + kM) * probs
                     } else
                     if(pars2[7] == 1.5)
                     {
-                      probs = kM/(nxt + kM) * probs
+                      probs = kM/(nxt2 + kM) * probs
                     } else
                     if(pars2[7] == 2)
                     {
-                      probs = nxt/(nxt + kM) * probs
+                      probs = nxt2/(nxt2 + kM) * probs
                     }
                   }
                   cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -359,6 +354,16 @@ if(is.nan(loglik) | is.na(loglik))
 return(loglik)
 }   
 
+dd_MS_loglik0 = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
+{
+   if(methode == 'analytical')
+   {
+      out = dd_MS_loglik2(pars1,pars2,brtsM,brtsS,missnumspec)
+   } else {
+      out = dd_MS_loglik1(pars1,pars2,brtsM,brtsS,missnumspec,methode = methode)
+   }
+   return(out)
+}
 
 dd_MS_loglik2 = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
 {
@@ -372,7 +377,7 @@ if(is.na(pars2[7]))
 {
   pars2[7] == 0
 }
-verbose <- pars2[1]
+verbose <- pars2[5]
 brtsM = -sort(abs(brtsM),decreasing = TRUE)
 maxbrtsS = 0
 if(!is.null(brtsS))
@@ -442,11 +447,11 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       lmax = pars2[1]
       ddep = pars2[2]
       cond = pars2[3]
-      tsplit = -abs(pars2[4])
+      #tsplit = -abs(pars2[4])
       soc = pars2[6]
       if(ddep != 1.3 & ddep != 2.3)
       {
-          cat("This only works for ddmodel = 1.2 or ddmodel == 1.3.\n")
+          cat("This only works for ddmodel = 1.3 or ddmodel == 2.3.\n")
           loglik = -Inf
       } else {
          lx = ceiling(min(max(1 + m[1],1 + K),lmax))

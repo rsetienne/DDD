@@ -351,3 +351,24 @@ test_that("conditioning_DDD_KI works",
                                                  methode = 'ode45')
   testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-4)
 })
+
+
+context("test_DDD_MS")
+
+test_that("DDD_MS works",
+{
+  pars1 <- c(0.2,0.1,100,1.0,0.1,9.8)
+  pars2 <- c(100,1.3,0,NA,1,2,1)
+  missnumspec <- 1
+  brtsM <- c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
+  brtsS <- c(9.6,8.6,7.4,4.9,2.5)
+  dd_MS_analytical <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
+  dd_MS_lsoda <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  testthat::expect_equal(dd_MS_lsoda,dd_MS_analytical,tol = 1E-4)
+  
+  pars1[3] <- Inf
+  dd_MS_DI <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  pars1a <- c(pars1[1:5],Inf,pars1[6])
+  dd_KI_DI <- DDD::dd_KI_loglik(pars1a,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tol = 1E-4)
+})  
