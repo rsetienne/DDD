@@ -19,8 +19,18 @@ static const R_FortranMethodDef FortranEntries[] = {
   {NULL, NULL, 0}
 };
 
+
+/* C bindings */
+extern SEXP dd_integrate_odeint(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+
+static const R_CallMethodDef CallEntries[] = {
+  {"dd_integrate_odeint", (DL_FUNC) &dd_integrate_odeint, 6},
+  {NULL, NULL, 0}
+};
+
+
 void R_init_DDD(DllInfo *dll)
 {
-  R_registerRoutines(dll, NULL, NULL, FortranEntries, NULL);
+  R_registerRoutines(dll, NULL, CallEntries, FortranEntries, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }

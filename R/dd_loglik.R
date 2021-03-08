@@ -531,11 +531,14 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     {
       parsvec = pars
     }
-    if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
+    if (startsWith(method, "odeint::")) {
+      # couldn't find a better place to plug this in
+      y <- dd_ode_odeint(initprobs, tvec, parsvec, atol, rtol,method = method)
+    } 
+    else if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
     {
       y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
-    } else
-    if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
+    } else if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
     {
       y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
     } else
@@ -567,3 +570,15 @@ dd_ode_FORTRAN <- function(
   #dyn.unload(paste("d:/data/ms/DDD/dd_loglik_rhs_FORTRAN", .Platform$dynlib.ext, sep = ""))
   return(probs)
 }
+
+
+dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method)
+{
+  # caller expect a matrix type
+  lx = length(initprobs)
+  y = matrix(nrow=2, ncol = lx + 1)
+  y[2,2:(lx+1)] <- .Call("dd_integrate_odeint", initprobs, tvec, parsvec, atol, rtol, method)
+  return(y)
+}
+
+
