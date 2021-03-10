@@ -10,11 +10,10 @@
 
 
 
-class dd_loglik_rhs
+class ode_rhs
 {
 public:
-  // constructor: collect/prepare parameter
-  dd_loglik_rhs(std::vector<double> parsvec)
+  ode_rhs(std::vector<double> parsvec)
   {
     const size_t lv = (parsvec.size() - 1) / 3;
     lavec.resize(lv, 0);
@@ -27,19 +26,18 @@ public:
     }
     kk = static_cast<size_t>(parsvec.back());
   }
-
   
-  // the rhs
   void operator()(const std::vector<double>& x, std::vector<double>& dxdt, double /* t */)
   {
     // R code:
+    // lx = length(x)
     // xx = c(0, x, 0)
     // dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
+    // return list(dx)
     
-    // unroll, avoiding xx
-    const size_t lx = x.size();
+    const size_t lx = x.size() - 1;
     double x0 = 0.0;
-	  for (size_t i = 1; i < lx - 1; ++i) {
+	  for (size_t i = 1; i < lx; ++i) {
       const size_t i0 = i - 1;
       const size_t i1 = i + 1;
       dxdt[i0] = lavec[i0 + kk] * nn[i0 + 2*kk] * x0
@@ -47,8 +45,9 @@ public:
                - (lavec[i + kk] + muvec[i + kk]) * nn[i + kk] * x[i0];
       x0 = x[i0];
     }
-    dxdt[lx - 1] = lavec[lx - 1 + kk] * nn[lx - 1 + 2*kk] * x0
-                 + muvec[lx - 1 + kk] * nn[lx - 1] * x[lx - 1];
+    dxdt[lx] = lavec[lx + kk] * nn[lx + 2*kk] * x0
+             + muvec[lx + kk] * nn[lx] * x[lx];
+         //  - 0.0
   }
   
 private:
@@ -78,7 +77,7 @@ RcppExport SEXP dd_integrate_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol
     auto stepper = as<std::string>(rstepper);
 
     // create the rhs object
-    auto rhs_obj = dd_loglik_rhs(pars);
+    auto rhs_obj = ode_rhs(pars);
     
     // call the helper function from odein_helper.hpp
     // Note: the ugly std::ref(rhs) is optional but avoids a copy of rhs.

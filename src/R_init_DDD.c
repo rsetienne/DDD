@@ -22,9 +22,11 @@ static const R_FortranMethodDef FortranEntries[] = {
 
 /* C bindings */
 extern SEXP dd_integrate_odeint(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP dd_integrate_bw_odeint(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
   {"dd_integrate_odeint", (DL_FUNC) &dd_integrate_odeint, 6},
+  {"dd_integrate_bw_odeint", (DL_FUNC) &dd_integrate_bw_odeint, 6},
   {NULL, NULL, 0}
 };
 
