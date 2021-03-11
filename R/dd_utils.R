@@ -1073,7 +1073,7 @@ pdd_simulation_replicated <-
               metric,
               offset)
     })
-    result_pars <- extract_pdd_result(results, 10, 5)
+    result_pars <- extract_pdd_result(results, rep, 5)
     result_pars_binded <- bind_result(result_pars)
     
     return(list(result_pars = result_pars, result_pars_binded = result_pars_binded))
@@ -1235,7 +1235,20 @@ pdd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
       stop("missing K")
     }
   }
-  pdd_simulation_plot(result, pars, age, model, offset)
+  
+  plot_pack <- pdd_simulation_plot(result, pars, age, model, offset)
+  
+  input_output_pack <-
+    list(
+      result = result,
+      pars = pars,
+      age = age,
+      model = model,
+      metric = metric,
+      offset = offset
+    )
+  
+  return(list(data = input_output_pack, plot = plot_pack))
 }
 
 #' @name edd_simulation_replicated
@@ -1318,7 +1331,22 @@ edd_simulation_wrapper <-
         stop("missing K")
       }
     }
-    edd_simulation_plot(result, pars, age, model, offset, EDPars, EDModel, EDMethod)
+    
+    plot_pack <- edd_simulation_plot(result, pars, age, model, offset, EDPars, EDModel, EDMethod)
+    
+    input_output_pack <-
+      list(
+        result = result,
+        pars = pars,
+        age = age,
+        model = model,
+        metric = metric,
+        offset = offset,
+        EDModel = EDModel,
+        EDMethod = EDMethod
+      )
+    
+    return(list(data = input_output_pack, plot = plot_pack))
   }
 
 #' @name edd_simulation_plot
