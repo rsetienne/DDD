@@ -47,20 +47,118 @@ edd_sum_rates <- function(lamu, ED, i) {
   return(sum(ED) * sum(lamu[i, ]))
 }
 
-edd_sample_event <- function(lamu, ED, i) {
-  if ((lamu[i - 1, 1] - lamu[i, 1]) >= 0) {
-    rspec <- lamu[i, 1] * ED
-    rfake_spec <- (lamu[i - 1, 1] - lamu[i, 1]) * ED
-  } else {
-    rspec <- lamu[i , 1] * ED
-    rfake_spec <- 0
+edd_sample_event <- function(lamu, ED, i, EDPars, EDModel, EDMethod) {
+  if (EDModel == "dsce") {
+    if (EDMethod == "scale") {
+      if (is.null(EDPars) == FALSE) {
+        stop("incorrect parameter(s)")
+      }
+      
+      ED <- range01(ED)
+      
+      if ((lamu[i - 1, 1] - lamu[i, 1]) >= 0) {
+        rspec <- lamu[i, 1] * ED
+        rfake_spec <- (lamu[i - 1, 1] - lamu[i, 1]) * ED
+      } else {
+        rspec <- lamu[i , 1] * ED
+        rfake_spec <- 0
+      }
+      
+      if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
+        rext <- lamu[i, 2] + ED - ED
+        rfake_ext <- (lamu[i - 1, 2] - lamu[i, 2]) + ED - ED
+      } else {
+        rext <- rlamu[i, 2] + ED - ED
+        rfake_ext <- 0
+      }
+    }
+    
+    if (EDMethod == "add") {
+      if (length(EDPars) != 1) {
+        stop("incorrect parameter(s)")
+      }
+      
+      rho_la <- EDPars[1]
+      
+      if ((lamu[i - 1, 1] - lamu[i, 1]) >= 0) {
+        rspec <- lamu[i, 1] + (rho_la * ED)
+        rspec[rspec < 0] <- 0
+        rfake_spec <-
+          (lamu[i - 1, 1] - lamu[i, 1]) + (rho_la * ED)
+        rfake_spec[rfake_spec < 0] <- 0
+      } else {
+        rspec <- lamu[i, 1] + (rho_la * ED)
+        rspec[rspec < 0] <- 0
+        rfake_spec <- 0
+      }
+      
+      if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
+        rext <- lamu[i, 2] + ED - ED
+        rfake_ext <- (lamu[i - 1, 2] - lamu[i, 2]) + ED - ED
+      } else {
+        rext <- rlamu[i, 2] + ED - ED
+        rfake_ext <- 0
+      }
+    }
   }
-  if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
-    rext <- lamu[i, 2] / ED
-    rfake_ext <- (lamu[i - 1, 2] - lamu[i, 2]) / ED
-  } else {
-    rext <- lamu[i, 2] / ED
-    rfake_ext <- 0 / ED
+  
+  if (EDModel == "dsde") {
+    if (EDMethod == "scale") {
+      if (is.null(EDPars) != FALSE) {
+        stop("incorrect parameter(s)")
+      }
+      
+      ED <- range01(ED)
+      
+      if ((lamu[i - 1, 1] - lamu[i, 1]) >= 0) {
+        rspec <- lamu[i, 1] * ED
+        rfake_spec <- (lamu[i - 1, 1] - lamu[i, 1]) * ED
+      } else {
+        rspec <- lamu[i , 1] * ED
+        rfake_spec <- 0
+      }
+      
+      if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
+        rext <- lamu[i, 2] / ED
+        rfake_ext <- (lamu[i - 1, 2] - lamu[i, 2]) / ED
+      } else {
+        rext <- lamu[i, 2] / ED
+        rfake_ext <- 0
+      }
+    }
+    
+    if (EDMethod == "add") {
+      if (length(EDPars) != 2) {
+        stop("incorrect parameter(s)")
+      }
+      
+      rho_la <- EDPars[1]
+      rho_mu <- EDPars[2]
+      
+      if ((lamu[i - 1, 1] - lamu[i, 1]) >= 0) {
+        rspec <- lamu[i, 1] + (rho_la * ED)
+        rspec[rspec < 0] <- 0
+        rfake_spec <-
+          (lamu[i - 1, 1] - lamu[i, 1]) + (rho_la * ED)
+        rfake_spec[rfake_spec < 0] <- 0
+      } else {
+        rspec <- lamu[i, 1] + (rho_la * ED)
+        rspec[rspec < 0] <- 0
+        rfake_spec <- 0
+      }
+      
+      if ((lamu[i - 1, 2] - lamu[i, 2]) >= 0) {
+        rext <-  lamu[i, 2] + (rho_mu * ED)
+        rext[rext < 0] <- 0
+        rfake_ext <-
+          (lamu[i - 1, 2] - lamu[i, 2]) + (rho_mu * ED)
+        rfake_ext[rfake_ext < 0] <- 0
+      } else {
+        rext <- lamu[i, 2] + (rho_mu * ED)
+        rext[rext < 0] <- 0
+        rfake_ext <- 0
+      }
+    }
   }
   
   # add prefix to names of the rates to distinguish between different event types
@@ -79,21 +177,33 @@ edd_sim <- function (pars,
                      age,
                      model = "dsce1",
                      metric = "pd",
-                     offset = "none") {
-  if (pars[1] < 0 | pars[2] < 0) {
+                     offset = "none",
+                     EDPars = NULL,
+                     EDModel = "dsce",
+                     EDMethod = "add") {
+  
+  if (pars[1] <= 0 | pars[2] <= 0) {
     stop('per species rates should be positive')
   }
   
   if (length(pars) == 3) {
-    if (pars[3] < 0) {
+    if (pars[3] <= 0) {
       stop('clade level carrying capacity should be positive')
     }
   }
   
   if (length(pars) == 4) {
-    if (pars[2] < 0) {
+    if (pars[2] <= 0) {
       stop('coefficient for extinction should be positive')
     }
+  }
+  
+  if (length(EDPars) == 1 && EDModel == "dsde") {
+    stop('incorrect parameter(s)')
+  }
+  
+  if (length(EDPars) == 2 && EDModel == "dsce") {
+    stop('incorrect parameter(s)')
   }
   
   if (length(pars) == 3 && model == "dsce1") {
@@ -125,6 +235,12 @@ edd_sim <- function (pars,
       while (t[i + 1] <= age) {
         i <- i + 1
         
+        # new algorithm to deal with non-constant rates
+        t_new <- t[i - 1] + stats::rexp(1, edd_sum_rates(lamu, ED, 1))
+        
+        if (t_new <= t[i])
+          t[i] <- t_new
+        
         # new offset methods
         if (offset == "none") {
           Phi[i] <- L2Phi(L, t[i], metric)
@@ -143,7 +259,7 @@ edd_sim <- function (pars,
         lamu <-
           rbind(lamu, edd_update_lamu(lamu, Phi[i], K, model))
         # sample an event containing info of focal lineage and event type
-        event <- edd_sample_event(lamu, ED, i)
+        event <- edd_sample_event(lamu, ED, i, EDPars, EDModel, EDMethod)
         # extract lineage number from event string
         numL <- sub(".*_t", "", event)
         # find out the lineage to match the sign in linlist
@@ -243,6 +359,12 @@ edd_sim <- function (pars,
       while (t[i + 1] <= age) {
         i <- i + 1
         
+        # new algorithm to deal with non-constant rates
+        t_new <- t[i - 1] + stats::rexp(1, edd_sum_rates(lamu, ED, 1))
+        
+        if (t_new <= t[i])
+          t[i] <- t_new
+        
         if (offset == "none") {
           Phi[i] <- L2Phi(L, t[i], metric)
         } else if (offset == "simtime") {
@@ -260,7 +382,7 @@ edd_sim <- function (pars,
         lamu <-
           rbind(lamu, edd_update_lamu(lamu, Phi[i], Nbetas, model))
         # sample an event containing info of focal lineage and event type
-        event <- edd_sample_event(lamu, ED, i)
+        event <- edd_sample_event(lamu, ED, i, EDPars, EDModel, EDMethod)
         # extract lineage number from event string
         numL <- sub(".*_t", "", event)
         # find out the lineage to match the sign in linlist
@@ -359,6 +481,12 @@ edd_sim <- function (pars,
       while (t[i + 1] <= age) {
         i <- i + 1
         
+        # new algorithm to deal with non-constant rates
+        t_new <- t[i - 1] + stats::rexp(1, edd_sum_rates(lamu, ED, 1))
+        
+        if (t_new <= t[i])
+          t[i] <- t_new
+        
         if (offset == "none") {
           Phi[i] <- L2Phi(L, t[i], metric)
         } else if (offset == "simtime") {
@@ -376,7 +504,7 @@ edd_sim <- function (pars,
         lamu <-
           rbind(lamu, edd_update_lamu(lamu, Phi[i], c(mu0, K), model))
         # sample an event containing info of focal lineage and event type
-        event <- edd_sample_event(lamu, ED, i)
+        event <- edd_sample_event(lamu, ED, i, EDPars, EDModel, EDMethod)
         # extract lineage number from event string
         numL <- sub(".*_t", "", event)
         # find out the lineage to match the sign in linlist
@@ -473,6 +601,12 @@ edd_sim <- function (pars,
       while (t[i + 1] <= age) {
         i <- i + 1
         
+        # new algorithm to deal with non-constant rates
+        t_new <- t[i - 1] + stats::rexp(1, edd_sum_rates(lamu, ED, 1))
+        
+        if (t_new <= t[i])
+          t[i] <- t_new
+        
         if (offset == "none") {
           Phi[i] <- L2Phi(L, t[i], metric)
         } else if (offset == "simtime") {
@@ -490,7 +624,7 @@ edd_sim <- function (pars,
         lamu <-
           rbind(lamu, edd_update_lamu(lamu, Phi[i], Nbg, model))
         # sample an event containing info of focal lineage and event type
-        event <- edd_sample_event(lamu, ED, i)
+        event <- edd_sample_event(lamu, ED, i, EDPars, EDModel, EDMethod)
         # extract lineage number from event string
         numL <- sub(".*_t", "", event)
         # find out the lineage to match the sign in linlist
