@@ -54,3 +54,12 @@ test_KI = function(imeth) {
   
   print(ddd_test)
 }
+
+
+test_bd = function(imeth) {
+  pars1 <- c(0.2,0.05,15)
+  pars2 <- c(4,1,0,0,2)
+  brts <- 1:10
+  r10 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = 0,methode = methods[imeth])
+  print(r10)
+}
