@@ -338,8 +338,15 @@ dd_KI_logliknorm <- function(brts_k_list,
       m1 = lavec[1:lx] * nx[1:lx]
       m2 = muvec[3:(lx + 2)] * nx[3:(lx + 2)]
       m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
-      y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
-      probs = y[2,2:(lx+1)]
+
+      if (startsWith(methode, 'odeint::')) {
+        probs = .Call('dd_logliknorm1_odeint', probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
+      }
+      else {
+        y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
+        probs = y[2,2:(lx+1)]
+      }
+
     } else
     {
       probs = dd_loglik_M(pars1_list[[2]],lx,0,ddep,tt = abs(tpres - tinn),probs)
@@ -361,7 +368,7 @@ dd_KI_logliknorm <- function(brts_k_list,
     # sum(probs[1:lx,1]) = probability of extinction of second lineage
     probs[2,2] = 1 # clade M starts with two species
     # STEP 1: integrate from tcrown to tinn
-    dim(probs) = c(lx*lx,1)
+    dim(probs) = c(lx,lx)
     if(methode != 'analytical')
     {
       m1 = lavec[1:lx,2:(lx+1)] * nx1[1:lx,2:(lx+1)]
@@ -371,8 +378,14 @@ dd_KI_logliknorm <- function(brts_k_list,
       m4 = lavec[2:(lx+1),1:lx] * nx2[2:(lx+1),1:lx]
       m5 = muvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
       m6 = ma * nx2[2:(lx+1),2:(lx+1)]
-      y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-      probs = y[2,2:(lx * lx + 1)]
+      if (startsWith(methode, "odeint::")) {
+        probs = .Call('dd_logliknorm2_odeint', probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
+      }
+      else {
+        dim(probs) = c(lx*lx,1)
+        y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs = y[2,2:(lx * lx + 1)]
+      }
     } else
     {
       probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tinn - tcrown),p = probs)
@@ -385,12 +398,18 @@ dd_KI_logliknorm <- function(brts_k_list,
     nx2a = nx2[2:(lx+1),2:(lx+1)]
     probs = probs * nx1a/(nx1a+nx2a)
     probs = rbind(probs[2:lx,1:lx], rep(0,lx))
-    dim(probs) = c(lx * lx,1)
     # STEP 3: integrate from tinn to tpres
     if(methode != 'analytical')
     {
-      y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-      probs = y[2,2:(lx * lx + 1)]
+      if (startsWith(methode, "odeint::")) {
+        probs = .Call('dd_logliknorm2_odeint', probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
+      }
+      else {
+        dim(probs) = c(lx*lx,1)
+        y = deSolve::ode(probs,c(tinn, tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs = y[2,2:(lx * lx + 1)]
+        dim(probs) = c(lx,lx)
+      }
     } else
     {
       probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tpres - tinn),p = probs)
@@ -402,8 +421,8 @@ dd_KI_logliknorm <- function(brts_k_list,
     #print(log(2) + (log(PM12 + PM2) + log(PS)))
     #print(log(2) + (log(PM12) + log(PS)))
     logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) +
-                          (cond == 4) * (log(PM12 + PM2) + log(PS)) +
-                          (cond == 5) * (log(PM12) + log(PS))
+      (cond == 4) * (log(PM12 + PM2) + log(PS)) +
+      (cond == 5) * (log(PM12) + log(PS))
   }
   return(logliknorm)
 }
@@ -477,7 +496,7 @@ check_for_impossible_pars_KI <- function(S_list,
     }
     are_pars_impossible <- 
       ((ddep == 1 && ceiling(pars1_list[[i]][1]/(pars1_list[[i]][1] - pars1_list[[i]][2]) * pars1_list[[i]][3]) < S_list[[i]] + m) ||
-       (ddep == 1.3 && ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
+         (ddep == 1.3 && ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
     if(are_pars_impossible)
     {
       return(are_pars_impossible)

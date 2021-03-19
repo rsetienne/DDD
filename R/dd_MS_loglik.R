@@ -256,8 +256,14 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                {
                   probs <- dd_loglik_M3(pars1,lx,ddep,tt = abs(t2 - t1),p = probs,kM,kS)
                } else {
-                  y <- deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
-                  probs <- y[2,2:(lx2 + 1)]
+                 if (startsWith(methode, "odeint::")) {
+                   dim(probs) = c(lx,lx)
+                   probs = .Call('dd_logliknorm2_odeint', probs, c(t1, t2), mm, reltol, abstol, methode)
+                 }
+                 else {
+                   y <- deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
+                   probs <- y[2,2:(lx2 + 1)]
+                 }
                }
                dim(probs) = c(lx,lx)
                

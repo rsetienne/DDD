@@ -1,3 +1,7 @@
+// [[Rcpp::plugins(cpp14)]]
+// [[Rcpp::depends(BH)]]
+
+
 #ifndef ODEINT_HELPER_HPP_INCLUDED
 #define ODEINT_HELPER_HPP_INCLUDED
 
@@ -48,8 +52,6 @@
 // [[Rcpp::depends(BH)]]
 
 #include <memory>
-#include <boost/numeric/odeint.hpp>
-
 #include <exception>
 #include <boost/numeric/odeint.hpp>
 
@@ -132,6 +134,17 @@ namespace odeint_helper {
     integrate(default_stepper_name, ode, start_state, t0, t1, dt);
   }
 
+  
+  // for debuging
+  template <typename IT>
+  inline void printf(IT first, IT last)
+  {
+    for (; first != last; ++first) {
+      Rprintf("%f ", *first);
+    }
+    Rprintf("\n");
+  }
+  
 }
 
 #endif

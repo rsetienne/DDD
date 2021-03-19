@@ -1,6 +1,4 @@
-// [[Rcpp::plugins(cpp14)]]
-// [[Rcpp::depends(BH)]]
-//' @export dd_integrate_odeint
+//' @export dd_integrate_bw_odeint
 
 
 #define STRICT_R_HEADERS
@@ -9,45 +7,13 @@
 #include "odeint_helper.hpp"
 
 
-dd_loglik_rhs = function(t,x,parsvec)
-{
-  lv = (length(parsvec) - 1)/3
-  lavec = parsvec[1:lv]
-  muvec = parsvec[(lv + 1):(2 * lv)]
-  nn = parsvec[(2 * lv + 1):(3 * lv)]
-  kk = parsvec[length(parsvec)]
-  lx = length(x)
-  xx = c(0,x,0)
-  dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
-  return(list(dx))
-}
+using namespace Rcpp;
 
 
-
-dd_loglik_bw_rhs = function(t,x,parsvec)
-{
-#parsvec = c(dd_loglik_rhs_precomp(pars,x),pars[length(pars) - 1])
-  lv = (length(parsvec) - 1)/3
-  lavec = parsvec[1:lv]
-  muvec = parsvec[(lv + 1):(2 * lv)]
-  nn = parsvec[(2 * lv + 1):(3 * lv)]
-  kk = parsvec[length(parsvec)]
-  lx = length(x) - 1
-  
-  xx = c(0,x[1:lx],0)
-  
-  dx = lavec[(2:(lx+1))+kk] * nn[(2:(lx+1))+2*kk] * xx[(2:(lx+1))+1] + muvec[(2:(lx+1))+kk] * nn[(2:(lx+1))] * xx[(2:(lx+1))-1] - (c(lavec[(2:(lx))+kk],0) + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
-
-  dG = x[1 + (kk == 0)]
-  
-  return(list(c(dx,dG)))
-}
-
-
-class ode_rhs
+class ode_bw_rhs
 {
 public:
-  ode_rhs(std::vector<double> parsvec)
+  ode_bw_rhs(NumericVector parsvec)
   {
     const size_t lv = (parsvec.size() - 1) / 3;
     lavec.resize(lv, 0);
@@ -58,35 +24,33 @@ public:
       muvec[i] = parsvec[lv + i];       // parsvec[(lv + 1):(2 * lv)]
       nn[i] = parsvec[2 * lv + i];      // parsvec[(2 * lv + 1):(3 * lv)]
     }
-    kk = static_cast<size_t>(parsvec.back());
+    kk = static_cast<size_t>(parsvec[parsvec.size() - 1]);
   }
   
-  void operator()(const std::vector<double>& x, std::vector<double>& dxdt, double /* t */)
+  void operator()(const std::vector<double>& xx, std::vector<double>& dx, double /* t */)
   {
     // R code:
     // lx = length(x) - 1
     // xx = c(0, x[1:lx], 0)
-    // dx = lavec[(2:(lx+1))+kk] * nn[(2:(lx+1))+2*kk] * xx[(2:(lx+1))+1] + muvec[(2:(lx+1))+kk] * nn[(2:(lx+1))] * xx[(2:(lx+1))-1] - (c(lavec[(2:(lx))+kk],0) + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
-    //
-    // dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
+    // dx = lavec[(2:(lx+1))+kk] * nn[(2:(lx+1))+2*kk] * xx[(2:(lx+1))+1] 
+    //    + muvec[(2:(lx+1))+kk] * nn[(2:(lx+1))] * xx[(2:(lx+1))-1] 
+    //    - (c(lavec[(2:(lx))+kk],0) + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
     //
     // dG = x[1 + (kk == 0)]
     // return(list(c(dx,dG)))
-    
-    // unroll, avoiding xx
-    const size_t lx = x.size();
-    double x0 = 0.0;
-    for (size_t i = 1; i < lx - 1; ++i) {
-      const size_t i0 = i - 1;
-      const size_t i1 = i + 1;
-      dxdt[i0] = lavec[i0 + kk] * nn[i0 + 2*kk] * x0
-        + muvec[i1 + kk] * nn[i1] * x[i]
-      - (lavec[i + kk] + muvec[i + kk]) * nn[i + kk] * x[i0];
-      x0 = x[i0];
+
+    dx.front() = dx.back() = 0.0;
+    const size_t lx = xx.size() - 1;
+    for (size_t i = 1; i < lx - 2; ++i) {
+      dx[i] = lavec[i + kk] * nn[i + 2 * kk] * xx[i + 1]
+            + muvec[i + kk] * nn[i] * xx[i - 1]
+            - (lavec[i + kk] + muvec[i + kk]) * nn[i + kk] * xx[i];
     }
-    dxdt[lx - 1] = lavec[lx - 1 + kk] * nn[lx - 1 + 2*kk] * x0
-      + muvec[lx - 1 + kk] * nn[lx - 1] * x[lx - 1];
-    // - 0.0    
+    const size_t i = lx - 2;
+    dx[i] = lavec[i + kk] * nn[i + 2 * kk] * xx[i + 1]
+          + muvec[i + kk] * nn[i] * xx[i - 1]
+          - (0.0 + muvec[i + kk]) * nn[i + kk] * xx[i];
+    dx[lx-1] = xx[1 + (kk == 0)];
   }
   
 private:
@@ -97,26 +61,23 @@ private:
 };
 
 
-
-using namespace Rcpp;
-
-
-
 //' Driver for the boost::odeint solver
 //'
 //' @name dd_integrate_bw_odeint
 RcppExport SEXP dd_integrate_bw_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
   BEGIN_RCPP
-    auto y = as<std::vector<double>>(ry);
+    auto y = as<NumericVector>(ry);
+    std::vector<double> yy(y.size() + 2, 0.0);    // [0,y,0]
+    std::copy(y.cbegin(), y.cend(), yy.begin() + 1); 
     auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<std::vector<double>>(rpars);
+    auto pars = as<NumericVector>(rpars);
     auto atol = as<double>(ratol);
     auto rtol = as<double>(rrtol);
     auto stepper = as<std::string>(rstepper);
     
-    auto rhs_obj = ode_rhs(pars);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
-  
-    return Rcpp::NumericVector(y.cbegin(), y.cend());
+    auto rhs_obj = ode_bw_rhs(pars);
+    auto steps = std::min(10000.0, (times[1] - times[0]) * 10.0);
+    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], (times[1] - times[0]) / steps, atol, rtol);
+    return Rcpp::NumericVector(yy.cbegin() + 1, yy.cend() -1);
   END_RCPP
 }

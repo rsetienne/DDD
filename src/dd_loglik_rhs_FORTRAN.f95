@@ -252,6 +252,7 @@
  !  This is the same as setting kk = 0 in
  !  dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] 
     !  * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
+
  !  mutd = rep(mu,lrs)
  !  En = sum((0:(lx - 1)) * x[1:lx] )
  !  dsigdiv = mutd / En

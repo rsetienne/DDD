@@ -178,8 +178,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
   } else {
-    abstol = 1e-16
-    reltol = 1e-10 
+    abstol = 1e-10
+    reltol = 1e-8 
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
@@ -266,7 +266,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
             { 
               probsn = rep(0,lx + 1)
               probsn[S + missnumspec + 1] = 1
-              TT = max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
+              
+              TT = 1e14 # max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
               y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
               logliknorm = log(y[2,lx + 2])
               if(soc == 2)
@@ -533,7 +534,7 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     }
     if (startsWith(method, "odeint::")) {
       # couldn't find a better place to plug this in
-      y <- dd_ode_odeint(initprobs, tvec, parsvec, atol, rtol,method = method)
+      y <- dd_ode_odeint(initprobs, tvec, parsvec, atol, rtol, method = method, rhs_name = rhs_func_name)
     } 
     else if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
     {
@@ -572,12 +573,56 @@ dd_ode_FORTRAN <- function(
 }
 
 
-dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method)
+dd_rhs_odeint_map = list(
+  'dd_loglik_rhs' = 'dd_integrate_odeint',
+  'dd_loglik_bw_rhs' = 'dd_integrate_bw_odeint',
+  'dd_loglik_rhs_FORTRAN' = 'dd_integrate_odeint',
+  'dd_loglik_bw_rhs_FORTRAN' = 'dd_integrate_bw_odeint'
+)
+
+
+dd_ode_bw_right_open_odeint = function(initprobs, tvec, parsvec, method)
 {
+  y = initprobs
+  dy = 0.0
+  ddy = 0.0
+  while (tvec[1] + 100 < tvec[2]) {
+    y0 = y[length(y)]
+    y <- .Call('dd_integrate_bw_odeint', y, c(tvec[1], tvec[1] + 100), parsvec, 1e-4, 1e-4, method)
+    G = y[length(y)]
+    dy = G - y0
+    ddy = dy - ddy;
+    tvec[1] = tvec[1] + 100
+    if (abs(ddy) < 1e-10) {
+      # dy became constant - extrapolate
+      return(G + (tvec[2] - tvec[1]) * dy / 100.0)
+    }
+    if (dy > 1e20) {
+      # blown up
+      return(Inf)
+    }
+    ddy = dy
+  }
+  # never reached so far...
+  y <- .Call('dd_integrate_bw_odeint', y, c(tvec[1], tvec[2]), parsvec, 1e-6, 1e-6, method)
+  return(y[length(y)])
+}
+
+
+
+dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
+{
+  fun = dd_rhs_odeint_map[[rhs_name]];
   # caller expect a matrix type
   lx = length(initprobs)
   y = matrix(nrow=2, ncol = lx + 1)
-  y[2,2:(lx+1)] <- .Call("dd_integrate_odeint", initprobs, tvec, parsvec, atol, rtol, method)
+  if (tvec[2] > 10000 && fun == 'dd_integrate_bw_odeint') {
+    # tends to hang if not handled 
+    y[2,2:(lx+1)] <- dd_ode_bw_right_open_odeint(initprobs, tvec, parsvec, method)
+  }
+  else {
+    y[2,2:(lx+1)] <- .Call(fun, initprobs, tvec, parsvec, atol, rtol, method)
+  }
   return(y)
 }
 
