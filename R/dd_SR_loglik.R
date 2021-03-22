@@ -464,7 +464,14 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              if(soc == 1) { aux = 1:lx }
              if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
              probsc = probs/aux
-             if(cond == 1) { logliknorm = log(sum(probsc)) }
+             if(cond == 1) {
+               sumprobsc <- sum(probsc)
+               if(sumprobsc > 1) {
+                 cat('Conditioning probability larger than 1 encountered; setting to 1.\n')
+                 sumprobsc <- 1
+               }
+               logliknorm <- log(sum(probsc))
+             }
              if(cond == 2) { logliknorm = log(probsc[S + missnumspec - 1])}             
           }
           if(cond == 3)

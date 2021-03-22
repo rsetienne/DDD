@@ -211,22 +211,23 @@ test_that("DDD_KI works",
   ); 
   testthat::expect_equal(ddd_test,-20.1686905596579997,tolerance = .000001)
 
+  cond <- 1
   pars <- c(0.35, 0.15, 0.7, 0.25)
   brts <- list(c(10:5,2), c(4,3,1))
   # sls_test <- sls::loglik_sls_p(
   #   pars = pars,
   #   brts = brts,
-  #   cond = 0,
+  #   cond = cond,
   #   n_max = 1e3
   # );
   t_d <- brts[[2]][1]
   tsplit <- min(abs(brts[[1]][abs(brts[[1]]) > t_d]))
   high_k <- 1e7
   pars1 <- c(pars[1], pars[2], high_k, pars[3], pars[4], high_k, t_d)
-  pars2 <- c(200,1,0,brts[[2]][1],0,2,1.5)
+  pars2 <- c(200,1,cond,brts[[2]][1],0,2,1.5)
   brtsM <- brts[[1]]
   brtsS <- brts[[2]][-1]
-  ddd_test <- DDD::dd_KI_loglik(
+  ddd_test1 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
     brtsM = brtsM,
@@ -234,7 +235,18 @@ test_that("DDD_KI works",
     missnumspec = 0,
     methode = 'analytical'
   );
-  testthat::expect_equal(ddd_test,-29.5449838542774543,tolerance = .000001)
+  testthat::expect_equal(ddd_test1,-28.5415506633517460,tolerance = .000001)
+  cond <- 0
+  pars2 <- c(200,1,cond,brts[[2]][1],0,2,1.5)
+  ddd_test0 <- DDD::dd_KI_loglik(
+    pars1 = pars1,
+    pars2 = pars2,
+    brtsM = brtsM,
+    brtsS = brtsS,
+    missnumspec = 0,
+    methode = 'analytical'
+  )
+  testthat::expect_equal(ddd_test0,-29.5449838542774543,tolerance = .000001)
   ddd_test2 <- DDD::dd_KI_loglik(
     pars1 = pars1,
     pars2 = pars2,
@@ -242,8 +254,8 @@ test_that("DDD_KI works",
     brtsS = brtsS,
     missnumspec = 0,
     methode = 'ode45'
-  );
-  testthat::expect_equal(ddd_test,ddd_test2,tolerance = .000001)
+  )
+  testthat::expect_equal(ddd_test0,ddd_test2,tolerance = .000001)
   
   brts <- 1:10
   pars1 <- c(0.8,0,40)
@@ -258,8 +270,7 @@ context("test_DDD_KI_conditioning")
 
 test_that("conditioning_DDD_KI works",
 {          
-  if(Sys.getenv("TRAVIS") != "")
-  {
+  skip_if(Sys.getenv("CI") == "", message = "Run only on CI")
     ts <- seq(-9,-1,2);
     p1 <- rep(0,5);
     p2 <- rep(0,5);
@@ -292,10 +303,7 @@ test_that("conditioning_DDD_KI works",
       #print(exp(p2[i]))
     }
     testthat::expect_equal(p1,p2,tolerance = 1e-4)
-  } else
-  {
-    testthat::skip("Run only on Travis")
-  }
+
 
   pars1_list <- list(c(0.4,0.1,30),c(0.2,0.1,20))
   pars2 <- c(500,1,5,NA,1,2,3)
@@ -343,3 +351,24 @@ test_that("conditioning_DDD_KI works",
                                                  methode = 'ode45')
   testthat::expect_equal(as.numeric(logliknorm1),logliknorm2,tolerance = 1e-4)
 })
+
+
+context("test_DDD_MS")
+
+test_that("DDD_MS works",
+{
+  pars1 <- c(0.2,0.1,100,1.0,0.1,9.8)
+  pars2 <- c(100,1.3,0,NA,1,2,1)
+  missnumspec <- 1
+  brtsM <- c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
+  brtsS <- c(9.6,8.6,7.4,4.9,2.5)
+  dd_MS_analytical <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
+  dd_MS_lsoda <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  testthat::expect_equal(dd_MS_lsoda,dd_MS_analytical,tol = 1E-4)
+  
+  pars1[3] <- Inf
+  dd_MS_DI <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  pars1a <- c(pars1[1:5],Inf,pars1[6])
+  dd_KI_DI <- DDD::dd_KI_loglik(pars1a,pars2,brtsM,brtsS,missnumspec,methode = 'lsoda')
+  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tol = 1E-4)
+})  

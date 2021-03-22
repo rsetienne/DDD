@@ -26,7 +26,7 @@ dd_MS_ML(
   changeloglikifnoconv = FALSE,
   optimmethod = "subplex",
   num_cycles = 1,
-  methode = "analytical",
+  methode = "ode45",
   correction = FALSE,
   verbose = FALSE
 )
@@ -114,7 +114,8 @@ versions)}
 \item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
 do as many cycles as needed to meet the tolerance set for the target function.}
 
-\item{methode}{The method used in the ode solver, default is ode45}
+\item{methode}{The method used in the ode solver. This can be either 'analytical'
+for explicit matrix exponentation or any of the solvers in the deSolve package.}
 
 \item{correction}{Sets whether the correction should be applied (TRUE) or
 not (FALSE)}
