@@ -46,7 +46,7 @@ dd_loglik_rhs_precomp = function(pars,x)
           } else {
             if(ddep == 2.3)
             {
-              y = K
+              y = -K
               lavec = pmax(rep(0,lnn),la * (nn + n0)^y)
               muvec = mu * rep(1,lnn)
             } else {

@@ -1,0 +1,6 @@
+#/bin/sh
+if [ `uname` = "Darwin" ] && [ `arch` = "arm64" ]; then
+echo "Detected platform: Apple Silicon"
+sed -i.bak 's/c_intptr_t/4/g' src/dd_loglik_rhs_FORTRAN.f95
+fi
+

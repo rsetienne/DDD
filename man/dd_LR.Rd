@@ -4,12 +4,27 @@
 \alias{dd_LR}
 \title{Bootstrap likelihood ratio test of diversity-dependent diversification model}
 \usage{
-dd_LR(brts, initparsoptDD, initparsoptCR, missnumspec,
-  outputfilename = NULL, seed = 42, endmc = 1000, alpha = 0.05,
-  plotit = TRUE, res = 10 * (1 + length(brts) + missnumspec),
-  ddmodel = 1, cond = 1, btorph = 1, soc = 2, tol = c(0.001,
-  1e-04, 1e-06), maxiter = 2000, changeloglikifnoconv = FALSE,
-  optimmethod = "subplex", methode = "analytical")
+dd_LR(
+  brts,
+  initparsoptDD,
+  initparsoptCR,
+  missnumspec,
+  outputfilename = NULL,
+  seed = 42,
+  endmc = 1000,
+  alpha = 0.05,
+  plotit = TRUE,
+  res = 10 * (1 + length(brts) + missnumspec),
+  ddmodel = 1,
+  cond = 1,
+  btorph = 1,
+  soc = 2,
+  tol = c(0.001, 1e-04, 1e-06),
+  maxiter = 2000,
+  changeloglikifnoconv = FALSE,
+  optimmethod = "subplex",
+  methode = "analytical"
+)
 }
 \arguments{
 \item{brts}{A set of branching times of a phylogeny, all positive}
