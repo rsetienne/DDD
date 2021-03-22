@@ -4,10 +4,6 @@ dd_lamuN = function(ddmodel,pars,N)
     mu = pars[2]
     K = pars[3]
     n0 = (ddmodel == 2 | ddmodel == 4)
-    if(length(pars) == 4)
-    {
-        r = pars[4]
-    }
     if(ddmodel == 1)
     {
         # linear dependence in speciation rate
@@ -49,14 +45,63 @@ dd_lamuN = function(ddmodel,pars,N)
     }
     if(ddmodel == 5)
     {
+        r = pars[4]
         # linear dependence in speciation rate and extinction rate
         laN = max(0,la - 1/(r+1)*(la-mu) * N/K)
         muN = mu + r/(r+1)*(la-mu)/K * N
     }
-    return(c(laN,muN))
+    if (ddmodel == 6) {
+        alpha <- pars[4]
+        # linear dependence in speciation rate, exponential dependence in extinction rate
+        al = (log(1 + alpha * (la  - mu) / mu) / log(K))
+        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
+        muN = mu * N ^ al
+    }
+    if (ddmodel == 7) {
+        alpha <- pars[4]
+        # exponential dependence in speciation rate and extinction rate
+        al1 = log(la / alpha * (la - mu) + mu) / log(K)
+        al2 = (log(1 + alpha * (la  - mu) / mu) / log(K))
+        laN = la * N ^ (-al1)
+        muN = mu * N ^ al2
+    }
+    if (ddmodel == 8) {
+        alpha <- pars[4]
+        # exponential dependence in speciation rate, linear dependence in extinction rate
+        al = log(la / alpha * (la - mu) + mu) / log(K)
+        laN = la * N ^ (-al)
+        muN =  mu + alpha * (la - mu) * N / K
+    }  
+    if (ddmodel == 9) {
+        # alternative exponential dependence in speciation rate
+        laN = la * (mu / la) ^ (N / K)
+        muN = mu
+    } 
+    if (ddmodel == 10) {
+        # alternative exponential dependence in extinction rate
+        laN = la
+        muN = mu * (la / mu) ^ (N / K)
+    } 
+    if (ddmodel == 11) {
+        alpha <- pars[4]
+        # alternative exponential dependence in extinction rate, linear dependence in extinction rate
+        laN =  la * (alpha + (1 - alpha) * mu / la) ^ (N / K)
+        muN =  mu + alpha * (la - mu) * N / K
+    }
+    if (ddmodel == 12) {
+        alpha <- pars[4]
+        # linear dependence in speciation rate, alternative exponential dependence in extinction rate
+        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
+        muN = mu * ((1 - alpha) + alpha * la / mu) ^ (N / K)
+    }
+    if (ddmodel == 13) {
+        alpha <- pars[4]
+        # alternative exponential dependence in speciation rate and extinction rate
+        laN =  la * (alpha + (1 - alpha) * mu / la) ^ (N / K)
+        muN = mu * ((1 - alpha) + alpha * la / mu) ^ (N / K)
+    }
+    return(c(laN, muN))
 }
-
-
 
 #' Function to simulate the diversity-dependent diversification process
 #' 
