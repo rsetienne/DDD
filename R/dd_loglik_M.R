@@ -12,30 +12,81 @@ lambdamu = function(n,pars,ddep)
     n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1)
     {
-       lavec = pmax(zeros,la - (la - mu) * n / K)
+        lavec = pmax(zeros,la - (la - mu) * n / K)
     } else if(ddep == 1.3)
     {
-       lavec = pmax(zeros,la * (1 - n/K))
+        lavec = pmax(zeros,la * (1 - n/K))
     } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
     {
-       y = -(log(la/mu)/log(K+n0))^(ddep != 2.2)
-       lavec = pmax(zeros,la * (n + n0)^y)
+        y = -(log(la/mu)/log(K+n0))^(ddep != 2.2)
+        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 2.3)
     {
-       y = -K
-       lavec = pmax(zeros,la * (n + n0)^y)
+        y = -K
+        lavec = pmax(zeros,la * (n + n0)^y)
     } else if(ddep == 3)
     {
-       lavec = la * ones
-       muvec = mu + (la - mu) * n/K
+        lavec = la * ones
+        muvec = mu + (la - mu) * n/K
     } else if(ddep == 4 | ddep == 4.1 | ddep == 4.2)
     {
-       y = (log(la/mu)/log(K+n0))^(ddep != 4.2)
-       muvec = mu * (n + n0)^y
+        y = (log(la/mu)/log(K+n0))^(ddep != 4.2)
+        muvec = mu * (n + n0)^y
     } else if(ddep == 5)
     { 
-       lavec = pmax(zeros,la - 1/(r + 1)*(la - mu)/K * n)
-       muvec = muvec = mu + r/(r + 1)*(la - mu)/K * n
+        lavec = pmax(zeros,la - 1/(r + 1)*(la - mu)/K * n)
+        muvec = mu + r/(r + 1)*(la - mu)/K * n
+    } else if (ddep == 6) {
+        alpha <- r / (1 + r)
+        y <- log(1 + alpha * (la  - mu) / mu) / log(K)
+        lambda_n <- la - (1 - alpha) * (la - mu) * n / K
+        mu_n <- mu * n ^ y
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 7) {
+        alpha <- r / (1 + r)
+        y1 <- log(la / alpha * (la - mu) + mu) / log(K)
+        y2 <- log(1 + alpha * (la  - mu) / mu) / log(K)
+        lambda_n <- la * n ^ (-y1)
+        mu_n <- mu * n ^ y2
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 8) {
+        alpha <- r / (1 + r)
+        y <-  log(la / alpha * (la - mu) + mu) / log(K)
+        lambda_n <- la * n ^ (-y)
+        mu_n <- mu + alpha * (la - mu) * n / K
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 9) {
+        y <-  log(la / alpha * (la - mu) + mu) / log(K)
+        lambda_n <- la * n ^ (-y)
+        mu_n <- rep(mu, lnn)
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 10) {
+        lambda_n <- rep(la, lnn)
+        mu_n <- mu * (la / mu) ^ (n / K)
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 11) {
+        alpha <- r / (1 + r)
+        lambda_n <- la - (1 - alpha) * (la - mu) * n / K
+        mu_n <- mu * (la / mu) ^ (n / K)
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 12) {
+        alpha <- r / (1 + r)
+        lambda_n <-  la * (alpha + (1 - alpha) * mu / la) ^ (n / K)
+        mu_n <- mu * (la / mu) ^ (n / K)
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
+    } else if (ddep == 13) {
+        alpha <- r / (1 + r)
+        lambda_n <-  la * (alpha + (1 - alpha) * mu / la) ^ (n / K)
+        mu_n <- mu + alpha * (la - mu) * n / K
+        lavec <- pmax(rep(0,lnn), lambda_n)
+        muvec <- pmax(rep(0,lnn), mu_n)
     }
     return(list(lavec,muvec))
 }
@@ -58,21 +109,21 @@ changepars = function(pars)
 {
     if(length(pars) <= 3)
     {
-       sel = 1:2
+        sel = 1:2
     } else {
-       sel = c(1:2,4:min(length(pars),5))
+        sel = c(1:2,4:min(length(pars),5))
     }
     if(sum(pars[sel] == Inf) > 0)
     {
-       pars[which(pars[sel] == Inf)] = 1E+10
+        pars[which(pars[sel] == Inf)] = 1E+10
     }
     if(sum(pars[sel] == 0) > 0)
     {
-       pars[which(pars[sel] == 0)] = 1E-14
+        pars[which(pars[sel] == 0)] = 1E-14
     }
     if(sum(pars[sel] == 1) > 0)
     {
-       pars[which(pars[sel] == 1)] = pars[which(pars[sel] == 1)] - 1E-14
+        pars[which(pars[sel] == 1)] = pars[which(pars[sel] == 1)] - 1E-14
     }
     return(pars)
 }

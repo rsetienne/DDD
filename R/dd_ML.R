@@ -1,16 +1,16 @@
 initparsoptdefault = function(ddmodel,brts,missnumspec)
 {
-  if(ddmodel < 5)
+  if(ddmodel %in% c(1:4, 9:10)) # three-parameter models
   {
     return(c(0.2,0.1,2 * (length(brts) + missnumspec)^(ddmodel != 2.3)))
-  } else {
+  } else {  # four-parameter models
     return(c(0.2,0.1,2 * (length(brts) + missnumspec),0.01))
   }
 }
 
 parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 {
-  if(ddmodel < 5)
+  if(ddmodel %in% c(1:4, 9:10))
   {
     return(c(0.2,0.1,2*(length(brts) + missnumspec))[-idparsopt])
   } else {
@@ -41,9 +41,16 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' for intrinsic speciation rate, extinction rate and carrying capacity.  The
 #' ids are defined as follows: \cr id == 1 corresponds to lambda (speciation
 #' rate) \cr id == 2 corresponds to mu (extinction rate) \cr id == 3
-#' corresponds to K (clade-level carrying capacity) \cr id == 4 corresponds to
-#' r (r = b/a where mu = mu_0 + b * N and lambda = lambda_0 - a * N) (This is
-#' only available when ddmodel = 5)
+#' corresponds to K (clade-level carrying capacity) \cr
+#' id == 4  is only relevant for DD models 5 through 8 and 11 through 13 
+#' (models where both speciation and extinction are diversity-dependent, see \code{ddmodel} below), 
+#' and corresponds to a parameter that controls where the speciation and 
+#' extinction rate intersect at N = K.
+#' For \code{ddmodel = 5} (linear dependence in both rates), id == 4 corresponds to r, the
+#' ratio of the slopes of the extinction and speciation rate. In all other models,
+#' both rates intersect at a weighted mean of lambda0 and mu0, so that 
+#' `lambda(K) = mu(K) = alpha * lambda0 + (1 - alpha) * mu0`. In that case, 
+#'  id == 4  corresponds to alpha. Note that r = alpha / (1 - alpha).
 #' @param idparsfix The ids of the parameters that should not be optimized,
 #' e.g. c(1,3) if lambda and K should not be optimized, but only mu. In that
 #' case idparsopt must be 2. The default is to fix all parameters not specified
@@ -75,6 +82,15 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' with offset at infinity \cr
 #' \code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
 #' dependence in speciation and extinction rate \cr
+#' \code{ddmodel == 5} : linear dependence in speciation and extinction rate \cr 
+#' \code{ddmodel == 6} : linear dependence in speciation rate, exponential dependence in extinction rate \cr
+#' \code{ddmodel == 7} : exponential dependence in speciation and extinction rate \cr
+#' \code{ddmodel == 8} : exponential dependence in speciation rate, linear dependence in extinction rate \cr
+#' DD models 9, 10, 11, 12, 13 are equivalent to models 2, 3, 6, 7, 8 respectively,
+#' but with an alternative formulation of the exponential dependence. 
+#' In DD models 2, 3, 6, 7, and 8 the exponential model is a power function of N,
+#' while in DD models 9, 10, 11, 12, and 13 the exponential model is based on an
+#' exponential function of N.
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
 #' @param cond Conditioning: \cr
@@ -136,7 +152,7 @@ dd_ML = function(
   brts,
   initparsopt = initparsoptdefault(ddmodel,brts,missnumspec),
   idparsopt = 1:length(initparsopt),
-  idparsfix = (1:(3 + (ddmodel == 5)))[-idparsopt],
+  idparsfix = (1:(3 + (ddmodel %in% c(5:8, 11:13))))[-idparsopt],
   parsfix = parsfixdefault(ddmodel,brts,missnumspec,idparsopt),
   res = 10*(1+length(brts)+missnumspec),
   ddmodel = 1,
@@ -162,17 +178,28 @@ dd_ML = function(
   {
     cat("The branching times should be numeric.\n")
     out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
-    if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+    if (ddmodel == 5) {
+      out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)
+    } else if (ddmodel %in% c(6:8, 11:13)) {
+      out2 = data.frame(lambda = -1,mu = -1,K = -1, alpha = -1, loglik = -1, df = -1, conv = -1)
+    }
   } else {
     idpars = sort(c(idparsopt,idparsfix))
-    if((prod(idpars == (1:(3 + (ddmodel == 5)))) != 1) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
+    if((prod(idpars == (1:(3 + (ddmodel %in% c(5:8, 11:13))))) != 1) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
     {
       cat("The parameters to be optimized and/or fixed are incoherent.\n")
       out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
       if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+      else if (ddmodel %in% c(6:8, 11:13)) {
+        out2 = data.frame(lambda = -1,mu = -1,K = -1, alpha = -1, loglik = -1, df = -1, conv = -1)
+      }
     } else {
       namepars = c("lambda","mu","K")
-      if(ddmodel == 5) {namepars = namepars = c("lambda","mu","K","r")}
+      if(ddmodel == 5) {
+        namepars = c("lambda","mu","K","r")
+      } else if (ddmodel %in% c(6:8, 11:13)) {
+        namepars = c("lambda","mu","K","alpha")
+      }
       if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
       cat("You are optimizing",optstr,"\n")
       if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
@@ -192,7 +219,11 @@ dd_ML = function(
       {
         cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
         out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
-        if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+        if(ddmodel == 5) {
+          out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)
+        } else if (ddmodel %in% c(6:8, 11:13)) {
+          out2 = data.frame(lambda = -1,mu = -1,K = -1, alpha = -1, loglik = -1, df = -1, conv = -1)
+        }
       } else {
         #code up to DDD v1.6: out = optimx2(trparsopt,dd_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,brts = brts, pars2 = pars2,missnumspec = missnumspec)
         #out = dd_simplex(trparsopt,idparsopt,trparsfix,idparsfix,pars2,brts,missnumspec)
@@ -201,12 +232,16 @@ dd_ML = function(
         {
           cat("Optimization has not converged. Try again with different initial values.\n")
           out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = unlist(out$conv))
-          if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = unlist(out$conv))}
+          if(ddmodel == 5) {
+            out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = unlist(out$conv))
+          } else if (ddmodel %in% c(6:8, 11:13)) {
+            out2 = data.frame(lambda = -1,mu = -1,K = -1, alpha = -1, loglik = -1, df = -1, conv = -1)
+          }
         } else {
           MLtrpars = as.numeric(unlist(out$par))
           MLpars = MLtrpars/(1-MLtrpars)
           MLpars1 = rep(0,3)
-          if(ddmodel == 5) {MLpars1 = rep(0,4)}
+          if(ddmodel %in% c(5:8, 11:13)) {MLpars1 = rep(0,4)}
           MLpars1[idparsopt] = MLpars
           if(length(idparsfix) != 0) { MLpars1[idparsfix] = parsfix }
           if(MLpars1[3] > 10^7){MLpars1[3] = Inf}
@@ -218,6 +253,11 @@ dd_ML = function(
             s1 = sprintf('%s, r: %f',s1,MLpars1[4])
             out2 = data.frame(lambda = MLpars1[1],mu = MLpars1[2],K = MLpars1[3], r = MLpars1[4], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))   
           }
+          if(ddmodel %in% c(6:8, 11:13))
+          {
+            s1 = sprintf('%s, r: %f',s1,MLpars1[4])
+            out2 = data.frame(lambda = MLpars1[1],mu = MLpars1[2],K = MLpars1[3], alpha = MLpars1[4], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))   
+          }
           if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
           s2 = sprintf('Maximum loglikelihood: %f',ML)
           cat(paste("\n",s1,"\n",s2,"\n",sep = ''))
@@ -225,5 +265,5 @@ dd_ML = function(
       }
     }
   }
-   return(invisible(out2))
+  return(invisible(out2))
 }

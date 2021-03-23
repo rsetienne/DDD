@@ -84,21 +84,21 @@ dd_lamuN = function(ddmodel,pars,N)
     } 
     if (ddmodel == 11) {
         alpha <- pars[4]
-        # alternative exponential dependence in extinction rate, linear dependence in extinction rate
-        laN =  la * (alpha + (1 - alpha) * mu / la) ^ (N / K)
+        # linear dependence in speciation rate, alternative exponential dependence in extinction rate
+        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
         muN =  mu + alpha * (la - mu) * N / K
     }
     if (ddmodel == 12) {
         alpha <- pars[4]
-        # linear dependence in speciation rate, alternative exponential dependence in extinction rate
-        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
+        # alternative exponential dependence in speciation rate and extinction rate
+        laN =  la * (alpha + (1 - alpha) * mu / la) ^ (N / K)
         muN = mu * ((1 - alpha) + alpha * la / mu) ^ (N / K)
     }
     if (ddmodel == 13) {
         alpha <- pars[4]
-        # alternative exponential dependence in speciation rate and extinction rate
+        # alternative exponential dependence in speciation rate, linear dependence in extinction rate
         laN =  la * (alpha + (1 - alpha) * mu / la) ^ (N / K)
-        muN = mu * ((1 - alpha) + alpha * la / mu) ^ (N / K)
+        muN =  mu + alpha * (la - mu) * N / K
     }
     return(c(laN, muN))
 }
@@ -109,10 +109,18 @@ dd_lamuN = function(ddmodel,pars,N)
 #' 
 #' 
 #' @param pars Vector of parameters: \cr \cr \code{pars[1]} corresponds to
-#' lambda (speciation rate) \cr \code{pars[2]} corresponds to mu (extinction
-#' rate) \cr \code{pars[3]} corresponds to K (clade-level carrying capacity)
+#' lambda0 (speciation rate) \cr \code{pars[2]} corresponds to mu0 (extinction
+#' rate) \cr \code{pars[3]} corresponds to K (clade-level carrying capacity) \cr
+#' \code{pars[4]} is only relevant for DD models 5 through 8 and 11 through 13 
+#' (models where both speciation and extinction are diversity-dependent, see \code{ddmodel} below), 
+#' and controls where the speciation and extinction rate intersect at N = K.
+#' For \code{ddmodel = 5} (linear dependence in both rates), \code{pars[4]} is r, the
+#' ratio of the slopes of the extinction and speciation rate. In all other models,
+#' both rates intersect at a weighted mean of lambda0 and mu0, so that 
+#' `lambda(K) = mu(K) = alpha * lambda0 + (1 - alpha) * mu0`. In that case, 
+#' \code{pars[4]} is alpha. Note that r = alpha / (1 - alpha).
 #' @param age Sets the crown age for the simulation
-#' @param ddmodel Sets the model of diversity-dependence: \cr \code{ddmodel ==
+#' @param ddmodel Sets the model of diversity-dependence: \code{ddmodel ==
 #' 1} : linear dependence in speciation rate with parameter K (= diversity
 #' where speciation = extinction)\cr \code{ddmodel == 1.3} : linear dependence
 #' in speciation rate with parameter K' (= diversity where speciation = 0)\cr
@@ -126,7 +134,15 @@ dd_lamuN = function(ddmodel,pars,N)
 #' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
 #' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
 #' 4.2} : 1/n dependence in extinction rate with offset at infinity \cr
-#' \code{ddmodel == 5} : linear dependence in speciation and extinction rate
+#' \code{ddmodel == 5} : linear dependence in speciation and extinction rate \cr 
+#' \code{ddmodel == 6} : linear dependence in speciation rate, exponential dependence in extinction rate \cr
+#' \code{ddmodel == 7} : exponential dependence in speciation and extinction rate \cr
+#' \code{ddmodel == 8} : exponential dependence in speciation rate, linear dependence in extinction rate \cr
+#' DD models 9, 10, 11, 12, 13 are equivalent to models 2, 3, 6, 7, 8 respectively,
+#' but with an alternative formulation of the exponential dependence. 
+#' In DD models 2, 3, 6, 7, and 8 the exponential model is a power function of N,
+#' while in DD models 9, 10, 11, 12, and 13 the exponential model is based on an
+#' exponential function of N.
 #' @return \item{ out }{ A list with the following four elements: The first
 #' element is the tree of extant species in phylo format \cr The second element
 #' is the tree of all species, including extinct species, in phylo format \cr

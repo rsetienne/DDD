@@ -118,8 +118,7 @@ flavec <- function(ddep,la,mu,K,r,lx,kk)
 flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
 {
    nn = (0:(lx - 1)) + kk
-   if(ddep == 1 | ddep == 5)
-   {
+   if(ddep %in% c(1, 5:6, 11)) {
        lavec = pmax(rep(0,lx),la - 1/(r + 1) * (la - mu)/K * nn)
    }
    if(ddep == 1.3)
@@ -134,9 +133,9 @@ flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
    {
        lavec = pmax(rep(0,lx),la * nn/K * (1 - nn/K))
    }
-   if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
+   if(ddep %in% c(2, 2.1, 2.2, 7:8))
    {
-       x = -(log(la/mu)/log(K + n0))^(ddep != 2.2)
+       x = -(log(la/mu)/log(K + n0)) ^ (ddep != 2.2)
        lavec = pmax(rep(0,lx),la * (nn + n0)^x)
    }
    if(ddep == 2.3)
@@ -144,9 +143,12 @@ flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
        x = -K
        lavec = pmax(rep(0,lx),la * (nn + n0)^x)
    }
-   if(ddep == 3 | ddep == 4 | ddep == 4.1 | ddep == 4.2)
-   {
+   if(ddep %in% c(3:4, 4.1, 4.2, 10)) {
        lavec = la * rep(1,lx)
+   }
+   if (ddep %in% c(9, 12:13)) {
+     alpha <- r / (1 + r)
+     lavec = pmax(rep(0,lx), la * (alpha + (1 - alpha) * mu / la) ^ (nn / K))
    }
    return(lavec)
 }
