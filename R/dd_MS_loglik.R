@@ -92,7 +92,7 @@
 #' species in main clade and subclade respectively.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
 #' @return The loglikelihood
 #' @author Rampal S. Etienne & Bart Haegeman
@@ -109,10 +109,10 @@
 #' missnumspec = 0
 #' brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
 #' brtsS = c(9.6,8.6,7.4,4.9,2.5)
-#' dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'ode45')
+#' dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec)
 #' 
 #' @export dd_MS_loglik
-dd_MS_loglik = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'ode45')
+dd_MS_loglik = function(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
 {
 if(length(pars2) == 4)
 {
@@ -258,18 +258,13 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
                } else {
                  if (startsWith(methode, "odeint::")) {
                    dim(probs) = c(lx,lx)
-                   probs = .Call('dd_logliknorm2_odeint', probs, c(t1, t2), mm, reltol, abstol, methode)
+                   probs = dd_logliknorm2_odeint(probs, c(t1, t2), mm, reltol, abstol, methode)
                  }
                  else {
-                   y <- deSolve::ode(probs,c(t1,t2),dd_logliknorm_rhs2,mm,rtol = reltol,atol = abstol,method = methode)
-                   probs <- y[2,2:(lx2 + 1)]
+                   stop("F95 is gone")
                  }
                }
                dim(probs) = c(lx,lx)
-               
-               #k1 = i + (soc - 2)
-               #y = desolve::ode(probs2,c(t1,t2),dd_loglik_rhs,c(pars1[1:3],k1,ddep),rtol = reltol,atol = abstol, methode = 'lsoda')
-               #probs2 = y[2,2:(lx+1)]              
                
                if(t2 < 0)
                {

@@ -1,8 +1,5 @@
 methode_vec <- c(
   'analytical',
-  'lsoda',
-  'ode45',
-  'lsodes',
   'odeint::runge_kutta_cash_karp54',
   'odeint::runge_kutta_fehlberg78',    # default
   'odeint::runge_kutta_dopri5',
@@ -753,6 +750,7 @@ DDD_script <- function(i,j)
   if(i == 29)
   {
   print("Linear independence of speciation rate with extinction")
+  print("### DDD_0a")
   DDD_0a <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.3, 0.1),
@@ -769,6 +767,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_0a)
   
+  print("### DDD_0b")
   DDD_0b <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.1, 0.01),
@@ -785,6 +784,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_0b)
   
+  print("### DDD_0c")
   DDD_0c <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.5, 0.1),
@@ -801,6 +801,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_0c)
   
+  print("### DDD_0d")
   DDD_0d <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.1393492, 1.441418E-17),
@@ -819,6 +820,7 @@ DDD_script <- function(i,j)
   
   ###
   print("Linear dependence of speciation rate without extinction")
+  print("### DDD_1a")
   DDD_1a <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.3, total_richness),
@@ -835,6 +837,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_1a)
   
+  print("### DDD_1b")
   DDD_1b <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.2, 500),
@@ -851,6 +854,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_1b)
   
+  print("### DDD_1c")
   DDD_1c <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.1, 500),
@@ -867,6 +871,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_1c)
   
+  print("### DDD_1d")
   DDD_1d <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.1756549, 540.6477),
@@ -886,6 +891,7 @@ DDD_script <- function(i,j)
   
   ###
   print("Linear dependence of speciation rate with extinction") #tweak rates from 0.3 and 0.1 to 0.2 and 0.01 respectively
+  print("### DDD_2a")
   DDD_2a <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.3, 0.01, total_richness),
@@ -899,6 +905,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_2a)
   
+  print("### DDD_2b")
   DDD_2b <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.158, 5.753e-05, 600),
@@ -912,6 +919,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_2b)
   
+  print("### DDD_2c")
   DDD_2c <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.18, 0.0015, 500),
@@ -925,6 +933,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_2c)
   
+  print("### DDD_2d")
   DDD_2d <- dd_ML(brts = brts,
                   ddmodel = 1,
                   initparsopt = c(0.257, 0.001602569, 1384),
@@ -940,6 +949,7 @@ DDD_script <- function(i,j)
   
   ###
   print("Exponential dependence of speciation rate with extinction")
+  print("### DDD_3a")
   DDD_3a <- dd_ML(brts = brts,
                   ddmodel = 2,
                   initparsopt = c(0.8, 0.1, 500),
@@ -953,6 +963,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_3a)
   
+  print("### DDD_3b")
   DDD_3b <- dd_ML(brts = brts,
                   ddmodel = 2, 
                   initparsopt = c(0.5, 0.1, 500),
@@ -966,6 +977,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_3b)
   
+  print("### DDD_3c")
   DDD_3c <- dd_ML(brts = brts,
                   ddmodel = 2,
                   initparsopt = c(0.5, 0.1, total_richness),
@@ -979,6 +991,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_3c)
   
+  print("### DDD_3d")
   DDD_3d <- dd_ML(brts = brts,
                   ddmodel = 2,
                   initparsopt = c(0.257, 0.01, 140),
@@ -994,6 +1007,7 @@ DDD_script <- function(i,j)
   
   ###
   print("Linear dependence of extinction rate") #tweak rates from 0.3 and 0.1 to 0.2 and 0.01 respectively
+  print("### DDD_4a")
   DDD_4a <- dd_ML(brts = brts,
                   ddmodel = 3,
                   initparsopt = c(0.1941203, 0.0001050502, 400), 
@@ -1007,6 +1021,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_4a)
   
+  print("### DDD_4b")
   DDD_4b <- dd_ML(brts = brts,
                   ddmodel = 3,
                   initparsopt = c(0.1551, 9.72E-05, 391),
@@ -1020,6 +1035,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_4b)
   
+  print("### DDD_4c")
   DDD_4c <- dd_ML(brts = brts,
                   ddmodel = 3,
                   initparsopt = c(0.3, 0.0004, 300),
@@ -1035,6 +1051,7 @@ DDD_script <- function(i,j)
   
   ###
   print("Exponential dependence of extinction rate")
+  print("### DDD_5a")
   DDD_5a <- dd_ML(brts = brts,
                   ddmodel = 4,
                   initparsopt=c(0.2, 0.01, 900),
@@ -1048,6 +1065,7 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_5a)
   
+  print("### DDD_5b")
   DDD_5b <- dd_ML(brts = brts,
                   ddmodel = 4,
                   initparsopt = c(0.1, 0.001, total_richness),
@@ -1061,32 +1079,36 @@ DDD_script <- function(i,j)
                   methode = methode)
   print(DDD_5b)
   
-  DDD_5c <- dd_ML(brts = brts,
-                  ddmodel = 4,
-                  initparsopt=c(0.3, 0.00001, 300),
-                  btorph = btorph,
-                  res = res,
-                  soc = soc,
-                  cond = cond,
-                  missnumspec = missnumspec,
-                  optimmethod = optimmethod,
-                  num_cycles = num_cycles,
-                  methode = methode)
-  print(DDD_5c)
+  print("### DDD_5c skipped")
+#  DDD_5c <- dd_ML(brts = brts,
+#                  ddmodel = 4,
+#                  initparsopt=c(0.3, 0.00001, 300),
+#                  btorph = btorph,
+#                  res = res,
+#                  soc = soc,
+#                  cond = cond,
+#                  missnumspec = missnumspec,
+#                  optimmethod = optimmethod,
+#                  num_cycles = num_cycles,
+#                  methode = methode)
+#  print(DDD_5c)
   }
 }  
 
 
-DDD_test_all = function() {
-	for (i in 1:1) {
+DDD_test_all = function(II, JJ) {
+  library("tictoc")
+  for (i in II) {
+    if (i <= 29) {
 	  print(paste('### i = ',i))
-		for (j in 1:length(methode_vec)) {
-		  print(paste('### ', methode_vec[j]))
+		for (j in JJ) {
+		  print(paste('### begin', methode_vec[j]))
+		  tic("### run")
 		  DDD_script(i, j)
+		  toc()
+		  print(paste('### end', methode_vec[j]))
 		}
-	  print('### end')
-	}
+	  print(paste('### end', i))
+    }
+  }
 }
-
-
-#DDD_test_all()

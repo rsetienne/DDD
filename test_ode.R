@@ -1,10 +1,8 @@
 library(DDD)
-
+library(Rcpp)
 
 methods = c(
   'analytical',
-  'ode45',
-  'lsoda',
   'odeint::runge_kutta_cash_karp54',
   'odeint::runge_kutta_fehlberg78',    # default
   'odeint::runge_kutta_dopri5',
@@ -15,7 +13,7 @@ methods = c(
 test_ode = function(rep = 1) {
   # parameter set from test suite:
   pars1 = c(0.8,0.1,40) 
-  pars2 = c(100,1,3,0.1,0.1,2)  # pars2[3] = 1: fw; = 3: bw;
+  pars2 = c(100,1,1,0.1,0.1,2)  # pars2[3] = 1: fw; = 3: bw;
   brts = 1:30
   missnumspec = 0
 

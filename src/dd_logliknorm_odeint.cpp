@@ -1,7 +1,3 @@
-//' @export dd_logliknorm1_odeint
-//' @export dd_logliknorm2_odeint
-
-
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
 #include <vector>
@@ -130,46 +126,39 @@ private:
 
 
 
-//' Driver for the boost::odeint solver
-//'
-//' @name dd_logliknorm1_odeint
-RcppExport SEXP dd_logliknorm1_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
-  BEGIN_RCPP
-    auto y = as<NumericVector>(ry);
-    std::vector<double> yy(y.size() + 2, 0.0);    // [0,y,0]
-    std::copy(y.cbegin(), y.cend(), yy.begin() + 1); 
-    auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<NumericVector>(rpars);
-    auto atol = as<double>(ratol);
-    auto rtol = as<double>(rrtol);
-    auto stepper = as<std::string>(rstepper);
-    auto rhs_obj = logliknorm1_rhs(pars);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
-    return Rcpp::NumericVector(yy.cbegin() + 1, yy.cend() - 1);
-  END_RCPP
+// [[Rcpp::export]]
+NumericVector dd_logliknorm1_odeint(NumericVector ry, 
+                                    NumericVector times,
+                                    NumericVector pars,
+                                    double atol,
+                                    double rtol,
+                                    std::string stepper) 
+{
+  std::vector<double> y(ry.length() + 2, 0.0);    // [0,y,0]
+  std::copy(ry.cbegin(), ry.cend(), y.begin() + 1); 
+
+  auto rhs_obj = logliknorm1_rhs(pars);
+  odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
+  return Rcpp::NumericVector(y.cbegin() + 1, y.cend() - 1);
 }
 
 
 
-//' Driver for the boost::odeint solver
-//'
-//' @name dd_logliknorm2_odeint
-RcppExport SEXP dd_logliknorm2_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
+// [[Rcpp::export]]
+NumericMatrix dd_logliknorm2_odeint(NumericMatrix ry, 
+                                    NumericVector times,
+                                    List pars, 
+                                    double atol, 
+                                    double rtol, 
+                                    std::string stepper) {
   BEGIN_RCPP
-    auto y = as<NumericMatrix>(ry);
-    size_t dim = std::sqrt(y.length());
-    matrix_t yy(dim + 2, dim + 2, 0.0);
-    auto py = mshift(yy, dim, 1, 1);
-    mcopy(y, py, dim);
-
-    auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<List>(rpars);
-    auto atol = as<double>(ratol);
-    auto rtol = as<double>(rrtol);
-    auto stepper = as<std::string>(rstepper);
+    size_t dim = std::sqrt(ry.length());
+    matrix_t y(dim + 2, dim + 2, 0.0);
+    auto py = mshift(y, dim, 1, 1);
+    mcopy(ry, py, dim);
 
     auto rhs_obj = logliknorm2_rhs(dim, pars);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
+    odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
 
     NumericMatrix ret(dim, dim);
     mcopy(py, ret, dim);

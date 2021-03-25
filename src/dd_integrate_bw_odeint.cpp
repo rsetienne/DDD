@@ -1,6 +1,3 @@
-//' @export dd_integrate_bw_odeint
-
-
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
 #include <vector>
@@ -61,23 +58,19 @@ private:
 };
 
 
-//' Driver for the boost::odeint solver
-//'
-//' @name dd_integrate_bw_odeint
-RcppExport SEXP dd_integrate_bw_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
-  BEGIN_RCPP
-    auto y = as<NumericVector>(ry);
-    std::vector<double> yy(y.size() + 2, 0.0);    // [0,y,0]
-    std::copy(y.cbegin(), y.cend(), yy.begin() + 1); 
-    auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<NumericVector>(rpars);
-    auto atol = as<double>(ratol);
-    auto rtol = as<double>(rrtol);
-    auto stepper = as<std::string>(rstepper);
-    
-    auto rhs_obj = ode_bw_rhs(pars);
-    auto steps = std::min(10000.0, (times[1] - times[0]) * 10.0);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], (times[1] - times[0]) / steps, atol, rtol);
-    return Rcpp::NumericVector(yy.cbegin() + 1, yy.cend() -1);
-  END_RCPP
+// [[Rcpp::export]]
+NumericVector dd_integrate_bw_odeint(NumericVector ry, 
+                                     NumericVector times, 
+                                     NumericVector pars, 
+                                     double atol, 
+                                     double rtol, 
+                                     std::string stepper) 
+{
+  std::vector<double> y(ry.size() + 2, 0.0);    // [0,y,0]
+  std::copy(ry.cbegin(), ry.cend(), y.begin() + 1); 
+  auto rhs_obj = ode_bw_rhs(pars);
+  auto steps = std::min(10000.0, (times[1] - times[0]) * 10.0);
+  
+  odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], (times[1] - times[0]) / steps, atol, rtol);
+  return NumericVector(y.cbegin() + 1, y.cend() -1);
 }

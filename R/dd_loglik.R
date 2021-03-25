@@ -114,7 +114,7 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' in the phylogeny
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
 #' @return The loglikelihood
 #' @author Rampal S. Etienne & Bart Haegeman
@@ -131,10 +131,10 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 {
    if(pars2[3] == 3)
    {
-     rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN'
+     rhs_func_name = 'dd_loglik_bw_rhs'
    } else
    {
-     rhs_func_name = 'dd_loglik_rhs_FORTRAN'
+     rhs_func_name = 'dd_loglik_rhs'
    }
    if(methode == 'analytical')
    {
@@ -146,7 +146,7 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
    return(out)
 }
 
-dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_name = 'dd_loglik_rhs_FORTRAN')
+dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs')
 {
   if(length(pars2) == 4)
   {
@@ -520,12 +520,12 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     if(is.character(rhs_func))
     {
       rhs_func_name <- rhs_func
-      if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN')
+      if(rhs_func_name != 'dd_loglik_rhs' & rhs_func_name != 'dd_loglik_bw_rhs')
       {
         rhs_func = match.fun(rhs_func)
       }
     }
-    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_rhs_FORTRAN' || rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
+    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs')
     {
       parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
     } else 
@@ -535,13 +535,6 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     if (startsWith(method, "odeint::")) {
       # couldn't find a better place to plug this in
       y <- dd_ode_odeint(initprobs, tvec, parsvec, atol, rtol, method = method, rhs_name = rhs_func_name)
-    } 
-    else if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
-    {
-      y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
-    } else if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
-    {
-      y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
     } else
     {
       y <- deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
@@ -550,34 +543,10 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
   return(y)
 }
 
-#' @useDynLib DDD
-dd_ode_FORTRAN <- function(
-  initprobs,
-  tvec,
-  parsvec,
-  atol,
-  rtol,
-  methode,
-  runmod = "dd_runmod"
-)
-{
-  #system("R CMD SHLIB d:/data/ms/DDD/dd_loglik_rhs_FORTRAN.f")
-  #dyn.load(paste("d:/data/ms/DDD/dd_loglik_rhs_FORTRAN", .Platform$dynlib.ext, sep = ""))
-  N <- length(initprobs)
-  probs <- deSolve::ode(y = initprobs, parms = c(N + 0.,parsvec[length(parsvec)] + 0.), rpar = parsvec[-length(parsvec)], 
-               times = tvec, func = runmod, initfunc = "dd_initmod", 
-               ynames = c("SV"), dimens = N + 2, nout = 1, outnames = c("Sum"), 
-               dllname = "DDD",atol = atol, rtol = rtol, method = methode)[,1:(N + 1)]
-  #dyn.unload(paste("d:/data/ms/DDD/dd_loglik_rhs_FORTRAN", .Platform$dynlib.ext, sep = ""))
-  return(probs)
-}
-
 
 dd_rhs_odeint_map = list(
-  'dd_loglik_rhs' = 'dd_integrate_odeint',
-  'dd_loglik_bw_rhs' = 'dd_integrate_bw_odeint',
-  'dd_loglik_rhs_FORTRAN' = 'dd_integrate_odeint',
-  'dd_loglik_bw_rhs_FORTRAN' = 'dd_integrate_bw_odeint'
+  'dd_loglik_rhs' = dd_integrate_odeint,
+  'dd_loglik_bw_rhs' = dd_integrate_bw_odeint
 )
 
 
@@ -588,7 +557,7 @@ dd_ode_bw_right_open_odeint = function(initprobs, tvec, parsvec, method)
   ddy = 0.0
   while (tvec[1] + 100 < tvec[2]) {
     y0 = y[length(y)]
-    y <- .Call('dd_integrate_bw_odeint', y, c(tvec[1], tvec[1] + 100), parsvec, 1e-4, 1e-4, method)
+    y <- dd_integrate_bw_odeint(y, c(tvec[1], tvec[1] + 100), parsvec, 1e-4, 1e-4, method)
     G = y[length(y)]
     dy = G - y0
     ddy = dy - ddy;
@@ -604,7 +573,7 @@ dd_ode_bw_right_open_odeint = function(initprobs, tvec, parsvec, method)
     ddy = dy
   }
   # never reached so far...
-  y <- .Call('dd_integrate_bw_odeint', y, c(tvec[1], tvec[2]), parsvec, 1e-6, 1e-6, method)
+  y <- dd_integrate_bw_odeint(y, c(tvec[1], tvec[2]), parsvec, 1e-6, 1e-6, method)
   return(y[length(y)])
 }
 
@@ -616,12 +585,12 @@ dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
   # caller expect a matrix type
   lx = length(initprobs)
   y = matrix(nrow=2, ncol = lx + 1)
-  if (tvec[2] > 10000 && fun == 'dd_integrate_bw_odeint') {
+  if (tvec[2] > 10000 && rhs_name == 'dd_loglik_bw_rhs') {
     # tends to hang if not handled 
     y[2,2:(lx+1)] <- dd_ode_bw_right_open_odeint(initprobs, tvec, parsvec, method)
   }
   else {
-    y[2,2:(lx+1)] <- .Call(fun, initprobs, tvec, parsvec, atol, rtol, method)
+    y[2,2:(lx+1)] <- fun(initprobs, tvec, parsvec, atol, rtol, method)
   }
   return(y)
 }

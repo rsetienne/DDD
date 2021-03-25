@@ -73,7 +73,7 @@
 #' species in main clade and subclade respectively.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
 #' @return The loglikelihood
 #' @author Rampal S. Etienne & Bart Haegeman
@@ -90,7 +90,7 @@
 #' missnumspec = 0
 #' brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
 #' brtsS = c(9.6,8.6,7.4,4.9,2.5)
-#' dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'ode45')
+#' dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec)
 #' 
 #' @export dd_KI_loglik
 dd_KI_loglik <- function(pars1,
@@ -98,7 +98,7 @@ dd_KI_loglik <- function(pars1,
                          brtsM,
                          brtsS,
                          missnumspec,
-                         methode = 'lsoda')
+                         methode = 'odeint::runge_kutta_cash_karp54')
 {
   if(length(pars2) == 4)
   {
@@ -340,7 +340,7 @@ dd_KI_logliknorm <- function(brts_k_list,
       m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
 
       if (startsWith(methode, 'odeint::')) {
-        probs = .Call('dd_logliknorm1_odeint', probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
+        probs = dd_logliknorm1_odeint(probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
       }
       else {
         y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
@@ -379,7 +379,7 @@ dd_KI_logliknorm <- function(brts_k_list,
       m5 = muvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
       m6 = ma * nx2[2:(lx+1),2:(lx+1)]
       if (startsWith(methode, "odeint::")) {
-        probs = .Call('dd_logliknorm2_odeint', probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
+        probs = dd_logliknorm2_odeint(probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
       }
       else {
         dim(probs) = c(lx*lx,1)
@@ -402,7 +402,7 @@ dd_KI_logliknorm <- function(brts_k_list,
     if(methode != 'analytical')
     {
       if (startsWith(methode, "odeint::")) {
-        probs = .Call('dd_logliknorm2_odeint', probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
+        probs = dd_logliknorm2_odeint(probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
       }
       else {
         dim(probs) = c(lx*lx,1)
@@ -559,7 +559,7 @@ dd_multiple_KI_loglik <- function(pars1_list,
                                   missnumspec_list,
                                   reltol = 1e-14,
                                   abstol = 1e-16,
-                                  methode = 'lsoda')
+                                  methode = 'odeint::runge_kutta_cash_karp54')
 {
   lx_list <- create_lx_list(lmax = pars2[1],
                             ddep = pars2[2],

@@ -1,10 +1,8 @@
-//' @export dd_integrate_td_odeint
-
-
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include "odeint_helper.hpp"
 
 
@@ -13,6 +11,8 @@ using namespace Rcpp;
 
 class ode_td_rhs
 {
+  using quad_t = boost::multiprecision::cpp_bin_float_quad;
+  
 public:
   ode_td_rhs(NumericVector parsvec)
   {
@@ -50,12 +50,12 @@ public:
     // En = sum((0:(lp - 1)) * x[1:lp] )
     // dsigdiv = mutd / En
     // return(list(c(dp,dsigdiv)))  
-    double En = 0.0;
+    quad_t En{0};
     for (size_t i = 0; i < lp; ++i) {
-      En += static_cast<double>(i) * xx[i];
+      En += quad_t{static_cast<double>(i) * xx[i]};
     }    
     for (size_t i = lp; i < xx.size(); ++i) {
-      dx[i] = mu / En;
+      dx[i] = (quad_t{mu} / En).convert_to<double>();
     }
   }
   
@@ -68,20 +68,15 @@ private:
 
 
 
-//' Driver for the boost::odeint solver
-//'
-//' @name dd_integrate_td_odeint
-RcppExport SEXP dd_integrate_td_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
-  BEGIN_RCPP
-    auto yy = as<std::vector<double>>(ry);
-    auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<NumericVector>(rpars);
-    auto atol = as<double>(ratol);
-    auto rtol = as<double>(rrtol);
-    auto stepper = as<std::string>(rstepper);
-    
-    auto rhs_obj = ode_td_rhs(pars);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
-    return Rcpp::NumericVector(yy.cbegin(), yy.cend());
-  END_RCPP
+// [[Rcpp::export]]
+std::vector<double> dd_integrate_td_odeint(std::vector<double> y, 
+                                           NumericVector times, 
+                                           NumericVector pars, 
+                                           double atol, 
+                                           double rtol,
+                                           std::string stepper) 
+{
+  auto rhs_obj = ode_td_rhs(pars);
+  odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
+  return y;
 }

@@ -1,4 +1,4 @@
-//' @export dd_integrate_odeint
+//' @useDynLib DDD
 
 
 #define STRICT_R_HEADERS
@@ -57,29 +57,20 @@ private:
 };
 
 
-//' Driver for the boost::odeint solver
-//'
-//' @name dd_integrate_odeint
-RcppExport SEXP dd_integrate_odeint(SEXP ry, SEXP rtimes, SEXP rpars, SEXP ratol, SEXP rrtol, SEXP rstepper) {
-  BEGIN_RCPP
-    // convert R arguments into c++ objects
-    auto y = as<NumericVector>(ry);
-    std::vector<double> yy(y.size() + 2, 0.0);    // [0,y,0]
-    std::copy(y.cbegin(), y.cend(), yy.begin() + 1); 
-    auto times = as<std::vector<double>>(rtimes);
-    auto pars = as<NumericVector>(rpars);
-    auto atol = as<double>(ratol);
-    auto rtol = as<double>(rrtol);
-    auto stepper = as<std::string>(rstepper);
+//' Driver for odeint
+//' 
+// [[Rcpp::export]]
+NumericVector dd_integrate_odeint(NumericVector ry, 
+                                  NumericVector times, 
+                                  NumericVector pars, 
+                                  double atol, 
+                                  double rtol,
+                                  std::string stepper) 
+{
+  std::vector<double> y(ry.size() + 2, 0.0);    // [0,y,0]
+  std::copy(ry.begin(), ry.end(), y.begin() + 1); 
 
-    // create the rhs object
-    auto rhs_obj = ode_rhs(pars);
-    
-    // call the helper function from odein_helper.hpp
-    // Note: the ugly std::ref(rhs) is optional but avoids a copy of rhs.
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), yy, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
-
-    // return as R object
-    return Rcpp::NumericVector(yy.cbegin() + 1, yy.cend() - 1);
-  END_RCPP
+  auto rhs_obj = ode_rhs(pars);
+  odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
+  return NumericVector(y.cbegin() + 1, y.cend() - 1);
 }
