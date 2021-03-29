@@ -1,7 +1,7 @@
 dd_loglik_choosepar = function(trparsopt,trparsfix,idparsopt,idparsfix,pars2,brts,missnumspec,methode)
 {
    trpars1 = rep(0,3)
-   if(pars2[2] == 5)
+   if(pars2[2] %in% c(5:8, 11:13))
    {   
       trpars1 = rep(0,4)
    }
@@ -14,7 +14,7 @@ dd_loglik_choosepar = function(trparsopt,trparsfix,idparsopt,idparsfix,pars2,brt
    {
       loglik = -Inf
    } else {
-      pars1 = trpars1/(1 - trpars1)
+      pars1 = trpars1 / (1 - trpars1)
       loglik = dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
       if(is.nan(loglik) || is.na(loglik) || loglik == Inf)
       {
