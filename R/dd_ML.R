@@ -157,22 +157,30 @@ dd_ML = function(
   {
     stop('Please specify a tolerance vector with three values') 
   }
+  both_rates_vary <- ddmodel %in% c(5:8, 11:13)
+  if (both_rates_vary) {
+    output_error <- data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)
+  } else {
+    output_error <- data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
+  }
+  
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
-  if(is.numeric(brts) == FALSE)
+  if (is.numeric(brts) == FALSE)
   {
     cat("The branching times should be numeric.\n")
-    out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
-    if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+    out2 <- output_error
   } else {
     idpars = sort(c(idparsopt,idparsfix))
-    if((prod(idpars == (1:(3 + (ddmodel == 5)))) != 1) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
+    if (!all(idpars == (1:(3 + both_rates_vary))) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
     {
       cat("The parameters to be optimized and/or fixed are incoherent.\n")
-      out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
-      if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+      out2 <- output_error
     } else {
-      namepars = c("lambda","mu","K")
-      if(ddmodel == 5) {namepars = namepars = c("lambda","mu","K","r")}
+      if(both_rates_vary) {
+        namepars = c("lambda","mu","K","r")
+      } else {
+        namepars = c("lambda","mu","K")
+      }
       if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
       cat("You are optimizing",optstr,"\n")
       if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
@@ -191,8 +199,7 @@ dd_ML = function(
       if(initloglik == -Inf)
       {
         cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
-        out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
-        if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)}
+        out2 <- output_error
       } else {
         #code up to DDD v1.6: out = optimx2(trparsopt,dd_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,brts = brts, pars2 = pars2,missnumspec = missnumspec)
         #out = dd_simplex(trparsopt,idparsopt,trparsfix,idparsfix,pars2,brts,missnumspec)
@@ -200,30 +207,34 @@ dd_ML = function(
         if(out$conv != 0)
         {
           cat("Optimization has not converged. Try again with different initial values.\n")
-          out2 = data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = unlist(out$conv))
-          if(ddmodel == 5) {out2 = data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = unlist(out$conv))}
+          out2 <- output_error
         } else {
           MLtrpars = as.numeric(unlist(out$par))
           MLpars = MLtrpars/(1-MLtrpars)
-          MLpars1 = rep(0,3)
-          if(ddmodel == 5) {MLpars1 = rep(0,4)}
+          if (both_rates_vary) {
+            MLpars1 <- rep(0,4)
+          } else {
+            MLpars1 <- rep(0,3)
+          }
           MLpars1[idparsopt] = MLpars
           if(length(idparsfix) != 0) { MLpars1[idparsfix] = parsfix }
           if(MLpars1[3] > 10^7){MLpars1[3] = Inf}
           ML = as.numeric(unlist(out$fvalues))
-          out2 = data.frame(lambda = MLpars1[1],mu = MLpars1[2],K = MLpars1[3], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))
-          s1 = sprintf('Maximum likelihood parameter estimates: lambda: %f, mu: %f, K: %f',MLpars1[1],MLpars1[2],MLpars1[3])
-          if(ddmodel == 5)
-          {
-            s1 = sprintf('%s, r: %f',s1,MLpars1[4])
-            out2 = data.frame(lambda = MLpars1[1],mu = MLpars1[2],K = MLpars1[3], r = MLpars1[4], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))   
+          if (both_rates_vary) {
+            s1 <- sprintf('Maximum likelihood parameter estimates: lambda: %f, mu: %f, K: %f, r: %f', MLpars1[1], MLpars1[2], MLpars1[3], MLpars1[4])
+            out2 <- data.frame(lambda = MLpars1[1], mu = MLpars1[2], K = MLpars1[3], r = MLpars1[4], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))   
+          } else {
+            s1 <- sprintf('Maximum likelihood parameter estimates: lambda: %f, mu: %f, K: %f', MLpars1[1], MLpars1[2], MLpars1[3])
+            out2 <- data.frame(lambda = MLpars1[1], mu = MLpars1[2], K = MLpars1[3], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))
           }
-          if(out2$conv != 0 & changeloglikifnoconv == T) { out2$loglik = -Inf }
+          if(out2$conv != 0 & changeloglikifnoconv == T) { 
+            out2$loglik = -Inf 
+          }
           s2 = sprintf('Maximum loglikelihood: %f',ML)
           cat(paste("\n",s1,"\n",s2,"\n",sep = ''))
         }
       }
     }
   }
-   return(invisible(out2))
+  return(invisible(out2))
 }
