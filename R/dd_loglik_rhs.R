@@ -4,8 +4,7 @@ dd_loglik_rhs_precomp = function(pars,x)
   la = pars[1]
   mu = pars[2]
   K = pars[3]
-  if(length(pars) < 6)
-  {
+  if (length(pars) < 6) {
     kk = pars[4]
     ddep = pars[5]
   } else {
@@ -17,54 +16,36 @@ dd_loglik_rhs_precomp = function(pars,x)
   
   nn <- c(0, 0:(lx + 2 * kk))
   lnn <- length(nn)
-
-  if(ddep == 1) {
+  
+  if (ddep == 1) {
     lavec = pmax(0, la - (la - mu) / K * nn)
     muvec = rep(mu, lnn)
-  } else {
-    if (ddep == 1.3) {
-      lavec = pmax(0, la * (1 - nn / K))
-      muvec = rep(mu, lnn)
-    } else {
-      if (ddep == 1.4) {
-        lavec = pmax(0, la * nn / (nn + K))
-      } else {
-        if(ddep == 1.5)
-        {
-          lavec = pmax(0, la * nn / K * (1 - nn / K))
-          muvec = rep(mu, lnn)
-        } else {
-          if (ddep == 2 | ddep == 2.1 | ddep == 2.2) {
-            y = -(log(la / mu) / log(K + n0)) ^ (ddep != 2.2)
-            lavec = pmax(0, la * (nn + n0) ^ y)
-            muvec = rep(mu, lnn)
-          } else {
-            if(ddep == 2.3)
-            {
-              y = -K
-              lavec = pmax(0, la * (nn + n0) ^ y)
-              muvec = rep(mu, lnn)
-            } else {
-              if (ddep == 3) {
-                lavec = rep(la, lnn)
-                muvec = mu + (la - mu) * nn / K
-              } else {
-                if (ddep == 4 | ddep == 4.1 | ddep == 4.2) {
-                  lavec = rep(la, lnn)
-                  y = (log(la / mu) / log(K + n0)) ^ (ddep != 4.2)
-                  muvec = mu * (nn + n0) ^ y
-                } else {
-                  if (ddep == 5) { 
-                    lavec = pmax(0, la - 1 / (r + 1) * (la - mu) / K * nn)
-                    muvec = mu + r / (r + 1) * (la - mu) / K * nn
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  } else if (ddep == 1.3) {
+    lavec = pmax(0, la * (1 - nn / K))
+    muvec = rep(mu, lnn)
+  } else if (ddep == 1.4) {
+    lavec = pmax(0, la * nn / (nn + K))
+  } else if(ddep == 1.5) {
+    lavec = pmax(0, la * nn / K * (1 - nn / K))
+    muvec = rep(mu, lnn)
+  } else if (ddep == 2 | ddep == 2.1 | ddep == 2.2) {
+    y = -(log(la / mu) / log(K + n0)) ^ (ddep != 2.2)
+    lavec = pmax(0, la * (nn + n0) ^ y)
+    muvec = rep(mu, lnn)
+  } else if(ddep == 2.3) {
+    y = -K
+    lavec = pmax(0, la * (nn + n0) ^ y)
+    muvec = rep(mu, lnn)
+  } else if (ddep == 3) {
+    lavec = rep(la, lnn)
+    muvec = mu + (la - mu) * nn / K
+  } else if (ddep == 4 | ddep == 4.1 | ddep == 4.2) {
+    lavec = rep(la, lnn)
+    y = (log(la / mu) / log(K + n0)) ^ (ddep != 4.2)
+    muvec = mu * (nn + n0) ^ y
+  } else if (ddep == 5) { 
+    lavec = pmax(0, la - 1 / (r + 1) * (la - mu) / K * nn)
+    muvec = mu + r / (r + 1) * (la - mu) / K * nn
   }
   return(c(lavec, muvec, nn))
 }  
