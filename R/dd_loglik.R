@@ -172,9 +172,9 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
       Kprime <- ceiling(K)
     } else {
       Kprime <- ceiling(la / (la - mu) * (r + 1) * K)
-    } else {
-      Kprime <- Inf
-    }
+    } 
+  } else {
+    Kprime <- Inf
   }
   
   lx = min(max(1 + missnumspec,1 + Kprime), ceiling(pars2[1]))
@@ -226,8 +226,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
                 if (verbose) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
-              if(k < (S + 2 - soc))
-              {
+              if (k < (S + 2 - soc)) {
                 probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
               }
               cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
@@ -513,8 +512,7 @@ dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 
 dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 {
-  if(method == 'analytical')
-  {
+  if(method == 'analytical') {
     probs <- dd_loglik_M(pars = pars[1:3],
                          lx = length(initprobs),
                          k = pars[4],
@@ -522,35 +520,26 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
                          tt = abs(tvec[2] - tvec[1]),
                          initprobs)
     y <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
-  } else
-  {  
+  } else {
     rhs_func_name <- 'no_name'
-    if(is.character(rhs_func))
-    {
+    if (is.character(rhs_func)) {
       rhs_func_name <- rhs_func
-      if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN')
-      {
+      if(rhs_func_name != 'dd_loglik_rhs_FORTRAN' & rhs_func_name != 'dd_loglik_bw_rhs_FORTRAN') {
         rhs_func = match.fun(rhs_func)
       }
     }
-    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_rhs_FORTRAN' || rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
-    {
+    if (rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_rhs_FORTRAN' || rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN') {
       parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
-    } else 
-    {
+    } else {
       parsvec = pars
     }
-    if(rhs_func_name == 'dd_loglik_rhs_FORTRAN')
-    {
+    if (rhs_func_name == 'dd_loglik_rhs_FORTRAN') {
       y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method)
-    } else
-      if(rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN')
-      {
-        y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
-      } else
-      {
-        y <- deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
-      }
+    } else if (rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN') {
+      y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
+    } else {
+      y <- deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+    }
   }
   return(y)
 }
