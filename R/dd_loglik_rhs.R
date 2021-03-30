@@ -46,6 +46,34 @@ dd_loglik_rhs_precomp = function(pars,x)
   } else if (ddep == 5) { 
     lavec = pmax(0, la - 1 / (r + 1) * (la - mu) / K * nn)
     muvec = mu + r / (r + 1) * (la - mu) / K * nn
+  } else if (ddep == 6) {
+    y = log((la * r + mu) / (mu * (1 + r))) / log(K)
+    lavec = pmax(0, la - 1 / (r + 1) * (la - mu) / K * nn)
+    muvec = mu * nn ^ y
+  } else if (ddep == 7) {
+    y1 = -log(la * (1 + r) / (la * r + mu)) / log(K)
+    y2 = log((la * r + mu) / (mu * (1 + r))) / log(K)
+    lavec = pmax(0, la * nn ^ y1)
+    muvec = mu * nn ^ y2
+  } else if (ddep == 8) {
+    y = -log(la * (1 + r) / (la * r + mu)) / log(K)
+    lavec = pmax(0, la * nn ^ y)
+    muvec = mu + r / (r + 1) * (la - mu) / K * nn
+  } else if (ddep == 9) {
+    lavec = pmax(0, la * (mu / la) ^ (nn / K))
+    muvec = rep(mu, lnn)
+  } else if (ddep == 10) {
+    lavec = rep(la, lnn)
+    muvec = mu * (la / mu) ^ (nn / K)
+  } else if (ddep == 11) {
+    lavec = pmax(0, la - 1 / (r + 1) * (la - mu) / K * nn)
+    muvec = mu * ((r * la + mu) / (mu * (1 + r))) ^ (nn / K)
+  } else if (ddep == 12) {
+    lavec = pmax(0, la * ((r * la + mu) / (la * (1 + r))) ^ (nn / K))
+    muvec = mu * ((r * la + mu) / (mu * (1 + r))) ^ (nn / K)
+  } else if (ddep == 13) {
+    lavec = pmax(0, la * ((r * la + mu) / (la * (1 + r))) ^ (nn / K))
+    muvec = mu + r / (r + 1) * (la - mu) / K * nn
   }
   return(c(lavec, muvec, nn))
 }  
