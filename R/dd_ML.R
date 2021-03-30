@@ -187,10 +187,10 @@ dd_ML = function(
       cat("You are fixing",fixstr,"\n")
       cat("Optimizing the likelihood - this may take a while.","\n")
       utils::flush.console()
-      trparsopt = initparsopt/(1 + initparsopt)
-      trparsopt[which(initparsopt == Inf)] = 1
-      trparsfix = parsfix/(1 + parsfix)
-      trparsfix[which(parsfix == Inf)] = 1
+      trparsopt = initparsopt / (1 + initparsopt)
+      trparsopt[which(initparsopt == Inf)] <- 1 # fix NaN
+      trparsfix = parsfix / (1 + parsfix)
+      trparsfix[which(parsfix == Inf)] <- 1 # fix NaN
       pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter)
       optimpars = c(tol,maxiter)
       initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
@@ -210,7 +210,7 @@ dd_ML = function(
           out2 <- output_error
         } else {
           MLtrpars = as.numeric(unlist(out$par))
-          MLpars = MLtrpars/(1-MLtrpars)
+          MLpars = MLtrpars / (1 - MLtrpars)
           if (both_rates_vary) {
             MLpars1 <- rep(0,4)
           } else {

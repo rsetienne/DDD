@@ -155,6 +155,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
   }
   ddep = pars2[2]
   both_rates_vary <- ddep %in% c(5:8, 11:13)
+  is_speciation_linear <- ddep %in% c(1, 1.3, 5, 6, 11)
   cond = pars2[3]
   btorph = pars2[4]
   verbose = pars2[5]
@@ -165,22 +166,19 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
   la = pars1[1]
   mu = pars1[2]
   K = pars1[3]
-  if(both_rates_vary) {
-    r = pars1[4]
-  } else {
-    r = 0
-  }
-  if(ddep == 1 | ddep == 5)
-  { 
-    lx = min(max(1 + missnumspec,1 + ceiling(la/(la - mu) * (r + 1) * K)),ceiling(pars2[1]))
-  } else {
-    if(ddep == 1.3)
-    {
-      lx = min(ceiling(K),ceiling(pars2[1]))
+  r <- ifelse(both_rates_vary, pars1[4], 0)
+  if (is_speciation_linear) {
+    if (ddep == 1.3) {
+      Kprime <- ceiling(K)
     } else {
-      lx = round(pars2[1])
+      Kprime <- ceiling(la / (la - mu) * (r + 1) * K)
+    } else {
+      Kprime <- Inf
     }
   }
+  
+  lx = min(max(1 + missnumspec,1 + Kprime), ceiling(pars2[1]))
+  
   if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
@@ -188,8 +186,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
     abstol = 1e-16
     reltol = 1e-10 
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
-    if(sum(brts == 0) == 0)
-    {
+    if (sum(brts == 0) == 0) {
       brts[length(brts) + 1] = 0
     }
     S = length(brts) + (soc - 2)
@@ -203,25 +200,30 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
         if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
-        if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
-        {
+        if (is_speciation_linear && Kprime < missnumspec + S) {
           if(verbose) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
-          if(cond != 3)
-          {
+          if (cond != 3) {
             probs = rep(0,lx)
             probs[1] = 1 # change if other species at stem/crown age 
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+              y <- dd_integrate(
+                initprobs = probs,
+                tvec = brts[(k-1):k],
+                rhs_func = rhs_func_name,
+                pars = c(pars1,k1,ddep),
+                rtol = reltol,
+                atol = abstol,
+                method = methode
+              )
               probs = y[2,2:(lx+1)]
-              if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
-              { 
-                loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-                if(verbose) cat('High lambda approximation has been applied.\n')
+              if (any(is.na(probs)) && pars1[2] / pars1[1] < 1E-4 && missnumspec == 0) { 
+                loglik = dd_loglik_high_lambda(pars1 = pars1, pars2 = pars2, brts = brts)
+                if (verbose) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
