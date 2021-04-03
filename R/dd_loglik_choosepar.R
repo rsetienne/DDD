@@ -1,7 +1,6 @@
 dd_loglik_choosepar = function(trparsopt,trparsfix,idparsopt,idparsfix,pars2,brts,missnumspec,methode)
 {
-   both_rates_vary <- pars2[2] %in% c(5:8, 11:13)
-   if(both_rates_vary) {   
+   if (both_rates_vary(pars2[2])) {   
       trpars1 = rep(0,4)
    } else {
       trpars1 = rep(0,3)

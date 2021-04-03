@@ -129,18 +129,14 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' @export dd_loglik
 dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 {
-  if(pars2[3] == 3)
-  {
+  if(pars2[3] == 3) {
     rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN'
-  } else
-  {
+  } else {
     rhs_func_name = 'dd_loglik_rhs_FORTRAN'
   }
-  if(methode == 'analytical')
-  {
+  if(methode == 'analytical') {
     out = dd_loglik2(pars1,pars2,brts,missnumspec)
-  } else
-  {
+  } else {
     out = dd_loglik1(pars1,pars2,brts,missnumspec,methode = methode,rhs_func_name = rhs_func_name)
   }
   return(out)
@@ -154,7 +150,6 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
     pars2[6] = 2
   }
   ddep = pars2[2]
-  both_rates_vary <- ddep %in% c(5:8, 11:13)
   is_speciation_linear <- ddep %in% c(1, 1.3, 5, 6, 11)
   cond = pars2[3]
   btorph = pars2[4]
@@ -166,7 +161,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
   la = pars1[1]
   mu = pars1[2]
   K = pars1[3]
-  r <- ifelse(both_rates_vary, pars1[4], 0)
+  r <- ifelse(both_rates_vary(ddep), pars1[4], 0)
   if (is_speciation_linear) {
     if (ddep == 1.3) {
       Kprime <- ceiling(K)
@@ -341,7 +336,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
     }
     if (verbose) {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
-      if (both_rates_vary) {
+      if (both_rates_vary(ddep)) {
         s1 = sprintf('%s %f',s1,pars1[4])
       }
       s2 = sprintf(', Loglikelihood: %f',loglik)
@@ -364,7 +359,10 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
     pars2[6] = 2
   }
   ddep = pars2[2]
-  cond = pars2[3]
+  if (ddep > 5) {
+    stop("This DD model is not implemented for the analytical method yet.")
+  }
+   cond = pars2[3]
   btorph = pars2[4]
   verbose <- pars2[5]
   soc = pars2[6]

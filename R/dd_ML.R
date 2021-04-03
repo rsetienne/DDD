@@ -1,20 +1,17 @@
 initparsoptdefault = function(ddmodel,brts,missnumspec)
 {
-  if(ddmodel < 5)
-  {
-    return(c(0.2,0.1,2 * (length(brts) + missnumspec)^(ddmodel != 2.3)))
+  if (both_rates_vary(ddmodel)) {
+    return(c(0.2, 0.1, 2 * (length(brts) + missnumspec), 0.01))
   } else {
-    return(c(0.2,0.1,2 * (length(brts) + missnumspec),0.01))
+    return(c(0.2, 0.1, 2 * (length(brts) + missnumspec) ^ (ddmodel != 2.3)))
   }
 }
 
-parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
-{
-  if(ddmodel < 5)
-  {
-    return(c(0.2,0.1,2*(length(brts) + missnumspec))[-idparsopt])
+parsfixdefault = function(ddmodel, brts, missnumspec, idparsopt) {
+  if (both_rates_vary(ddmodel)) {
+    return(c(0.2, 0.1, 2 * (length(brts) + missnumspec), 0)[-idparsopt])
   } else {
-    return(c(0.2,0.1,2*(length(brts) + missnumspec),0)[-idparsopt])
+    return(c(0.2, 0.1, 2 * (length(brts) + missnumspec))[-idparsopt])
   }
 }
 
@@ -136,9 +133,9 @@ dd_ML = function(
   brts,
   initparsopt = initparsoptdefault(ddmodel,brts,missnumspec),
   idparsopt = 1:length(initparsopt),
-  idparsfix = (1:(3 + (ddmodel == 5)))[-idparsopt],
+  idparsfix = (1:(3 + both_rates_vary(ddmodel)))[-idparsopt],
   parsfix = parsfixdefault(ddmodel,brts,missnumspec,idparsopt),
-  res = 10*(1+length(brts)+missnumspec),
+  res = 10 * (1 + length(brts) + missnumspec),
   ddmodel = 1,
   missnumspec = 0,
   cond = 1,
@@ -150,33 +147,30 @@ dd_ML = function(
   optimmethod = 'subplex',
   num_cycles = 1,
   methode = 'analytical',
-  verbose = FALSE)
-{
+  verbose = FALSE
+  ) {
   #options(warn = -1)
-  if(length(tol) != 3)
-  {
+  if(length(tol) != 3) {
     stop('Please specify a tolerance vector with three values') 
   }
-  both_rates_vary <- ddmodel %in% c(5:8, 11:13)
-  if (both_rates_vary) {
+  if (both_rates_vary(ddmodel)) {
     output_error <- data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)
   } else {
     output_error <- data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
   }
   
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)
-  if (is.numeric(brts) == FALSE)
-  {
+  if (is.numeric(brts) == FALSE) {
     cat("The branching times should be numeric.\n")
     out2 <- output_error
   } else {
     idpars = sort(c(idparsopt,idparsfix))
-    if (!all(idpars == (1:(3 + both_rates_vary))) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
+    if (!all(idpars == (1:(3 + both_rates_vary(ddmodel)))) || (length(initparsopt) != length(idparsopt)) || (length(parsfix) != length(idparsfix)))
     {
       cat("The parameters to be optimized and/or fixed are incoherent.\n")
       out2 <- output_error
     } else {
-      if(both_rates_vary) {
+      if (both_rates_vary(ddmodel)) {
         namepars = c("lambda","mu","K","r")
       } else {
         namepars = c("lambda","mu","K")
@@ -203,24 +197,40 @@ dd_ML = function(
       } else {
         #code up to DDD v1.6: out = optimx2(trparsopt,dd_loglik_choosepar,hess=NULL,method = "Nelder-Mead",hessian = FALSE,control = list(maximize = TRUE,abstol = pars2[8],reltol = pars2[7],trace = 0,starttests = FALSE,kkt = FALSE),trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,brts = brts, pars2 = pars2,missnumspec = missnumspec)
         #out = dd_simplex(trparsopt,idparsopt,trparsfix,idparsfix,pars2,brts,missnumspec)
-        out = optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = dd_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts, missnumspec = missnumspec, methode = methode, num_cycles = num_cycles)
-        if(out$conv != 0)
-        {
+        out = optimizer(
+          optimmethod = optimmethod,
+          optimpars = optimpars,
+          fun = dd_loglik_choosepar,
+          trparsopt = trparsopt,
+          trparsfix = trparsfix,
+          idparsopt = idparsopt,
+          idparsfix = idparsfix,
+          pars2 = pars2,
+          brts = brts, 
+          missnumspec = missnumspec, 
+          methode = methode, 
+          num_cycles = num_cycles
+          )
+        if (out$conv != 0) {
           cat("Optimization has not converged. Try again with different initial values.\n")
           out2 <- output_error
         } else {
           MLtrpars = as.numeric(unlist(out$par))
           MLpars = MLtrpars / (1 - MLtrpars)
-          if (both_rates_vary) {
+          if (both_rates_vary(ddmodel)) {
             MLpars1 <- rep(0,4)
           } else {
             MLpars1 <- rep(0,3)
           }
           MLpars1[idparsopt] = MLpars
-          if(length(idparsfix) != 0) { MLpars1[idparsfix] = parsfix }
-          if(MLpars1[3] > 10^7){MLpars1[3] = Inf}
+          if (length(idparsfix) != 0) {
+            MLpars1[idparsfix] = parsfix
+            }
+          if (MLpars1[3] > 10 ^ 7) { 
+            MLpars1[3] = Inf
+          }
           ML = as.numeric(unlist(out$fvalues))
-          if (both_rates_vary) {
+          if (both_rates_vary(ddmodel)) {
             s1 <- sprintf('Maximum likelihood parameter estimates: lambda: %f, mu: %f, K: %f, r: %f', MLpars1[1], MLpars1[2], MLpars1[3], MLpars1[4])
             out2 <- data.frame(lambda = MLpars1[1], mu = MLpars1[2], K = MLpars1[3], r = MLpars1[4], loglik = ML, df = length(initparsopt), conv = unlist(out$conv))   
           } else {

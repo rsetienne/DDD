@@ -883,3 +883,17 @@ rng_respecting_sample <- function(x, size, replace, prob) {
   non_zero_x <- x[which_non_zero]
   return(sample(x = non_zero_x, size = size, replace = replace, prob = non_zero_prob))
 }
+
+#' Evaluate whether both speciation rates vary in specified DD model
+#' 
+#' @param ddmodel a character or integer specifying a DD model, as described in
+#'  dd_loglik() and dd_ML() documentation
+#'  
+#'  @return TRUE if both speciation and extinction rates vary with N, FALSE otherwise
+#'  @export
+#'  @author Theo Pannetier
+#' 
+both_rates_vary <- function(ddmodel) {
+  return(ddmodel %in% c(5:8, 11:13))
+}
+
