@@ -228,7 +228,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
                 return(loglik)
               }
               if (k < (S + 2 - soc)) {
-                qn_vec <- flavec(ddep, la, mu, K, r, lx, k1) * qn_vec # speciation event
+                qn_vec <- flavec(ddep, la, mu, K, r, lx, k1) * qn_vec # transition vector
               }
               cp <- check_probs(loglik, qn_vec, verbose)
               loglik <- cp[[1]]
@@ -291,7 +291,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
               if(soc == 2)
               {
                 probsn = rep(0,lx + 1)
-                probsn[1:lx] = probs[1:lx]
+                probsn[1:lx] = qn_vec[1:lx]
                 probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
                 y = dd_integrate(probsn,c(max(abs(brts)),TT),rhs_func_name,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
                 logliknorm = logliknorm - log(y[2,lx + 2])
