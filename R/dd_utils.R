@@ -111,8 +111,8 @@ conv = function(x,y)
 flavec <- function(ddep,la,mu,K,r,lx,kk)
 {
   nn <- (0:(lx - 1)) + kk
-  lambdamu_nk <- lambdamu(nn,c(la,mu,K,r),ddep)
-  return(lambdamu_nk[[1]])
+  lambda_n_vec <- lambdamu(nn, c(la, mu, K, r), ddep)[[1]]
+  return(lambda_n_vec)
 }
 
 flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)

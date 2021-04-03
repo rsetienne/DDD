@@ -80,13 +80,19 @@ dd_loglik_rhs_precomp = function(pars,x)
 
 dd_loglik_rhs = function(t,x,parsvec)
 {
+  # Unpack parameter vector
   lv = (length(parsvec) - 1)/3
   lavec = parsvec[1:lv]
   muvec = parsvec[(lv + 1):(2 * lv)]
   nn = parsvec[(2 * lv + 1):(3 * lv)]
-  kk = parsvec[length(parsvec)]
+  k = parsvec[length(parsvec)] # nb species in phylo at time t
+  
   lx = length(x)
-  xx = c(0,x,0)
-  dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
+  qn_vec = c(0, x, 0)
+  nvec <- 2:(lx + 1)
+  # DDD master system
+  dx <-  lavec[nvec + k - 1] * nn[nvec + 2 * k - 1] * qn_vec[nvec - 1] + 
+    muvec[nvec + k + 1] * nn[nvec + 1] * qn_vec[nvec + 1] - 
+    (lavec[nvec + k] + muvec[nvec + k]) * nn[nvec + k] * qn_vec[nvec]
   return(list(dx))
 }

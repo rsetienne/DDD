@@ -206,13 +206,13 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
         } else {
           loglik = (btorph == 0) * lgamma(S)
           if (cond != 3) {
-            probs = rep(0,lx)
-            probs[1] = 1 # change if other species at stem/crown age 
+            qn_vec = rep(0,lx)
+            qn_vec[1] = 1 # change if other species at stem/crown age 
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
               y <- dd_integrate(
-                initprobs = probs,
+                initprobs = qn_vec,
                 tvec = brts[(k-1):k],
                 rhs_func = rhs_func_name,
                 pars = c(pars1,k1,ddep),
@@ -220,38 +220,49 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
                 atol = abstol,
                 method = methode
               )
-              probs = y[2,2:(lx+1)]
-              if (any(is.na(probs)) && pars1[2] / pars1[1] < 1E-4 && missnumspec == 0) { 
+              qn_vec = y[2,2:(lx+1)]
+              
+              if (any(is.na(qn_vec)) && pars1[2] / pars1[1] < 1E-4 && missnumspec == 0) { 
                 loglik = dd_loglik_high_lambda(pars1 = pars1, pars2 = pars2, brts = brts)
                 if (verbose) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if (k < (S + 2 - soc)) {
-                probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
+                qn_vec <- flavec(ddep, la, mu, K, r, lx, k1) * qn_vec # speciation event
               }
-              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+              cp <- check_probs(loglik, qn_vec, verbose)
+              loglik <- cp[[1]]
+              qn_vec <- cp[[2]]
             }    
           } else {
-            probs = rep(0,lx + 1)
-            probs[1 + missnumspec] = 1
+            qn_vec = rep(0,lx + 1)
+            qn_vec[1 + missnumspec] = 1
             for(k in (S + 2 - soc):2)
             {
               k1 = k + (soc - 2)
-              y = dd_integrate(probs,-brts[k:(k-1)],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-              probs = y[2,2:(lx+2)]
+              y = dd_integrate(
+                initprobs = qn_vec, 
+                tvec = -brts[k:(k-1)], 
+                rhs_func = rhs_func_name, 
+                pars = c(pars1,k1,ddep), 
+                rtol = reltol, 
+                atol = abstol, 
+                method = methode
+              )
+              qn_vec = y[2,2:(lx+2)]
               if(k > soc)
               {
-                probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
+                qn_vec = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * qn_vec # speciation event
               }
-              cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
+              cp <- check_probs(loglik,qn_vec[1:lx],verbose); loglik <- cp[[1]]; qn_vec[1:lx] <- cp[[2]];
             }
           }
-          if(probs[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik))
+          if(qn_vec[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik))
           {
             if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else {        
-            loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+            loglik = loglik + (cond != 3 | soc == 1) * log(qn_vec[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             
             logliknorm = 0
             if(cond == 1 | cond == 2)
@@ -538,7 +549,15 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     } else if (rhs_func_name == 'dd_loglik_bw_rhs_FORTRAN') {
       y <- dd_ode_FORTRAN(initprobs,tvec,parsvec,atol,rtol,method,runmod = "dd_runmodbw")
     } else {
-      y <- deSolve::ode(initprobs,tvec,rhs_func,parsvec,rtol = rtol,atol = atol,method = method)
+      y <- deSolve::ode(
+        y = initprobs,
+        times = tvec,
+        func = rhs_func,
+        parms = parsvec,
+        rtol = rtol,
+        atol = atol,
+        method = method
+      )
     }
   }
   return(y)
