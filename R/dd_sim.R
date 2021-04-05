@@ -1,10 +1,12 @@
 dd_lamuN = function(ddmodel,pars,N) {
+    testthat::expect_length(N, 1)
     la = pars[1]
     mu = pars[2]
     K = pars[3]
     n0 = (ddmodel == 2 | ddmodel == 4)
-    if(length(pars) == 4) {
+    if (length(pars) == 4) {
         r = pars[4]
+        alpha <- ifelse(r == Inf, 1, r / (1 + r))
     }
     if (ddmodel == 1) {
         # linear dependence in speciation rate
@@ -33,38 +35,38 @@ dd_lamuN = function(ddmodel,pars,N) {
         al = (log(la/mu)/log(K+n0))^(ddmodel != 4.2)
         laN = la
         muN = mu * (N + n0)^al
-    } else if(ddmodel == 5) {
+    } else if (ddmodel == 5) {
         # linear dependence in speciation rate and extinction rate
-        laN = max(0, la - 1 / (r + 1) * (la - mu) * N / K)
-        muN = mu + r / (r + 1) * (la - mu) / K * N
-    } else if (ddep == 6) {
-        y = log((la * r + mu) / (mu * (1 + r))) / log(K)
-        lavec = max(0, la - 1 / (r + 1) * (la - mu) / K * N)
-        muvec = mu * N ^ y
-    } else if (ddep == 7) {
-        y1 = -log(la * (1 + r) / (la * r + mu)) / log(K)
-        y2 = log((la * r + mu) / (mu * (1 + r))) / log(K)
-        lavec = max(0, la * N ^ y1)
-        muvec = mu * N ^ y2
-    } else if (ddep == 8) {
-        y = -log(la * (1 + r) / (la * r + mu)) / log(K)
-        lavec = max(0, la * N ^ y)
-        muvec = mu + r / (r + 1) * (la - mu) / K * N
-    } else if (ddep == 9) {
-        lavec = max(0, la * (mu / la) ^ (N / K))
-        muvec = mu
-    } else if (ddep == 10) {
-        lavec = la
-        muvec = mu * (la / mu) ^ (N / K)
-    } else if (ddep == 11) {
-        lavec = max(0, la - 1 / (r + 1) * (la - mu) / K * N)
-        muvec = mu * ((r * la + mu) / (mu * (1 + r))) ^ (N / K)
-    } else if (ddep == 12) {
-        lavec = max(0, la * ((r * la + mu) / (la * (1 + r))) ^ (N / K))
-        muvec = mu * ((r * la + mu) / (mu * (1 + r))) ^ (N / K)
-    } else if (ddep == 13) {
-        lavec = max(0, la * ((r * la + mu) / (la * (1 + r))) ^ (N / K))
-        muvec = mu + r / (r + 1) * (la - mu) / K * N
+        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
+        muN = mu + alpha * (la - mu) * N / K
+    } else if (ddmodel == 6) {
+        y = log(1 + alpha * (la - mu) / mu) / log(K)
+        laN = max(0, la - (1 - alpha) * (la - mu) * N / K)
+        muN = mu * N ^ y
+    } else if (ddmodel == 7) {
+        y1 = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        y2 = log(1 + alpha * (la - mu) / mu) / log(K)
+        laN = max(0, la * N ^ y1)
+        muN = mu * N ^ y2
+    } else if (ddmodel == 8) {
+        y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        laN = max(0, la * N ^ y)
+        muN = mu + alpha * (la - mu) / K * N
+    } else if (ddmodel == 9) {
+        laN = max(0, la * (mu / la) ^ (N / K))
+        muN = mu
+    } else if (ddmodel == 10) {
+        laN = la
+        muN = mu * (la / mu) ^ (N / K)
+    } else if (ddmodel == 11) {
+        laN = max(0, la - (1 - alpha) * (la - mu) / K * N)
+        muN = mu * (1 + alpha * (la - mu) / mu) ^ (N / K)
+    } else if (ddmodel == 12) {
+        laN = max(0, la * ((alpha * (la - mu) + mu) / la) ^ (N / K))
+        muN = mu * (1 + alpha * (la - mu) / mu) ^ (N / K)
+    } else if (ddmodel == 13) {
+        laN = max(0, la * ((alpha * (la - mu) + mu) / la) ^ (N / K))
+        muN = mu + alpha * (la - mu) / K * N
     }
     return(c(laN,muN))
 }
