@@ -1,32 +1,32 @@
 edd_update_lamu <- function(ED, params, model, i) {
   if (model == "dsce2") {
-    if (length(pars) != 5) {
+    if (length(params) != 5) {
       stop("incorrect parameter(s)")
     }
     #dependent speciation, constant extinction
-    N <- pars[1]
-    la0 <- pars[2]
-    mu0 <- pars[3]
-    beta_N <- pars[4]
-    beta_phi <- pars[5]
-    newlas <- la0 + beta_N * N + beta_phi * ED
+    N <- params[1]
+    la0 <- params[2]
+    mu0 <- params[3]
+    beta_N <- params[4]
+    beta_phi <- params[5]
+    newlas <- la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
     newlas[newlas < 0] <- 0
     newmus <- NA
   } else if (model == "dsde2") {
-    if (length(pars) != 7) {
+    if (length(params) != 7) {
       stop("incorrect parameter(s)")
     }
     #dependent speciation, constant extinction
-    N <- pars[1]
-    la0 <- pars[2]
-    mu0 <- pars[3]
-    beta_N <- pars[4]
-    beta_phi <- pars[5]
-    gamma_N <- pars[6]
-    gamma_phi <- pars[7]
-    newlas <- la0 + beta_N * N + beta_phi * ED
+    N <- params[1]
+    la0 <- params[2]
+    mu0 <- params[3]
+    beta_N <- params[4]
+    beta_phi <- params[5]
+    gamma_N <- params[6]
+    gamma_phi <- params[7]
+    newlas <- la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
     newlas[newlas < 0] <- 0
-    newmus <- mu0 + gamma_N * N + gamma_phi * ED
+    newmus <- mu0 + gamma_N * N + gamma_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
     newmus[newmus < 0] <- 0
   }
   
@@ -34,15 +34,15 @@ edd_update_lamu <- function(ED, params, model, i) {
 }
 
 edd_sum_rates <- function(las, mus, i) {
-  return(sum(las[i, ]) + sum(mus[i, ]))
+  return(sum(dplyr::select_if(las[i, ], !is.na(las[i, ]))) + sum(dplyr::select_if(mus[i, ], !is.na(mus[i, ]))))
 }
 
 edd_sample_event <- function(las, mus, i) {
   # add prefix to names of the rates to distinguish between different event types
-  rspec <- las[i, ][!is.na(las[i, ])]
-  rext <- mus[i, ][!is.na(mus[i, ])]
-  names(rspec) <- paste("rs", names(las), sep = "_")
-  names(rext) <- paste("re", names(mus), sep = "_")
+  rspec <- dplyr::select_if(las[i, ], !is.na(las[i, ]))
+  rext <- dplyr::select_if(mus[i, ], !is.na(mus[i, ]))
+  names(rspec) <- paste("rs", names(rspec), sep = "_")
+  names(rext) <- paste("re", names(rext), sep = "_")
   
   rates <- c(rspec, rext)
   events <- names(rates)
@@ -100,8 +100,10 @@ edd_sim <- function (pars,
       if (metric == "ed"){
         ED <- c(1, 1)
         names(ED) <- c("t1", "t2")
-        las <- matrix(ED * pars[1], nrow = 1)
-        mus <- matrix(ED * pars[2], nrow = 1)
+        las <- ED * pars[1]
+        las <- tibble::as_tibble_row(las)
+        mus <- ED * pars[2]
+        mus <- tibble::as_tibble_row(mus)
       }else{
         lamu <- matrix(c(pars[1], pars[2]), ncol = 2)
         Phi[i] <- 0
@@ -115,7 +117,6 @@ edd_sim <- function (pars,
         t[i + 1] <-
           t[i] + stats::rexp(1, pdd_sum_rates(lamu, N, i))
       }
-      
       
       # main simulation circle
       while (t[i + 1] <= age) {
@@ -132,7 +133,7 @@ edd_sim <- function (pars,
         if (t_new <= t[i])
           t[i] <- t_new
         
-        if (metric == pd){
+        if (metric == "pd"){
           if (offset == "none") {
             Phi[i] <- L2Phi(L, t[i], metric)
           } else if (offset == "simtime") {
@@ -148,7 +149,13 @@ edd_sim <- function (pars,
           ED <- dplyr::bind_rows(ED, L2ED(L, t[i]))
           newlamus <- edd_update_lamu(ED, params, model, i)
           las <- dplyr::bind_rows(las, newlamus$newlas)
-          mus <- dplyr::bind_rows(mus, newlamus$newmus)
+          
+          if(model == "dsce2"){
+            mus <- dplyr::bind_rows(mus, mus)
+          }else{
+            mus <- dplyr::bind_rows(mus, newlamus$newmus)
+          }
+          
           # sample an event containing info of focal lineage and event type
           event <-
             edd_sample_event(las, mus, i)
@@ -173,6 +180,7 @@ edd_sim <- function (pars,
                      grepl("rfe", event, fixed = TRUE)) {
             N[i] <- N[i - 1]
           }
+          
           if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
             t[i + 1] <- Inf
           } else {
@@ -216,6 +224,7 @@ edd_sim <- function (pars,
         }
 
       }
+      
       if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
         done <- 0
       } else {
