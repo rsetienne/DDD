@@ -117,7 +117,7 @@ pdd_sim <- function (pars,
                 ranL <- sample2(linlist, 1)
                 
                 # new algorithm to deal with non-constant rates
-                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, i - 1))
                 
                 if (t_new <= t[i])
                     t[i] <- t_new
@@ -227,7 +227,7 @@ pdd_sim <- function (pars,
                 ranL <- sample2(linlist, 1)
                 
                 # new algorithm to deal with non-constant rates
-                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, i - 1))
                 
                 if (t_new <= t[i])
                     t[i] <- t_new
@@ -338,7 +338,7 @@ pdd_sim <- function (pars,
                 ranL <- sample2(linlist, 1)
                 
                 # new algorithm to deal with non-constant rates
-                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, i - 1))
                 
                 if (t_new <= t[i])
                     t[i] <- t_new
@@ -448,7 +448,7 @@ pdd_sim <- function (pars,
                 ranL <- sample2(linlist, 1)
                 
                 # new algorithm to deal with non-constant rates
-                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, 1))
+                t_new <- t[i - 1] + stats::rexp(1, pdd_sum_rates(lamu, N, i - 1))
                 
                 if (t_new <= t[i])
                     t[i] <- t_new
