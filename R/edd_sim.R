@@ -235,6 +235,20 @@ edd_sim <- function (pars,
       }
     }
     
+    if (metric == "ed") {
+      ED <- dplyr::bind_rows(ED, L2ED(L, t[i + 1]))
+      newlamus <- edd_update_lamu(ED, params, model, i + 1)
+      las <- dplyr::bind_rows(las, newlamus$newlas)
+      las <- las[-1, ]
+      if(model == "dsce2"){
+        mus <- dplyr::bind_rows(mus, mus)
+        mus <- mus[-1, ]
+      }else{
+        mus <- dplyr::bind_rows(mus, newlamus$newmus)
+        mus <- mus[-1, ]
+      }
+    }
+    
     L[, 1] <- age - c(L[, 1])
     notmin1 <- which(L[, 4] != -1)
     L[notmin1, 4] <- age - c(L[notmin1, 4])
@@ -245,10 +259,8 @@ edd_sim <- function (pars,
     
     if (metric == "ed") {
       LTT <-
-        data.frame(
-          "time" = t[-i],
-          "N" = N
-        )
+        data.frame("time" = t[-i],
+                   "N" = N)
       out <-
         list(
           tes = tes,

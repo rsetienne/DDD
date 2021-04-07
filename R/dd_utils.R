@@ -1402,5 +1402,39 @@ edd_simulation_plot <-
       ggplot2::ggplot(result[[2]], aes(time, N, group = rep, color = rep)) + ggplot2::geom_line() +
       ggplot2::theme(legend.position = "none") + xlab("age")
     
-    return(plotN)
+    tree <-
+      ggtree::ggtree(result$result_raw[, 1]$tas) + ggtree::geom_tiplab(size = 4)
+    
+    relas <-
+      dplyr::bind_cols(result$result_raw[, 1]$LTT$time, result$result_raw[, 1]$las)
+    relas <- relas %>% tibble::column_to_rownames(var = "...1")
+    
+    remus <-
+      dplyr::bind_cols(result$result_raw[, 1]$LTT$time, result$result_raw[, 1]$mus)
+    remus <- remus %>% tibble::column_to_rownames(var = "...1")
+    
+    plotlas <- ggtree::gheatmap(
+      tree,
+      t(relas),
+      offset = 0.6,
+      width = 0.8,
+      colnames = FALSE,
+      legend_title = "PSR"
+    )
+    
+    plotmus <- ggtree::gheatmap(
+      tree,
+      t(remus),
+      offset = 0.6,
+      width = 0.8,
+      colnames = FALSE,
+      legend_title = "PER"
+    )
+    
+    plot_bottom <- cowplot::plot_grid(plotlas, plotmus)
+    
+    plotall <-
+      cowplot::plot_grid(plotN, plot_bottom, nrow = 2, rel_heights = c(1, 2))
+    
+    return(plotall)
   }
