@@ -97,6 +97,9 @@ edd_sim <- function (pars,
       linlist <- c(-1, 2)
       newL <- 2
       
+      # controlling significant digits in tibble objects
+      options(pillar.sigfig = 10)
+      
       if (metric == "ed"){
         ED <- c(1, 1)
         names(ED) <- c("t1", "t2")
@@ -241,13 +244,21 @@ edd_sim <- function (pars,
     brts <- L2brts(L, dropextinct = T)
     
     if (metric == "ed") {
+      LTT <-
+        data.frame(
+          "time" = t[-i],
+          "N" = N
+        )
       out <-
         list(
           tes = tes,
           tas = tas,
           L = L,
           brts = brts,
-          ED = ED
+          ED = ED,
+          las = las,
+          mus = mus,
+          LTT = LTT
         )
     }else{
       lamuphis <-
