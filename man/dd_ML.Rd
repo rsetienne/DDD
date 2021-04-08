@@ -9,7 +9,7 @@ dd_ML(
   brts,
   initparsopt = initparsoptdefault(ddmodel, brts, missnumspec),
   idparsopt = 1:length(initparsopt),
-  idparsfix = (1:(3 + (ddmodel == 5)))[-idparsopt],
+  idparsfix = (1:(3 + both_rates_vary(ddmodel)))[-idparsopt],
   parsfix = parsfixdefault(ddmodel, brts, missnumspec, idparsopt),
   res = 10 * (1 + length(brts) + missnumspec),
   ddmodel = 1,
