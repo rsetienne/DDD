@@ -1,5 +1,6 @@
 context("test_DDD")
 
+# file named z_DDD so tests run last
 test_that("DDD works", {
   expect_equal_x64 <- function(object, expected, ...)
   {
@@ -19,10 +20,10 @@ test_that("DDD works", {
   missnumspec = 0
   methode = 'lsoda'
   
-  r0 <- DDD:::dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
-  r1 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs',methode = methode)
-  r2 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
-  r3 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
+  r0 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
+  r1 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs', methode = methode)
+  r2 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  r3 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
 
   testthat::expect_equal(r0,r2,tolerance = .00001)
   testthat::expect_equal(r1,r2,tolerance = .00001)
@@ -34,9 +35,9 @@ test_that("DDD works", {
 
   brts = 1:5
   pars2 = c(100,1,3,0,0,2)
-  r5 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs',methode = methode)
-  r6 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN',methode = methode)
-  r7 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
+  r5 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs',methode = methode)
+  r6 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN',methode = methode)
+  r7 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
   
   testthat::expect_equal(r5,r6,tolerance = .00001)
   testthat::expect_equal(r5,r7,tolerance = .01)
@@ -45,8 +46,8 @@ test_that("DDD works", {
   pars1 = c(0.2,0.05,1000000)
   pars2 = c(1000,1,1,0,0,2)
   brts = 1:10
-  r8 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
-  r9 <- DDD:::dd_loglik_test(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  r8 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  r9 <- dd_loglik(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
   expect_equal_x64(r8,r9,tolerance = .00001)
   
   pars1 <- c(0.2,0.05,15)
@@ -282,7 +283,7 @@ test_that("conditioning_DDD_KI works",
     for(i in 1:5)
     {
       brts_k_list <- list(rbind(c(-10,ts[i],0),c(2,1,1)),rbind(c(ts[i],0),c(1,1)))
-      p1[i] <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+      p1[i] <- dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
                                                pars1_list = pars1_list,
                                                pars2 = c(200,1,5,NA,1,2,3),
                                                loglik = 0,
@@ -290,7 +291,7 @@ test_that("conditioning_DDD_KI works",
                                                reltol = reltol,
                                                abstol = abstol,
                                                methode = 'ode45')
-      p2[i] <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
+      p2[i] <- dd_KI_logliknorm(brts_k_list = brts_k_list,
                                       pars1_list = pars1_list,
                                       loglik = 0,
                                       cond = 5,
@@ -309,7 +310,7 @@ test_that("conditioning_DDD_KI works",
   pars2 <- c(500,1,5,NA,1,2,3)
   lx_list <- list(pars2[1],pars2[1])
   brts_k_list <- list(rbind(sort(c(-10:-6,-3,-1,0)),c(2,3,4,5,6,5,6,6)),rbind(c(-3,-2,0),c(1,2,2)))
-  logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
+  logliknorm1 <- dd_KI_logliknorm(brts_k_list = brts_k_list,
                                         pars1_list = pars1_list,
                                         loglik = 0,
                                         cond = 5,
@@ -318,7 +319,7 @@ test_that("conditioning_DDD_KI works",
                                         reltol = reltol,
                                         abstol = abstol,
                                         methode = 'ode45')
-  logliknorm2 <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+  logliknorm2 <- dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
                                                  pars1_list = pars1_list,
                                                  pars2 = pars2,
                                                  loglik = 0,
@@ -332,7 +333,7 @@ test_that("conditioning_DDD_KI works",
   pars2 <- c(500,1,5,NA,1,2,3)
   lx_list <- list(pars2[1],pars2[1])
   brts_k_list <- list(rbind(c(-10:-6,-3,-1,0),c(2,3,4,5,6,5,6,6)),rbind(c(-3,-2,0),c(1,2,2)))
-  logliknorm1 <- DDD:::dd_KI_logliknorm(brts_k_list = brts_k_list,
+  logliknorm1 <- dd_KI_logliknorm(brts_k_list = brts_k_list,
                                         pars1_list = pars1_list,
                                         loglik = 0,
                                         cond = 5,
@@ -341,7 +342,7 @@ test_that("conditioning_DDD_KI works",
                                         reltol = reltol,
                                         abstol = abstol,
                                         methode = 'ode45')
-  logliknorm2 <- DDD:::dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
+  logliknorm2 <- dd_multiple_KI_logliknorm(brts_k_list = brts_k_list,
                                                  pars1_list = pars1_list,
                                                  pars2 = pars2,
                                                  loglik = 0,
