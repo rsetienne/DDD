@@ -897,3 +897,37 @@ both_rates_vary <- function(ddmodel) {
   return(ddmodel %in% c(5:8, 11:13))
 }
 
+#' Get carrying capacity from other parameters of the model
+#' 
+#' Compute the carrying capacity K', the maximum diversity that is possible to reach
+#' with the model, i.e. the value of N for which lambda(N) = 0.
+#' This is different from K, the equilibrium diversity, i.e. the value of N for 
+#' which lambda(N) = mu(N).
+#' 
+#' @param ddmodel a character or integer specifying a DD model, as described in
+#' dd_loglik() and dd_ML() documentation
+#' @param pars a numeric vector containing parameter values of the DD model.
+#' \code{pars[1]} is the lambda0, \code{pars[2]} is mu0, \code{pars[3]} is K
+#' and \code{pars[4]}, if relevant, is r.
+#' 
+#' @export
+#' @author Theo Pannetier
+#' @return a numeric value, K'
+
+get_Kprime <- function(ddmodel, pars) {
+  la <- pars[1]
+  mu <- pars[2]
+  K <- pars[3]
+  if (ddmodel == 1) {
+    Kprime <- la / (la - mu) * K
+  } else if (ddmodel == 1.3) {
+    Kprime <- K
+  } else if (ddmodel %in% c(5, 6, 11)) {
+    r <- pars[4]
+    Kprime <- (1 + r) * la / (la - mu) * K
+  } else {
+    Kprime <- Inf
+  }
+  return(Kprime)
+}
+
