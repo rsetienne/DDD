@@ -9,8 +9,7 @@ edd_update_lamu <- function(ED, params, model, i) {
     mu0 <- params[3]
     beta_N <- params[4]
     beta_phi <- params[5]
-    newlas <- la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
-    newlas[newlas < 0] <- 0
+    newlas <- pmax(0,la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ])))
     newmus <- NA
   } else if (model == "dsde2") {
     if (length(params) != 7) {
@@ -24,10 +23,8 @@ edd_update_lamu <- function(ED, params, model, i) {
     beta_phi <- params[5]
     gamma_N <- params[6]
     gamma_phi <- params[7]
-    newlas <- la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
-    newlas[newlas < 0] <- 0
-    newmus <- mu0 + gamma_N * N + gamma_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ]))
-    newmus[newmus < 0] <- 0
+    newlas <- pmax(0, la0 + beta_N * N + beta_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ])))
+    newmus <- pmax(0, mu0 + gamma_N * N + gamma_phi * dplyr::select_if(ED[i, ], !is.na(ED[i, ])))
   }
   
   return(list(newlas = newlas, newmus = newmus))
