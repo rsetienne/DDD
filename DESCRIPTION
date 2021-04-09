@@ -3,7 +3,7 @@ Type: Package
 Title: Diversity-Dependent Diversification
 Version: 4.4.2
 Date: 2021-02-01
-Depends: R (>= 3.5.0), Rcpp (>= 1.0.5)
+Depends: R (>= 3.5.0)
 Imports: deSolve, ape, phytools, subplex, Matrix, expm, SparseM, Rcpp (>= 1.0.5)
 LinkingTo: Rcpp, BH
 Suggests: testthat, testit

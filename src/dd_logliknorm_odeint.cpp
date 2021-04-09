@@ -6,7 +6,7 @@
 #include <chrono>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
-#include "odeint_helper.hpp"
+#include "odeint_helper.h"
 
 
 using namespace Rcpp;
@@ -151,19 +151,17 @@ NumericMatrix dd_logliknorm2_odeint(NumericMatrix ry,
                                     double atol, 
                                     double rtol, 
                                     std::string stepper) {
-  BEGIN_RCPP
-    size_t dim = std::sqrt(ry.length());
-    matrix_t y(dim + 2, dim + 2, 0.0);
-    auto py = mshift(y, dim, 1, 1);
-    mcopy(ry, py, dim);
+  size_t dim = std::sqrt(ry.length());
+  matrix_t y(dim + 2, dim + 2, 0.0);
+  auto py = mshift(y, dim, 1, 1);
+  mcopy(ry, py, dim);
 
-    auto rhs_obj = logliknorm2_rhs(dim, pars);
-    odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
+  auto rhs_obj = logliknorm2_rhs(dim, pars);
+  odeint_helper::integrate(stepper, std::ref(rhs_obj), y, times[0], times[1], 0.1 * (times[1] - times[0]), atol, rtol);
 
-    NumericMatrix ret(dim, dim);
-    mcopy(py, ret, dim);
-    return ret;
-  END_RCPP
+  NumericMatrix ret(dim, dim);
+  mcopy(py, ret, dim);
+  return ret;
 }
 
 

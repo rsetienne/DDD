@@ -578,7 +578,6 @@ dd_ode_bw_right_open_odeint = function(initprobs, tvec, parsvec, method)
 }
 
 
-
 dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
 {
   fun = dd_rhs_odeint_map[[rhs_name]];

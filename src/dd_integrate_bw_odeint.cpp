@@ -1,7 +1,7 @@
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
 #include <vector>
-#include "odeint_helper.hpp"
+#include "odeint_helper.h"
 
 
 using namespace Rcpp;

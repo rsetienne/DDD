@@ -5,7 +5,7 @@
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>
-#include "odeint_helper.hpp"
+#include "odeint_helper.h"
 
 
 using namespace Rcpp;
@@ -57,8 +57,6 @@ private:
 };
 
 
-//' Driver for odeint
-//' 
 // [[Rcpp::export]]
 NumericVector dd_integrate_odeint(NumericVector ry, 
                                   NumericVector times, 

@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <boost/multiprecision/cpp_bin_float.hpp>
-#include "odeint_helper.hpp"
+#include "odeint_helper.h"
 
 
 using namespace Rcpp;
