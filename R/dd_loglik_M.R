@@ -5,7 +5,7 @@ lambdamu = function(n,pars,ddep)
     mu = pars[2]
     K = pars[3]
     r = pars[4]
-    alpha <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) can be NaN
+    alpha <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) is NaN
     n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1) {
        lavec = pmax(0, la - (la - mu) * n / K)

@@ -164,6 +164,13 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
   r <- ifelse(both_rates_vary(ddep), pars1[4], 0)
   Kprime <- get_Kprime(ddep, pars1)
   is_speciation_linear <- ddep %in% c(1, 1.3, 5, 6, 11)
+  if (verbose) {
+    if (both_rates_vary(ddep)) {
+      cat("loglik for la0 =", la, "mu0 =", mu, "K =", K, "r =", r, "\n")
+    } else {
+      cat("loglik for la0 =", la, "mu0 =", mu, "K =", K, "\n")
+    }
+  }
   
   lx = min(max(1 + missnumspec, 1 + Kprime), ceiling(pars2[1]))
   
@@ -224,6 +231,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
           cp <- check_probs(loglik, qn_vec, verbose)
           loglik <- cp[[1]]
           qn_vec <- cp[[2]]
+          if (loglik == -Inf | is.na(loglik) | is.nan(loglik)) break()
         }    
       } else { # cond == 3
         qn_vec = rep(0,lx + 1)
@@ -246,6 +254,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
           cp <- check_probs(loglik,qn_vec[1:lx],verbose)
           loglik <- cp[[1]]
           qn_vec[1:lx] <- cp[[2]]
+          if (loglik == -Inf | is.na(loglik) | is.nan(loglik))  break()
         }
       }
       if (qn_vec[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik)) {
@@ -327,15 +336,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'lsoda',rhs_func_na
       }
     }
   }
-  if (verbose) {
-    s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
-    if (both_rates_vary(ddep)) {
-      s1 = sprintf('%s %f',s1,pars1[4])
-    }
-    s2 = sprintf(', Loglikelihood: %f',loglik)
-    cat(s1,s2,"\n",sep = "")
-    utils::flush.console()
-  }
+  if (verbose) cat("Loglikelihood =", loglik, "\n\n")
   loglik = as.numeric(loglik)
   if(is.nan(loglik) | is.na(loglik)) {
     loglik = -Inf
