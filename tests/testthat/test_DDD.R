@@ -17,14 +17,16 @@ test_that("DDD works", {
   pars2 = c(100,1,1,0,0,2)
   brts = 1:30
   missnumspec = 0
-  methode = 'odeint::runge_kutta_cash_karp54'
+  methode = 'analytical'
   
   r0 <- DDD:::dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
   r1 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs',methode = methode)
-  r2 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
+  r2 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  r3 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
 
   testthat::expect_equal(r0,r2,tolerance = .00001)
   testthat::expect_equal(r1,r2,tolerance = .00001)
+  testthat::expect_equal(r1,r3,tolerance = .00001)
   testthat::expect_equal(-39.36047,r1,tolerance = .000001)
   
   r4 <- DDD::dd_SR_loglik(pars1 = c(0.2,0.1,50,0.2,0.1,70,5), pars2 = c(100,1,1,1,0,2), brts = 1:10, missnumspec = 0)
@@ -33,22 +35,24 @@ test_that("DDD works", {
   brts = 1:5
   pars2 = c(100,1,3,0,0,2)
   r5 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs',methode = methode)
-  r6 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
+  r6 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN',methode = methode)
+  r7 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
   
-  testthat::expect_equal(r5,r6,tolerance = .2)
-  expect_equal_x64(-8.579058,r6,tolerance = .00001) #was -8.582413 before
+  testthat::expect_equal(r5,r6,tolerance = .00001)
+  testthat::expect_equal(r5,r7,tolerance = .01)
+  expect_equal_x64(-8.579058,r7,tolerance = .00001) #was -8.582413 before
 
   pars1 = c(0.2,0.05,1000000)
   pars2 = c(1000,1,1,0,0,2)
   brts = 1:10
-  r8 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs',methode = methode)
-  r9 <- DDD:::dd_loglik_test(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs',methode = methode)
+  r8 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  r9 <- DDD:::dd_loglik_test(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
   expect_equal_x64(r8,r9,tolerance = .00001)
   
   pars1 <- c(0.2,0.05,15)
   pars2 <- c(4,1,0,0,2)
   brts <- 1:10
-  r10 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = 0, methode = 'odeint::runge_kutta_cash_karp54')
+  r10 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = 0,methode = 'odeint::runge_kutta_cash_karp54')
   expect_equal_x64(r10,-11.6076802136507471,tolerance = 1E-10)
 
   r11 <- DDD::bd_loglik(pars1 = c(0.4,0.1,20),pars2 = c(4,0,1,0,2), brts = 1:10, missnumspec = 0)
@@ -257,9 +261,9 @@ test_that("DDD_KI works",
   pars1 <- c(0.8,0,40)
   pars2 <- c(2,1,1,0,1)
   missnumspec <- 0
-  result1 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec)
-  result2 <- DDD::dd_loglik(pars1 = pars1,pars2 = c(min(1000,10 * (length(brts) + missnumspec)),1,pars2[2:5]),brts = brts,missnumspec = 0)
-  testthat::expect_equal(result1,result2, tolerance = 0.0001)
+  result1 <- DDD::bd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = 'odeint::runge_kutta_fehlberg78')
+  result2 <- DDD::dd_loglik(pars1 = pars1,pars2 = c(min(1000,10 * (length(brts) + missnumspec)),1,pars2[2:5]),brts = brts,missnumspec = 0, methode = 'odeint::runge_kutta_fehlberg78')
+  testthat::expect_equal(result1,result2)
 })           
 
 context("test_DDD_KI_conditioning")
@@ -359,12 +363,12 @@ test_that("DDD_MS works",
   brtsM <- c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
   brtsS <- c(9.6,8.6,7.4,4.9,2.5)
   dd_MS_analytical <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
-  dd_MS_lsoda <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
-  testthat::expect_equal(dd_MS_lsoda,dd_MS_analytical,tol = 1E-4)
+  dd_MS_odeint <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
+  testthat::expect_equal(dd_MS_odeint,dd_MS_analytical,tol = 1E-4)
   
   pars1[3] <- Inf
   dd_MS_DI <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
   pars1a <- c(pars1[1:5],Inf,pars1[6])
   dd_KI_DI <- DDD::dd_KI_loglik(pars1a,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
   testthat::expect_equal(dd_KI_DI,dd_MS_DI,tol = 1E-4)
-})
+})  
