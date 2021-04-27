@@ -8,12 +8,14 @@ both_rates_vary(ddmodel)
 }
 \arguments{
 \item{ddmodel}{a character or integer specifying a DD model, as described in
-dd_loglik() and dd_ML() documentation
-
-@return TRUE if both speciation and extinction rates vary with N, FALSE otherwise
-@export
-@author Theo Pannetier}
+dd_loglik() and dd_ML() documentation}
+}
+\value{
+TRUE if both speciation and extinction rates vary with N, FALSE otherwise
 }
 \description{
 Evaluate whether both speciation rates vary in specified DD model
+}
+\author{
+Theo Pannetier
 }
