@@ -4,17 +4,7 @@
 \alias{edd_simulation_wrapper}
 \title{Conducting a edd simulation and plotting the results}
 \usage{
-edd_simulation_wrapper(
-  rep,
-  pars,
-  age,
-  model,
-  metric,
-  offset,
-  EDPars,
-  EDModel,
-  EDMethod
-)
+edd_simulation_wrapper(rep, pars, age, model, metric, offset)
 }
 \arguments{
 \item{rep}{the number of replication}

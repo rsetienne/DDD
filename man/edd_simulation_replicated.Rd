@@ -4,17 +4,7 @@
 \alias{edd_simulation_replicated}
 \title{Running a replicated edd simulation}
 \usage{
-edd_simulation_replicated(
-  rep,
-  pars,
-  age,
-  model,
-  metric,
-  offset,
-  EDPars,
-  EDModel,
-  EDMethod
-)
+edd_simulation_replicated(rep, pars, age, model, metric, offset)
 }
 \arguments{
 \item{rep}{the number of replication}
