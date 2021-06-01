@@ -57,6 +57,40 @@ edd_update_lamu <- function(ED, ED_max, params, model) {
   return(list(newlas = newlas, newmus = newmus))
 }
 
+edd_get_edmax <- function(N, L, age, metric, offset) {
+  if (metric == "ed") {
+    ED_max <- as.vector(L2ED(L, age))
+  } else if (metric == "pd") {
+    if (offset == "none") {
+      ED_max <- rep(as.vector(L2Phi(L, age, metric)), N)
+    } else if (offset == "simtime") {
+      ED_max <- rep(as.vector(L2Phi(L, age, metric) - age), N)
+    } else {
+      stop("no such offset method")
+    }
+  } else {
+    stop("no such metric")
+  }
+  return(ED_max)
+}
+
+edd_get_ed <- function(N, L, t, metric, offset){
+  if (metric == "ed") {
+    ED <- as.vector(L2ED(L, t))
+  } else if (metric == "pd") {
+    if (offset == "none") {
+      ED <- rep(as.vector(L2Phi(L, t, metric)), N)
+    } else if (offset == "simtime") {
+      ED <- rep(as.vector(L2Phi(L, t, metric) - t), N)
+    } else {
+      stop("no such offset method")
+    }
+  } else {
+    stop("no such metric")
+  }
+  return(ED)
+}
+
 edd_sum_rates <- function(las, mus) {
   return(sum(las) + sum(mus))
 }
@@ -69,7 +103,7 @@ edd_sample_event <- function(las, mus, linlist) {
 edd_sim <- function (pars,
                      age,
                      model = "dsce2",
-                     metric = "pd",
+                     metric = "ed",
                      offset = "none") {
   
   edd_pars_check(pars,age,model,metric,offset)
@@ -84,137 +118,61 @@ edd_sim <- function (pars,
     N <- 2
     L[1, 1:4] <- c(0, 0, -1, -1)
     L[2, 1:4] <- c(0, -1, 2, -1)
-    Phi <- rep(0, 1)
-    
-    if (metric == "ed") {
-      params <- c(N, pars)
-    } else{
-      params <- c(N, pars[-c(1, 2)])
-    }
-    
     linlist <- c(-1, 2)
     newL <- 2
+    params <- c(N, pars)
+    ED <- c(0, 0)
+    ED_max <- edd_get_edmax(N, L, age, metric, offset)
+    lamu <- edd_update_lamu(ED, ED_max, params, model)
     
-    # controlling significant digits in tibble objects
-    options(pillar.sigfig = 10)
-    
-    if (metric == "ed") {
-      ED <- c(0, 0)
-      ED_max <- as.vector(L2ED(L, age))
-      lamu <- edd_update_lamu(ED, ED_max, params, model)
-    } else {
-      lamu <- matrix(c(pars[1], pars[2]), ncol = 2)
-      Phi[i] <- 0
-    }
-    # ED values determine the total rates
-    if (metric == "ed") {
-      t[i + 1] <-
-        t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
-    } else {
-      t[i + 1] <-
-        t[i] + stats::rexp(1, pdd_sum_rates(lamu, N, i))
-    }
+    # get time interval
+    t[i + 1] <-
+      t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
     
     # main simulation circle
     while (t[i + 1] <= age) {
+      # time step index
       i <- i + 1
-      #print(i)
-      #print(t[i])
-      if (metric == "pd") {
-        if (offset == "none") {
-          Phi[i] <- L2Phi(L, t[i], metric)
-        } else if (offset == "simtime") {
-          Phi[i] <- L2Phi(L, t[i], metric) - t[i]
-        } else if (offset == "nspecies") {
-          Phi[i] <- L2Phi(L, t[i], metric) / N[i - 1]
-        } else{
-          stop("no such offset method")
-        }
-      }
-      
-      if (metric == "ed") {
-        ED <- as.vector(L2ED(L, t[i]))
-        lamu_real <- edd_update_lamu(ED, ED, params, model)
-        # sample whether event is fake or real
-        #print(lamu$newlas)
-        event <- sample(c('real', 'fake'),
-                        1,
-                        prob = c(
-                          sum(lamu_real$newlas + lamu_real$newmus),
-                          sum(
-                            lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
-                          )
-                        ))
-        #print(event)
-        if (event == 'real') {
-          # sample an event containing info of focal lineage and event type
-          event <-
-            edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
-          #print(event)
-          ranL <- c(linlist, linlist)[event]
-          
-          if (event <= length(linlist)) {
-            N[i] <- N[i - 1] + 1
-            newL <- newL + 1
-            L <- rbind(L, c(t[i], ranL, sign(ranL) * newL, -1))
-            linlist <- c(linlist, sign(ranL) * newL)
-          } else {
-            N[i] <- N[i - 1] - 1
-            L[abs(ranL), 4] <- t[i]
-            w <- which(linlist == ranL)
-            linlist <- linlist[-w]
-            linlist <- sort(linlist)
-          }
-        } else {
-          N[i] <- N[i - 1]
-        }
-        #print(linlist)
-        if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
-          t[i + 1] <- Inf
-        } else {
-          ED <- as.vector(L2ED(L, t[i]))
-          ED_max <- as.vector(L2ED(L, age))
-          params[1] <- N[i]
-          lamu <- edd_update_lamu(ED, ED_max, params, model)
-          #print(lamu)
-          t[i + 1] <-
-            t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
-        }
-      } else {
-        lamu <-
-          rbind(lamu, pdd_update_lamu(lamu, Phi[i], params, model))
-        event <- pdd_sample_event(lamu, N, i)
+      ED <- edd_get_ed(N[i - 1], L, t[i], metric, offset)
+      lamu_real <- edd_update_lamu(ED, ED, params, model)
+      event_type <- sample(c('real', 'fake'),
+                      1,
+                      prob = c(
+                        sum(lamu_real$newlas + lamu_real$newmus),
+                        sum(
+                          lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
+                        )
+                      ))
+      if (event_type == 'real') {
+        event <-
+          edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
+        ranL <- c(linlist, linlist)[event]
         
-        if (event == "spec") {
+        if (event <= length(linlist)) {
           N[i] <- N[i - 1] + 1
           newL <- newL + 1
-          L <- rbind(L, c(t[i], ranL, sign(ranL) * newL,
-                          -1))
+          L <- rbind(L, c(t[i], ranL, sign(ranL) * newL, -1))
           linlist <- c(linlist, sign(ranL) * newL)
-        } else if (event == "ext") {
+        } else {
           N[i] <- N[i - 1] - 1
           L[abs(ranL), 4] <- t[i]
           w <- which(linlist == ranL)
           linlist <- linlist[-w]
           linlist <- sort(linlist)
-          
-          if (sum(linlist < 0) == 0 |
-              sum(linlist > 0) == 0) {
-            # when one whole crown branch is extinct, do nothing
-          } else {
-            Phi[i] <- L2Phi(L, t[i], metric)
-            lamu[i, ] <-
-              pdd_update_lamu(lamu, Phi[i], params, model)
-          }
-        } else if (event == "fake_spec" |
-                   event == "fake_ext") {
-          N[i] <- N[i - 1]
         }
-        if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
-          t[i + 1] <- Inf
-        } else {
-          t[i + 1] <- t[i] + stats::rexp(1, pdd_sum_rates(lamu, N, i))
-        }
+      } else {
+        N[i] <- N[i - 1]
+      }
+      
+      if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
+        t[i + 1] <- Inf
+      } else {
+        ED <- edd_get_ed(N[i], L, t[i], metric, offset)
+        ED_max <- edd_get_edmax(N[i], L, age, metric, offset)
+        params[1] <- N[i]
+        lamu <- edd_update_lamu(ED, ED_max, params, model)
+        t[i + 1] <-
+          t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
       }
     }
     
@@ -233,36 +191,17 @@ edd_sim <- function (pars,
   tas <- L2phylo(L, dropextinct = F)
   brts <- L2brts(L, dropextinct = T)
   
-  if (metric == "ed") {
-    LTT <-
-      data.frame("time" = t[-i],
-                 "N" = N)
-    out <-
-      list(
-        tes = tes,
-        tas = tas,
-        L = L,
-        brts = brts,
-        LTT = LTT
-      )
-  } else {
-    lamuphis <-
-      data.frame(
-        "time" = t[-i],
-        "lambda" = lamu[, 1],
-        "mu" = lamu[, 2],
-        "Phi" = Phi,
-        "N" = N
-      )
-    out <-
-      list(
-        tes = tes,
-        tas = tas,
-        L = L,
-        brts = brts,
-        lamuphis = lamuphis
-      )
-  }
+  LTT <-
+    data.frame("time" = t[-i],
+               "N" = N)
+  out <-
+    list(
+      tes = tes,
+      tas = tas,
+      L = L,
+      brts = brts,
+      LTT = LTT
+    )
   
   return(out)
 } 
