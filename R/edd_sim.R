@@ -125,6 +125,14 @@ edd_sim <- function (pars,
     ED_max <- edd_get_edmax(N, L, age, metric, offset)
     lamu <- edd_update_lamu(ED, ED_max, params, model)
     
+    # controlling significant digits in tibble objects
+    options(pillar.sigfig = 10)
+    
+    # store EDs and lamus and associated lineages
+    EDs <- list(ED)
+    lamus <- list(lamu)
+    linlists <- list(linlist)
+    
     # get time interval
     t[i + 1] <-
       t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
@@ -171,6 +179,12 @@ edd_sim <- function (pars,
         ED_max <- edd_get_edmax(N[i], L, age, metric, offset)
         params[1] <- N[i]
         lamu <- edd_update_lamu(ED, ED_max, params, model)
+        
+        # append EDs and lamus
+        EDs <- c(EDs, list(ED))
+        lamus <- c(lamus, list(lamu))
+        linlists <-c(linlists, list(linlist))
+        
         t[i + 1] <-
           t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
       }
@@ -200,7 +214,10 @@ edd_sim <- function (pars,
       tas = tas,
       L = L,
       brts = brts,
-      LTT = LTT
+      LTT = LTT,
+      ED = EDs,
+      lamu = lamus,
+      linlist = linlists
     )
   
   return(out)
