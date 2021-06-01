@@ -1,3 +1,24 @@
+edd_pars_check <- function(pars, age, model, metric, offset) {
+  #pars range check
+  if (pars[1] <= 0 | pars[2] <= 0) {
+    stop('per species rates should be positive')
+  }
+  if (pars[2] <= 0) {
+    stop('coefficient for extinction should be positive')
+  }
+  #pars and model match check
+  if (model == "dsce2" && length(pars) != 4) {
+    stop('this model requires four parameters')
+  }
+  if (model == "dsde2" && length(pars) != 6) {
+    stop('this model requires six parameters')
+  }
+  #metric and offset match check
+  if (metric != "pd" && offset != "none") {
+    stop('only pd metric has offset methods')
+  }
+}
+
 edd_update_lamu <- function(ED, ED_max, params, model) {
   N <- params[1]
   la0 <- params[2]
@@ -50,21 +71,8 @@ edd_sim <- function (pars,
                      model = "dsce2",
                      metric = "pd",
                      offset = "none") {
-  if (pars[1] <= 0 | pars[2] <= 0) {
-    stop('per species rates should be positive')
-  }
-  if (model == "dsce2" && length(pars) != 4) {
-    stop('incorrect parameters')
-  }
-  if (model == "dsde2" && length(pars) != 6) {
-    stop('incorrect parameters')
-  }
-  if (pars[2] <= 0) {
-    stop('coefficient for extinction should be positive')
-  }
-  if (metric != "pd" && offset != "none") {
-    stop('only pd metric has offset methods')
-  }
+  
+  edd_pars_check(pars,age,model,metric,offset)
   
   done <- 0
   while (done == 0) {
