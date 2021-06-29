@@ -15,8 +15,6 @@ parsfixdefault = function(ddmodel, brts, missnumspec, idparsopt) {
   }
 }
 
-
-
 #' Maximization of the loglikelihood under a diversity-dependent
 #' diversification model
 #' 
@@ -59,19 +57,38 @@ parsfixdefault = function(ddmodel, brts, missnumspec, idparsopt) {
 #' \code{ddmodel == 1.5} : positive and negative dependence in speciation rate
 #' with parameter K' (= diversity where speciation = 0); lambda = lambda0 *
 #' S/K' * (1 - S/K') where S is species richness\cr
-#' \code{ddmodel == 2} : exponential dependence in speciation rate with parameter
+#' \code{ddmodel == 2} : exponential dependence (power function) in speciation rate with parameter
 #' K (= diversity where speciation = extinction)\cr
-#' \code{ddmodel == 2.1} : variant of exponential dependence in speciation rate
+#' \code{ddmodel == 2.1} : variant of exponential dependence (power function) in speciation rate
 #' with offset at infinity\cr
 #' \code{ddmodel == 2.2} : 1/n dependence in speciation rate\cr 
-#' \code{ddmodel == 2.3} : exponential dependence in speciation rate with parameter x (=
+#' \code{ddmodel == 2.3} : exponential dependence (power function) in speciation rate with parameter x (=
 #' exponent)\cr
 #' \code{ddmodel == 3} : linear dependence in extinction rate \cr
-#' \code{ddmodel == 4} : exponential dependence in extinction rate \cr
+#' \code{ddmodel == 4} : exponential dependence (power function) in extinction rate \cr
 #' \code{ddmodel == 4.1} : variant of exponential dependence in extinction rate
 #' with offset at infinity \cr
 #' \code{ddmodel == 4.2} : 1/n dependence in extinction rate with offset at infinity \cr \code{ddmodel == 5} : linear
 #' dependence in speciation and extinction rate \cr
+#' \code{ddmodel == 5} : linear dependence in speciation and 
+#' extinction rate \cr
+#' \code{ddmodel == 6} : linear dependence in speciation rate, exponential
+#' dependence (power function) in extinction rate \cr
+#' \code{ddmodel == 7} : exponential dependence (power function) in speciation
+#' and extinction rate \cr
+#' \code{ddmodel == 8} : exponential dependence (power function) in speciation rate,
+#' linear dependence in extinction rate \cr
+#' \code{ddmodel == 9} : exponential dependence (exponential function) in speciation,
+#' constant-rate extinction \cr
+#' \code{ddmodel == 10} : constant-rate speciation, exponential dependence 
+#' (exponential function) in extinction \cr
+#' \code{ddmodel == 11} : linear dependence in speciation, exponential 
+#' dependence (exponential function) in extinction\cr
+#' \code{ddmodel == 12} : exponential dependence (exponential function) in 
+#' speciation and extinction\cr
+#' \code{ddmodel == 13} : exponential dependence (exponential function) in 
+#' speciation, linear dependence in extinction \cr
+#' 
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
 #' @param cond Conditioning: \cr
@@ -157,6 +174,12 @@ dd_ML = function(
     output_error <- data.frame(lambda = -1,mu = -1,K = -1, r = -1, loglik = -1, df = -1, conv = -1)
   } else {
     output_error <- data.frame(lambda = -1,mu = -1,K = -1, loglik = -1, df = -1, conv = -1)
+  }
+  
+  if (ddmodel > 5) {
+    if (method == "analytical" || cond == 3) {
+      stop("Sorry, ddmodel options > 5 have not been developed for method = \"analytical\" or cond = 3.")
+    }
   }
   
   brts = sort(abs(as.numeric(brts)),decreasing = TRUE)

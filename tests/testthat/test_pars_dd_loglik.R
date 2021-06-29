@@ -1,4 +1,3 @@
-
 # Case tree
 set.seed(26071948) # jjsepkoski
 phylo <- dd_sim(
@@ -56,9 +55,8 @@ test_that("all DD models return a likelihood", {
 })
 
 test_that("ddmodel = 1 ok", {
-  expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 500), -Inf) # also -Inf with 1000
-  # run_dd_loglik(ddmodel = 1, lambda_0 = 300) NAs / NaNs introduced, not solved
-  # expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 5000), -Inf) # bug! # high lambda approximation
+  # expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 500,verbose = TRUE), -Inf) # also -Inf with 1000
+  # run_dd_loglik(ddmodel = 1, lambda_0 = 300) # NAs / NaNs introduced, not solved
   # Negative parameters are not allowed
   expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = -1), -Inf)
   # lambda0 = mu0 not allowed

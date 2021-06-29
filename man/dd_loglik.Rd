@@ -26,11 +26,9 @@ rate)
 \cr \cr \code{pars2[1]} sets the
 maximum number of species for which a probability must be computed.  This
 must be larger than 1 + missnumspec + length(brts).
-\cr \cr \code{pars2[2]}
-sets the model of diversity-dependence:
-\cr - \code{pars2[2] == 1} linear
-dependence in speciation rate with parameter K (= diversity where speciation
-= extinction)
+\cr \cr \code{pars2[2]} sets the model of diversity-dependence:
+\cr - \code{pars2[2] == 1} linear dependence in speciation rate with 
+parameter K (= diversity where speciation = extinction)
 \cr - \code{pars2[2] == 1.3} linear dependence in speciation
 rate with parameter K' (= diversity where speciation = 0)
 \cr - \code{pars2[2] == 1.4} : positive diversity-dependence in speciation rate
@@ -39,28 +37,38 @@ maximum); lambda = lambda0 * S/(S + K') where S is species richness
 \cr - \code{pars2[2] == 1.5} : positive and negative diversity-dependence in
 speciation rate with parameter K' (= diversity where speciation = 0); lambda
 = lambda0 * S/K' * (1 - S/K') where S is species richness
-\cr - \code{pars2[2] == 2} exponential dependence in speciation rate with
+\cr - \code{pars2[2] == 2} exponential dependence (power function) in speciation rate with
 parameter K (= diversity where speciation = extinction)
 \cr - \code{pars2[2]
-== 2.1} variant of exponential dependence in speciation rate with offset at
+== 2.1} variant of exponential dependence (power function) in speciation rate with offset at
 infinity
 \cr - \code{pars2[2] == 2.2} 1/n dependence in speciation rate
-\cr - \code{pars2[2] == 2.3} exponential dependence in speciation rate with
+\cr - \code{pars2[2] == 2.3} exponential dependence (power function) in speciation rate with
 parameter x (= exponent)
-\cr - \code{pars2[2] == 3} linear dependence in
-extinction rate
-\cr - \code{pars2[2] == 4} exponential dependence in
-extinction rate
-\cr - \code{pars2[2] == 4.1} variant of exponential
-dependence in extinction rate with offset at infinity
-\cr - \code{pars2[2] ==
-4.2} 1/n dependence in extinction rate
-\cr - \code{pars2[2] == 5} linear
-dependence in speciation and extinction rate
-\cr \cr \code{pars2[3]} sets
-the conditioning:
-\cr - \code{pars2[3] == 0} conditioning on stem or crown
-age
+\cr - \code{pars2[2] == 3} linear dependence in extinction rate
+\cr - \code{pars2[2] == 4} exponential dependence (power function) in extinction rate
+\cr - \code{pars2[2] == 4.1} variant of exponential dependence (power function) in extinction 
+rate with offset at infinity
+\cr - \code{pars2[2] == 4.2} 1/n dependence in extinction rate
+\cr - \code{pars2[2] == 5} linear dependence in speciation and extinction rate
+\cr - \code{pars2[2] == 6} linear dependence in speciation rate, exponential
+dependence (power function) in extinction rate \cr
+\cr - \code{pars2[2] == 7} exponential dependence (power function) in speciation
+and extinction rate \cr
+\cr - \code{pars2[2] == 8} exponential dependence (power function) in speciation rate,
+linear dependence in extinction rate \cr
+\cr - \code{pars2[2] == 9} exponential dependence (exponential function) in speciation,
+constant-rate extinction \cr
+\cr - \code{pars2[2] == 10} constant-rate speciation, exponential dependence 
+(exponential function) in extinction \cr
+\cr - \code{pars2[2] == 11} linear dependence in speciation, exponential 
+dependence (exponential function) in extinction\cr
+\cr - \code{pars2[2] == 12} exponential dependence (exponential function) in 
+speciation and extinction\cr
+\cr - \code{pars2[2] == 13} exponential dependence (exponential function) in 
+speciation, linear dependence in extinction \cr
+\cr \cr \code{pars2[3]} sets the conditioning:
+\cr - \code{pars2[3] == 0} conditioning on stem or crown age
 \cr - \code{pars2[3] == 1} conditioning on stem or crown age and
 non-extinction of the phylogeny
 \cr - \code{pars2[3] == 2} conditioning on
