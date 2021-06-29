@@ -91,7 +91,11 @@ dependence (exponential function) in extinction\cr
 \code{ddmodel == 12} : exponential dependence (exponential function) in 
 speciation and extinction\cr
 \code{ddmodel == 13} : exponential dependence (exponential function) in 
-speciation, linear dependence in extinction \cr}
+speciation, linear dependence in extinction \cr
+\code{ddmodel == 14} : exponential dependence (exponential function) in 
+speciation, exponential dependence (power function) in extinction \cr
+\code{ddmodel == 15} : exponential dependence (power function) in 
+speciation, exponential dependence (exponential function) in extinction \cr}
 
 \item{missnumspec}{The number of species that are in the clade but missing
 in the phylogeny}

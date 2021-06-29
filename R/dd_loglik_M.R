@@ -89,6 +89,18 @@ lambdamu = function(n,pars,ddep)
         # linear DD on extinction
         lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (n / K))
         muvec = mu + alpha * (la - mu) * n / K
+    } else if (ddep == 14) {
+        # exponential DD on speciation (exponential function) 
+        # exponential DD on extinction (power function)
+        y = log(1 + alpha * (la - mu) / mu) / log(K)
+        lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (n / K))
+        muvec = mu * n ^ y
+    } else if (ddep == 15) {
+        # exponential DD on speciation (power function)
+        # exponential DD on extinction (exponential function)
+        y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        lavec = pmax(0, la * n ^ y)
+        muvec = mu * (1 + alpha * (la - mu) / mu) ^ (n / K)
     }
     return(list(lavec,muvec))
 }

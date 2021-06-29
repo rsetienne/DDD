@@ -75,6 +75,14 @@ dd_loglik_rhs_precomp = function(pars,x)
   } else if (ddep == 13) {
     lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (nn / K))
     muvec = mu + alpha * (la - mu) / K * nn
+  } else if (ddep == 14) {
+    y = log(1 + alpha * (la - mu) / mu) / log(K)
+    lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (nn / K))
+    muvec = mu * nn ^ y
+  } else if (ddep == 15) {
+    y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+    lavec = pmax(0, la * nn ^ y)
+    muvec = mu * (1 + alpha * (la - mu) / mu) ^ (nn / K)
   }
   return(c(lavec, muvec, nn))
 }  

@@ -67,6 +67,14 @@ dd_lamuN = function(ddmodel,pars,N) {
     } else if (ddmodel == 13) {
         laN = max(0, la * ((alpha * (la - mu) + mu) / la) ^ (N / K))
         muN = mu + alpha * (la - mu) / K * N
+    } else if (ddmodel == 14) {
+        y = log(1 + alpha * (la - mu) / mu) / log(K)
+        laN = max(0, la * ((alpha * (la - mu) + mu) / la) ^ (N / K))
+        muN = mu * N ^ y
+    } else if (ddmodel == 15) {
+        y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        laN = max(0, la * N ^ y)
+        muN = mu * (1 + alpha * (la - mu) / mu) ^ (N / K)
     }
     return(c(laN,muN))
 }

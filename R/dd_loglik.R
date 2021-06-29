@@ -23,19 +23,22 @@
 # (power function) in extinction rate
 # . ddep == 7 : exponential dependence (power function) in speciation
 # and extinction rate
-# . ddep == 8 : : exponential dependence (power function) in speciation rate,
+# . ddep == 8 : exponential dependence (power function) in speciation rate,
 # linear dependence in extinction rate
-# . ddep == 9 : : exponential dependence (exponential function) in speciation,
+# . ddep == 9 : exponential dependence (exponential function) in speciation,
 # constant-rate extinction
-# . ddep == 10 : : constant-rate speciation, exponential dependence 
+# . ddep == 10 : constant-rate speciation, exponential dependence 
 # (exponential function) in extinction
-# . ddep == 11 : : linear dependence in speciation, exponential 
+# . ddep == 11 : linear dependence in speciation, exponential 
 # dependence (exponential function) in extinction
-# . ddep == 12 : : exponential dependence (exponential function) in 
+# . ddep == 12 : exponential dependence (exponential function) in 
 # speciation and extinction
-# . ddep == 13 : : exponential dependence (exponential function) in 
+# . ddep == 13 : exponential dependence (exponential function) in 
 # speciation, linear dependence in extinction
-
+# . ddep == 14 : exponential dependence (exponential function) in 
+# speciation, exponential dependence (power function) in extinction
+# . ddep == 15 : exponential dependence (power function) in 
+# speciation, exponential dependence (exponential function) in extinction
 # - pars2[3] = cond = conditioning
 #  . cond == 0 : conditioning on stem or crown age
 #  . cond == 1 : conditioning on stem or crown age and non-extinction of the phylogeny
