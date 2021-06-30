@@ -17,10 +17,10 @@ exptd_rates_set1 <- list(
   #"mu_cst"        = function(N) 0.2, # not with alpha != 0
   "lambda_lin"     = function(N) pmax(0.8 - 0.0225 * N, 0),
   "mu_lin"         = function(N) 0.2 + 0.0075 * N,
-  "lambda_exp"     = function(N) pmax(0.8 * N ^ (-log(0.8 / 0.35) / log(20)), 0),
-  "mu_exp"         = function(N) 0.2 * N ^ (log(1.75) / log(20)),
-  "lambda_exp_alt" = function(N) pmax(0.8 * (7 / 16) ^ (N / 20), 0),
-  'mu_exp_alt'     = function(N) 0.2 * (7 / 4) ^ (N / 20)
+  "lambda_pow"     = function(N) pmax(0.8 * N ^ (-log(0.8 / 0.35) / log(20)), 0),
+  "mu_pow"         = function(N) 0.2 * N ^ (log(1.75) / log(20)),
+  "lambda_exp" = function(N) pmax(0.8 * (7 / 16) ^ (N / 20), 0),
+  'mu_exp'     = function(N) 0.2 * (7 / 4) ^ (N / 20)
 )
 
 # Case 2.: r = 0 (alpha = 0)
@@ -35,10 +35,10 @@ exptd_rates_set2 <- list(
   #"mu_cst"        = function(N) 0.2, # not with alpha != 0
   "lambda_lin"     = function(N) pmax(0.8 - 0.03 * N, 0),
   "mu_lin"         = function(N) rep(0.2, length(N)),
-  "lambda_exp"     = function(N) pmax(0.8 * N ^ (-log(4) / log(20)), 0),
-  "mu_exp"         = function(N) rep(0.2, length(N)),
-  "lambda_exp_alt" = function(N) pmax(0.8 * (1/4) ^ (N / 20), 0),
-  'mu_exp_alt'     = function(N) rep(0.2, length(N))
+  "lambda_pow"     = function(N) pmax(0.8 * N ^ (-log(4) / log(20)), 0),
+  "mu_pow"         = function(N) rep(0.2, length(N)),
+  "lambda_exp" = function(N) pmax(0.8 * (1 / 4) ^ (N / 20), 0),
+  'mu_exp'     = function(N) rep(0.2, length(N))
 )
 # Case 3.: r = Inf (alpha = 1)
 pars_set3 <- c(
@@ -52,10 +52,10 @@ exptd_rates_set3 <- list(
   #"mu_cst"        = function(N) 0.2, # not with alpha != 0
   "lambda_lin"     = function(N) rep(0.8, length(N)),
   "mu_lin"         = function(N) 0.2 + 0.03 * N,
-  "lambda_exp"     = function(N) rep(0.8, length(N)),
-  "mu_exp"         = function(N) 0.2 * N ^ (log(4) / log(20)),
-  "lambda_exp_alt" = function(N) rep(0.8, length(N)),
-  'mu_exp_alt'     = function(N) 0.2 * 4 ^ (N / 20)
+  "lambda_pow"     = function(N) rep(0.8, length(N)),
+  "mu_pow"         = function(N) 0.2 * N ^ (log(4) / log(20)),
+  "lambda_exp" = function(N) rep(0.8, length(N)),
+  'mu_exp'     = function(N) 0.2 * 4 ^ (N / 20)
 )
 
 # Declare test functions
@@ -65,14 +65,16 @@ match_exptd_rates <- function(ddmodel, exptd_rates_set, n_seq) {
   rates_ls <- switch(
     as.character(ddmodel),
     "5" = list("la_N" = exptd_rates_set$lambda_lin(n_seq), "mu_N" = exptd_rates_set$mu_lin(n_seq)),
-    "6" = list("la_N" = exptd_rates_set$lambda_lin(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq)),
-    "7" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq)),
-    "8" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_lin(n_seq)),
-    #"9" = list("la_N" = exptd_rates_set$lambda_exp_alt(n_seq), "mu_N" = exptd_rates_set$mu_cst(n_seq)),
-    #"10" = list("la_N" = exptd_rates_set$lambda_cst(n_seq), "mu_N" = exptd_rates_set$mu_exp_alt(n_seq)),
-    "11" = list("la_N" = exptd_rates_set$lambda_lin(n_seq), "mu_N" = exptd_rates_set$mu_exp_alt(n_seq)),
-    "12" = list("la_N" = exptd_rates_set$lambda_exp_alt(n_seq), "mu_N" = exptd_rates_set$mu_exp_alt(n_seq)),
-    "13" = list("la_N" = exptd_rates_set$lambda_exp_alt(n_seq), "mu_N" = exptd_rates_set$mu_lin(n_seq)),
+    "6" = list("la_N" = exptd_rates_set$lambda_lin(n_seq), "mu_N" = exptd_rates_set$mu_pow(n_seq)),
+    "7" = list("la_N" = exptd_rates_set$lambda_pow(n_seq), "mu_N" = exptd_rates_set$mu_pow(n_seq)),
+    "8" = list("la_N" = exptd_rates_set$lambda_pow(n_seq), "mu_N" = exptd_rates_set$mu_lin(n_seq)),
+    #"9" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_cst(n_seq)),
+    #"10" = list("la_N" = exptd_rates_set$lambda_cst(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq)),
+    "11" = list("la_N" = exptd_rates_set$lambda_lin(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq)),
+    "12" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq)),
+    "13" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_lin(n_seq)),
+    "14" = list("la_N" = exptd_rates_set$lambda_exp(n_seq), "mu_N" = exptd_rates_set$mu_pow(n_seq)),
+    "15" = list("la_N" = exptd_rates_set$lambda_pow(n_seq), "mu_N" = exptd_rates_set$mu_exp(n_seq))
   )
   return(rates_ls)
 }
@@ -142,7 +144,7 @@ test_dd_lamuN <- function(ddmodel, pars_set, exptd_rates_set) {
 }
 
 test_that("set1", {
-  ddmodels <- c(5:8, 11:13)
+  ddmodels <- c(5:8, 11:15)
   purrr::walk(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
@@ -164,7 +166,7 @@ test_that("set1", {
 })
 
 test_that("set2", {
-  ddmodels <- c(5:8, 11:13)
+  ddmodels <- c(5:8, 11:15)
   purrr::walk(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
@@ -186,7 +188,7 @@ test_that("set2", {
 })
 
 test_that("set3", {
-  ddmodels <- c(5:8, 11:13)
+  ddmodels <- c(5:8, 11:15)
   purrr::walk(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
