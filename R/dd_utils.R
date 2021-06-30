@@ -5,7 +5,6 @@
 #' 
 #' Converting a set of branching times to a phylogeny
 #' 
-#' 
 #' @param times Set of branching times
 #' @param root When root is FALSE, the largest branching time will be assumed to be
 #' the crown age. When root is TRUE, it will be the stem age. 
@@ -893,7 +892,7 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 #' @author Theo Pannetier
 #' @export
 both_rates_vary <- function(ddmodel) {
-  return(ddmodel %in% c(5:8, 11:13))
+  return(ddmodel %in% c(5:8, 11:15))
 }
 
 #' Get carrying capacity from other parameters of the model
