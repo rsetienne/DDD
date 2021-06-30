@@ -180,7 +180,7 @@ dd_ML = function(
   }
   
   if (ddmodel > 5) {
-    if (method == "analytical" || cond == 3) {
+    if (methode == "analytical" || cond == 3) {
       stop("Sorry, ddmodel options > 5 have not been developed for method = \"analytical\" or cond = 3.")
     }
   }
