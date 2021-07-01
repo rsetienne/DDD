@@ -886,6 +886,162 @@ rng_respecting_sample <- function(x, size, replace, prob) {
   return(sample(x = non_zero_x, size = size, replace = replace, prob = non_zero_prob))
 }
 
+
+
+#' Function to convert a table with speciation and extinction events to a set
+#' of branching times
+#' 
+#' Converting a table with speciation and extinction events to a set of
+#' branching times
+#' 
+#' 
+#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param dropextinct Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @return \item{ brts }{ A set of branching times }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' sim = dd_sim(c(0.2,0.1,20),10)
+#' phy = L2brts(sim$L)
+#' plot(phy)
+#' 
+#' @export L2brts
+L2brts2 = function(L,dropextinct = T)
+# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
+{
+   brts = NULL
+   L = L[order(abs(L[,3])),1:4]
+   age = L[nrow(L),1]
+   L[1,1] = -1
+   if(dropextinct == T)
+   {
+      sall = which(L[,4] == -1)
+      tend = age
+   } else {
+      sall = which(L[,4] >= -1)
+      tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
+   }
+   L = L[,-4]
+   linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
+   linlist[,4] = as.character(linlist[,4])
+   names(linlist) = 1:5
+   done = 0
+   while(done == 0)
+   {
+      j = which.max(linlist[,1])
+      daughter = linlist[j,3]
+      parent = linlist[j,2]
+      parentj = which(parent == linlist[,3])
+      parentinlist = length(parentj)
+      if(parentinlist == 1)
+      {
+         spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
+         spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
+         linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
+         linlist[parentj,5] = linlist[j,1]
+         brts = c(brts,linlist[j,1])
+         linlist = linlist[-j,]
+      } else {
+         #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
+         linlist[j,1:3] = L[which(L[,3] == parent),1:3]
+      }
+      if(nrow(linlist) == 1) { done = 1 }
+   }
+   #linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
+   brts = rev(sort(age - brts))
+   return(brts)
+}
+
+
+
+#' Function to convert a table with speciation and extinction events to a
+#' phylogeny
+#' 
+#' Converting a table with speciation and extinction events to a phylogeny
+#' 
+#' 
+#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param dropextinct Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @return \item{ phy }{ A phylogeny of the phylo type }
+#' @author Rampal S. Etienne
+#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
+#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
+#' 180: E75-E89, doi: 10.1086/667574
+#' @keywords models
+#' @examples
+#' 
+#' sim = dd_sim(c(0.2,0.1,20),10)
+#' phy = L2phylo(sim$L)
+#' plot(phy)
+#' 
+#' @export L2phylo2
+L2phylo2 = function(L,dropextinct = T)
+# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
+{
+   L = L[order(abs(L[,3])),1:4]
+   age = L[nrow(L),1]
+   L[1, 1] <- -1
+   if(dropextinct == T)
+   {
+      sall = which(L[,4] == -1)
+      tend = age
+   } else {
+      sall = which(L[,4] >= -1)
+      tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
+   }
+   L = L[,-4]
+   linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
+   linlist[,4] = as.character(linlist[,4])
+   names(linlist) = 1:5
+   done = 0
+   while(done == 0)
+   {
+      j = which.max(linlist[,1])
+      daughter = linlist[j,3]
+      parent = linlist[j,2]
+      parentj = which(parent == linlist[,3])
+      parentinlist = length(parentj)
+      if(parentinlist == 1)
+      {
+         spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
+         spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
+         linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
+         linlist[parentj,5] = linlist[j,1]
+         linlist = linlist[-j,]
+      } else {
+         #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
+         linlist[j,1:3] = L[which(L[,3] == parent),1:3]
+      }
+      if(nrow(linlist) == 1) { done = 1 }
+   }
+   linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
+   phy = ape::read.tree(text = linlist[1,4])
+   tree = ape::as.phylo(phy)
+   return(tree)
+}
+
+
+
 #' @name L2Phi
 #' @title Converting a table with speciation and extinction events to a phylogenetic
 #' diversity metric
@@ -910,22 +1066,18 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 #' @keywords models
 #' @export L2Phi
 L2Phi <- function(L, t, metric) {
-  # reverse time scale
-  L[, 1] <- t - c(L[, 1])
-  notmin1 <- which(L[, 4] != -1)
-  L[notmin1, 4] <- t - c(L[notmin1, 4])
-  L[which(L[, 4] == t + 1), 4] <- -1
-  
   # metrics
   if (metric == "pd") {
-    return(sum(L2phylo(L, dropextinct = T)$edge.length))
+    return(sum(DDD::L2phylo(L, dropextinct = T)$edge.length))
   } else if (metric == "mpd") {
-    phy <- L2phylo(L, dropextinct = T)
+    phy <- DDD::L2phylo(L, dropextinct = T)
     n <- length(phy$tip.label)
     dist <- ape::dist.nodes(phy)[1:n, 1:n]
     return(mean(dist[lower.tri(dist)]))
   }
 }
+
+
 
 #' @name L2ED
 #' @title Converting a table with speciation and extinction events to evolutionary 
@@ -948,19 +1100,14 @@ L2Phi <- function(L, t, metric) {
 #' @keywords models
 #' @export L2ED
 L2ED <- function(L, t) {
-# reverse time scale
-  L[, 1] <- t - c(L[, 1])
-  notmin1 <- which(L[, 4] != -1)
-  L[notmin1, 4] <- t - c(L[notmin1, 4])
-  L[which(L[, 4] == t + 1), 4] <- -1
-  
-  dist.tips <- ape::cophenetic.phylo(L2phylo(L, dropextinct = T))
-  diag(dist.tips) <- NA
-  dist.means <- rowMeans(dist.tips, na.rm = T)
+  dist.tips <- ape::cophenetic.phylo(DDD::L2phylo2(L, dropextinct = T))
+  dist.means <- rowSums(dist.tips) / (dim(dist.tips)[1] - 1)
   dist.means.sorted <- dist.means[gtools::mixedorder(names(dist.means))]
   
   return(dist.means.sorted)
 }
+
+
 
 #' @name range01
 #' @title standardizing data to the range from 0 to 1
@@ -985,6 +1132,8 @@ range01 <- function(x) {
   }
 }
 
+
+
 #' @name phylo2mpd
 #' @title Converting a phylogenetic tree of phylo object to mean pairwise distance
 #' among all tips
@@ -1002,13 +1151,14 @@ phylo2mpd <- function(phy) {
   return(mean(dist[lower.tri(dist)]))
 }
 
+
+
 #' @name phylo2pd
 #' @title Converting a phylogenetic tree of phylo object to total lengths of all
 #' branches in the tree
 #' @description Function to convert a phylogenetic tree with extant species to
 #' phylogenetic diversity
-#' @param phy
-#' @param a phylo object that only contains extant species
+#' @param phy a phylo object that only contains extant species
 #' extinct at the present
 #' @return a numeric value of phylogenetic diversity
 #' @author Tianjian Qin
@@ -1017,6 +1167,8 @@ phylo2mpd <- function(phy) {
 phylo2pd <- function(phy) {
   return(sum(phy$edge.length))
 }
+
+
 
 #' @name extract_pdd_result
 #' @title Extracting all results generated in simulation
@@ -1031,6 +1183,8 @@ extract_pdd_result <- function(result, nrep, which, nlist = 5) {
   out <-
     return(result[seq(which, nlist * nrep, by = nlist)])
 }
+
+
 
 #' @name bind_result
 #' @title Binding extracted results in simulation
@@ -1050,6 +1204,8 @@ bind_result <- function(result) {
   
   return(dplyr::bind_rows(out))
 }
+
+
 
 #' @name pdd_simulation_replicated
 #' @title Running a replicated pdd simulation
@@ -1078,6 +1234,8 @@ pdd_simulation_replicated <-
     
     return(list(result_pars = result_pars, result_pars_binded = result_pars_binded))
   }
+
+
 
 #' @name pdd_simulation_plot
 #' @title Plotting results of a replicated pdd simulation
@@ -1206,6 +1364,8 @@ pdd_simulation_plot <- function(result, pars, age, model, offset) {
   return(plotwithtitle)
 }
 
+
+
 #' @name pdd_simulation_wrapper
 #' @title Conducting a pdd simulation and plotting the results
 #' @description Function to automatically run a replicated pdd simulation and then
@@ -1251,6 +1411,8 @@ pdd_simulation_wrapper <- function(rep, pars, age, model, metric, offset) {
   return(list(data = input_output_pack, plot = plot_pack))
 }
 
+
+
 #' @name extract_edd_result
 #' @title Extracting all results generated in simulation
 #' @description Function to extract all results generated in edd simulation
@@ -1264,6 +1426,8 @@ extract_edd_result <- function(result, nrep, which, nlist = 8) {
   out <-
     return(result[seq(which, nlist * nrep, by = nlist)])
 }
+
+
 
 #' @name edd_simulation_replicated
 #' @title Running a replicated edd simulation
@@ -1318,6 +1482,8 @@ edd_simulation_replicated <-
     }
     
   }
+
+
 
 #' @name edd_simulation_wrapper
 #' @title Conducting a edd simulation and plotting the results
@@ -1379,6 +1545,8 @@ edd_simulation_wrapper <-
       return(list(data = input_output_pack, plot = plot_pack))
     }
   }
+
+
 
 #' @name edd_simulation_plot
 #' @title Plotting results of a replicated edd simulation

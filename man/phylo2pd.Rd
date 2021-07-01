@@ -8,7 +8,7 @@ branches in the tree}
 phylo2pd(phy)
 }
 \arguments{
-\item{a}{phylo object that only contains extant species
+\item{phy}{a phylo object that only contains extant species
 extinct at the present}
 }
 \value{
