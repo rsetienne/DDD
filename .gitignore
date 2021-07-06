@@ -10,3 +10,4 @@ src-i386
 src-x64
 *.RData
 
+test_functions.r
