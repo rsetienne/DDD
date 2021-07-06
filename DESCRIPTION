@@ -4,7 +4,15 @@ Title: Diversity-Dependent Diversification
 Version: 4.4
 Date: 2020-06-02
 Depends: R (>= 3.5.0)
-Imports: deSolve, ape, phytools, subplex, Matrix, expm, SparseM
+Imports: 
+    deSolve,
+    ape,
+    phytools,
+    subplex,
+    Matrix,
+    expm,
+    SparseM,
+    gtools
 Suggests: 
     testthat (>= 3.0.0),
     testit

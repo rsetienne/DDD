@@ -24,6 +24,11 @@ dsce2} : linear dependence in speciation rate with parameters beta_num and
 beta-phi\cr \code{model == dsde2} : linear dependence
 in both speciation rate and extinction rate with parameters beta_num,
 beta_phi, gamma_num and gamma_phi}
+
+\item{metric}{Specifies which phylogenetic diversity metric should be used}
+
+\item{offset}{Specifies which method to use to offset time effect on evolutionary
+distinctiveness}
 }
 \value{
 \item{ out }{ A list with the following four elements: The first

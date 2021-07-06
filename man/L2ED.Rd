@@ -16,18 +16,15 @@ third column is the label of the daughter species itself; positive and
 negative values indicate whether the species belongs to the left or right
 crown lineage \cr - the fourth column is the time of extinction of the
 species; if the fourth element equals -1, then the species is still extant.}
+
+\item{t}{Simulation time}
 }
 \value{
-a named vector of evolutionary distances
+a named vector of mean evolutionary distinctivenesses
 }
 \description{
 Function to convert a table with speciation and extinction events to 
 mean evolutionary distances between each species and the rest of the community
-}
-\references{
-- Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
-doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
-180: E75-E89, doi: 10.1086/667574
 }
 \author{
 Tianjian Qin
