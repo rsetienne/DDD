@@ -888,36 +888,6 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 
 
 
-#' Function to convert a table with speciation and extinction events to a set
-#' of branching times
-#' 
-#' Converting a table with speciation and extinction events to a set of
-#' branching times
-#' 
-#' 
-#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
-#' is the time at which a species is born in Mya\cr - the second column is the
-#' label of the parent of the species; positive and negative values indicate
-#' whether the species belongs to the left or right crown lineage \cr - the
-#' third column is the label of the daughter species itself; positive and
-#' negative values indicate whether the species belongs to the left or right
-#' crown lineage \cr - the fourth column is the time of extinction of the
-#' species; if the fourth element equals -1, then the species is still extant.
-#' @param dropextinct Sets whether the phylogeny should drop species that are
-#' extinct at the present
-#' @return \item{ brts }{ A set of branching times }
-#' @author Rampal S. Etienne
-#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
-#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
-#' 180: E75-E89, doi: 10.1086/667574
-#' @keywords models
-#' @examples
-#' 
-#' sim = dd_sim(c(0.2,0.1,20),10)
-#' phy = L2brts(sim$L)
-#' plot(phy)
-#' 
-#' @export L2brts2
 L2brts2 = function(L,dropextinct = T)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
@@ -966,35 +936,6 @@ L2brts2 = function(L,dropextinct = T)
 
 
 
-#' Function to convert a table with speciation and extinction events to a
-#' phylogeny
-#' 
-#' Converting a table with speciation and extinction events to a phylogeny
-#' 
-#' 
-#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
-#' is the time at which a species is born in Mya\cr - the second column is the
-#' label of the parent of the species; positive and negative values indicate
-#' whether the species belongs to the left or right crown lineage \cr - the
-#' third column is the label of the daughter species itself; positive and
-#' negative values indicate whether the species belongs to the left or right
-#' crown lineage \cr - the fourth column is the time of extinction of the
-#' species; if the fourth element equals -1, then the species is still extant.
-#' @param dropextinct Sets whether the phylogeny should drop species that are
-#' extinct at the present
-#' @return \item{ phy }{ A phylogeny of the phylo type }
-#' @author Rampal S. Etienne
-#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
-#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
-#' 180: E75-E89, doi: 10.1086/667574
-#' @keywords models
-#' @examples
-#' 
-#' sim = dd_sim(c(0.2,0.1,20),10)
-#' phy = L2phylo(sim$L)
-#' plot(phy)
-#' 
-#' @export L2phylo2
 L2phylo2 = function(L,dropextinct = T)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
