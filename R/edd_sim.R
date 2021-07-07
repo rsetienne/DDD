@@ -100,13 +100,10 @@ edd_sample_event <- function(las, mus, linlist) {
   return(DDD::sample2(events, 1, prob = c(las, mus)))
 }
 
-#' Function to simulate the evolutionary distinctiveness dependent
+#' @title Function to simulate the evolutionary distinctiveness dependent
 #' diversification process
-#'
-#' Simulating the evolutionary distinctiveness dependent
+#' @description Simulating the evolutionary distinctiveness dependent
 #' diversification process
-#'
-#'
 #' @param pars Vector of parameters: \cr \cr \code{pars[1]} corresponds to
 #' lambda (speciation rate) \cr \code{pars[2]} corresponds to mu (extinction
 #' rate) \cr \code{pars[3]} corresponds to beta_num (coefficient for species
@@ -122,8 +119,8 @@ edd_sample_event <- function(las, mus, linlist) {
 #' in both speciation rate and extinction rate with parameters beta_num,
 #' beta_phi, gamma_num and gamma_phi
 #' @param metric Specifies which phylogenetic diversity metric should be used
-#' @param offset Specifies which method to use to offset time effect on evolutionary
-#' distinctiveness
+#' @param offset Specifies which method to use to offset time effect on
+#' evolutionary distinctiveness
 #' @return \item{ out }{ A list with the following four elements: The first
 #' element is the tree of extant species in phylo format \cr The second element
 #' is the tree of all species, including extinct species, in phylo format \cr
@@ -141,9 +138,6 @@ edd_sample_event <- function(las, mus, linlist) {
 #' seventh element is a matrix of all the speciation and extinction rates of all
 #' lineages. \cr The eighth element is a matrix of}
 #' @author Tianjian Qin, Rampal S. Etienne
-#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
-#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
-#' 180: E75-E89, doi: 10.1086/667574
 #' @keywords models
 #' @examples
 #' edd_sim(
