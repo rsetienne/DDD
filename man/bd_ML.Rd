@@ -22,7 +22,7 @@ bd_ML(
   changeloglikifnoconv = FALSE,
   optimmethod = "subplex",
   num_cycles = 1,
-  methode = "lsoda",
+  methode = "odeint::runge_kutta_cash_karp54",
   verbose = FALSE
 )
 }
@@ -92,7 +92,7 @@ versions)}
 do as many cycles as needed to meet the tolerance set for the target function.}
 
 \item{methode}{The method used to solve the master equation under tdmodel =
-4, default is 'lsoda'.}
+4, default is 'odeint::runge_kutta_cash_karp54'.}
 
 \item{verbose}{Show the parameters and loglikelihood for every call to the
 loglik function}

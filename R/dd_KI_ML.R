@@ -84,7 +84,7 @@
 #' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
 #' @param correction Sets whether the correction should be applied (TRUE) or
 #' not (FALSE)

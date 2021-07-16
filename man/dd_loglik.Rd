@@ -74,8 +74,11 @@ in the phylogeny}
 
 \item{methode}{The method used to solve the master equation, default is
 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
-package before version 3.1.}
+solvers can be used. Before version 3.1 these were solvers from the deSolve
+package such as 'lsoda' and 'ode45'. Currently solvers from odeint are used,
+such as 'odeint::runge_kutta_cash_karp54', 'odeint::runge_kutta_fehlberg78',
+'odeint::runge_kutta_dopri5', or odeint::bulirsch_stoer'. The first two are
+recommended in most cases.}
 }
 \value{
 The loglikelihood

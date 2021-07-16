@@ -1,4 +1,6 @@
- dd_logliknorm_rhs3 = function(t,x,m)
+# seems to be abandoned
+
+dd_logliknorm_rhs3 = function(t,x,m)
 {
    nx = roundn((length(x))^(1/3))
    dim(x) = c(nx,nx,nx)     

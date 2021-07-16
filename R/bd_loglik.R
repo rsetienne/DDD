@@ -47,7 +47,7 @@
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
 #' @param methode The method used to solve the master equation, default is
-#' 'lsoda'.
+#' 'odeint::runge_kutta_cash_karp54'.
 #' @return The loglikelihood
 #' @author Rampal S. Etienne, Bart Haegeman & Cesar Martinez
 #' @seealso \code{\link{bd_ML}}
@@ -59,7 +59,7 @@
 #' bd_loglik(pars1 = c(0.5,0.1), pars2 = c(0,1,1,0,2), brts = 1:10, 
 #' missnumspec = 0)
 #' @export bd_loglik
-bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "lsoda"){
+bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_kutta_cash_karp54"){
   # pars1 contains model parameters
   # - pars1[1] = la0 = speciation rate
   # - pars1[2] = mu0 = extinction rate
@@ -265,21 +265,14 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "lsoda"){
           t1 <- brts2[k - 1]
           t2 <- brts2[k]
           variables[lx + k - 1] <- 0
-          #y2 = deSolve::ode(variables, c(t1, t2), td_loglik_rhs, c(pars1[1:min(4, length(pars1))], tdmodel - 3, lx), rtol = 1e-10, atol = 1e-16, method = methode)
-          parsvec <- c(
-            dd_loglik_rhs_precomp(pars = c(la0, mu0, K, 0, 1), rep(0, lx)),
-            k - 1
-          ) # This gives a vector of lavec, muvec, nn and k - 1
-          y <- dd_ode_FORTRAN(
-            initprobs = variables[1:(lx + k - 1)],
-            tvec = c(t1, t2),
-            parsvec = parsvec,
-            rtol = 1e-10,
-            atol = 1e-16,
-            methode = methode,
-            runmod = "dd_runmodtd"
-          )
-          variables <- y[2, 2:(lx + k)]
+          parsvec = c(pars1[1:min(4, length(pars1))], tdmodel - 3, lx)
+
+          if(startsWith(methode, "odeint::")) {
+            variables = dd_integrate_td_odeint(variables, c(t1, t2), parsvec, 1e-10, 1e-16, methode)
+          }
+          else {
+            stop("f95 is gone")
+          }
           if (is.na(sum(variables)) | is.nan(sum(variables))) {
             if (verbose) {
               cat('NA or NaN issues encountered.\n')
