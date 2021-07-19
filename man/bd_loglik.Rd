@@ -4,7 +4,13 @@
 \alias{bd_loglik}
 \title{Loglikelihood for diversity-independent diversification model}
 \usage{
-bd_loglik(pars1, pars2, brts, missnumspec, methode = "lsoda")
+bd_loglik(
+  pars1,
+  pars2,
+  brts,
+  missnumspec,
+  methode = "odeint::runge_kutta_cash_karp54"
+)
 }
 \arguments{
 \item{pars1}{Vector of parameters:
@@ -53,7 +59,7 @@ point is stem age (1) or crown age (2)}
 in the phylogeny}
 
 \item{methode}{The method used to solve the master equation, default is
-'lsoda'.}
+'odeint::runge_kutta_cash_karp54'.}
 }
 \value{
 The loglikelihood
