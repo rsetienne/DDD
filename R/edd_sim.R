@@ -121,7 +121,7 @@ edd_sample_event <- function(las, mus, linlist) {
 #' @param metric Specifies which phylogenetic diversity metric should be used
 #' @param offset Specifies which method to use to offset time effect on
 #' evolutionary distinctiveness
-#' @return \item{ out }{ A list with the following four elements: The first
+#' @return \item{ out }{ A list with the following nine elements: The first
 #' element is the tree of extant species in phylo format \cr The second element
 #' is the tree of all species, including extinct species, in phylo format \cr
 #' The third element is a matrix of all species where \cr - the first column is
@@ -134,9 +134,11 @@ edd_sample_event <- function(las, mus, linlist) {
 #' species. If this equals -1, then the species is still extant.\cr The fourth
 #' element is the set of branching times of the tree of extant species.\cr The
 #' fifth element is the lineage-through-time plot. \cr The sixth element is a
-#' matrix of all evolutionary distinctiveness values of all lineages. \cr The
-#' seventh element is a matrix of all the speciation and extinction rates of all
-#' lineages. \cr The eighth element is a matrix of}
+#' list of all evolutionary distinctiveness values of all lineages. \cr The
+#' seventh element is a list of all the speciation rates of all lineages at all
+#' the time steps. \cr The eighth element is a list of all the extinction rates
+#' of all lineages at all the time steps. \cr The nineth element is a list of
+#' all the lineages at all the time steps.}
 #' @author Tianjian Qin, Rampal S. Etienne
 #' @keywords models
 #' @examples
