@@ -174,7 +174,8 @@ edd_sim <- function(pars,
 
     # store EDs and lamus and associated lineages
     eds <- list(ed)
-    lamus <- list(lamu)
+    las <- list(lamu$newlas)
+    mus <- list(lamu$newmus)
     linlists <- list(linlist)
 
     # get time interval
@@ -227,7 +228,8 @@ edd_sim <- function(pars,
 
         # append EDs and lamus
         eds <- c(eds, list(ed))
-        lamus <- c(lamus, list(lamu))
+        las <- c(las, list(lamu$newlas))
+        mus <- c(mus, list(lamu$newmus))
         linlists <- c(linlists, list(linlist))
 
         t[i + 1] <-
@@ -259,7 +261,8 @@ edd_sim <- function(pars,
       brts = brts,
       nltt = nltt,
       eds = eds,
-      lamus = lamus,
+      las = las,
+      mus = mus,
       linlists = linlists
     )
 
