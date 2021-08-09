@@ -57,14 +57,14 @@ edd_update_lamu <- function(ed, ed_max, params, model) {
   return(list(newlas = newlas, newmus = newmus))
 }
 
-edd_get_edmax <- function(num, l_table, age, metric, offset) {
+edd_get_edmax <- function(num, l_table, t, metric, offset) {
   if (metric == "ed") {
-    ed_max <- as.vector(DDD::L2ED(l_table, age))
+    ed_max <- as.vector(DDD::L2ED(l_table, t))
   } else if (metric == "pd") {
     if (offset == "none") {
-      ed_max <- rep(as.vector(DDD::L2Phi(l_table, age, metric)), num)
+      ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric)), num)
     } else if (offset == "simtime") {
-      ed_max <- rep(as.vector(DDD::L2Phi(l_table, age, metric) - age), num)
+      ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric) - t), num)
     } else {
       stop("no such offset method")
     }
@@ -246,8 +246,8 @@ edd_sim <- function(pars,
     }
   }
 
-  tes <- DDD::L2phylo2(l_table, dropextinct = T)
-  tas <- DDD::L2phylo2(l_table, dropextinct = F)
+  tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
+  tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
   brts <- DDD::L2brts2(l_table, dropextinct = T)
 
   nltt <-
