@@ -251,10 +251,9 @@ edd_sim <- function(pars,
   brts <- DDD::L2brts2(l_table, age, dropextinct = T)
   nltt <-
     data.frame(
-      "time" = t[-i],
+      "time" = t[-length(t)],
       "num" = num
     )
-  nltt[nrow(nltt), 1] <- age
 
   out <-
     list(
