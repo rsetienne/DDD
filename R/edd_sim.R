@@ -228,7 +228,7 @@ edd_sim <- function(pars,
         params[1] <- num[i]
         lamu <- edd_update_lamu(ed, ed_max, params, model)
 
-        # append EDs and lamus
+        # append to EDs and lamus
         eds <- c(eds, list(ed))
         las <- c(las, list(lamu$newlas))
         mus <- c(mus, list(lamu$newmus))

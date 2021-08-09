@@ -978,6 +978,7 @@ L2brts2 = function(L,dropextinct = T)
 #' species; if the fourth element equals -1, then the species is still extant.
 #' @param dropextinct Sets whether the phylogeny should drop species that are
 #' extinct at the present
+#' @param age Sets the crown age for the tree
 #' @return \item{ phy }{ A phylogeny of the phylo type }
 #' @author Rampal S. Etienne
 #' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
@@ -985,14 +986,13 @@ L2brts2 = function(L,dropextinct = T)
 #' 180: E75-E89, doi: 10.1086/667574
 #' @keywords models
 #' @examples
-#' # do not use this function, use L2phylo()
+#' # do not use this function, use L2phylo() instead
 #' 
 #' @export L2phylo2
-L2phylo2 = function(L,dropextinct = T)
+L2phylo2 = function(L, dropextinct = T, age)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
    L = L[order(abs(L[,3])),1:4]
-   age = L[nrow(L),1]
    L[1, 1] <- -1
    if(dropextinct == T)
    {
