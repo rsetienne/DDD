@@ -246,8 +246,6 @@ edd_sim <- function(pars,
     }
   }
 
-  
-
   tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
   tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
   brts <- DDD::L2brts2(l_table, dropextinct = T)
@@ -256,6 +254,8 @@ edd_sim <- function(pars,
       "time" = t[-i],
       "num" = num
     )
+  nltt[nrow[nltt], 1] <- age
+
   out <-
     list(
       tes = tes,

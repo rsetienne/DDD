@@ -902,6 +902,7 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 #' negative values indicate whether the species belongs to the left or right
 #' crown lineage \cr - the fourth column is the time of extinction of the
 #' species; if the fourth element equals -1, then the species is still extant.
+#' @param t Simulation time
 #' @param dropextinct Sets whether the phylogeny should drop species that are
 #' extinct at the present
 #' @return \item{ brts }{ A set of branching times }
@@ -914,49 +915,47 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 #' # Do not use this function, use L2brts
 #' 
 #' @export L2brts2
-L2brts2 = function(L,dropextinct = T)
+L2brts2 <- function(L, t, dropextinct = T)
 # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
-   brts = NULL
-   L = L[order(abs(L[,3])),1:4]
-   age = L[nrow(L),1]
-   L[1,1] = -1
+   brts <- NULL
+   L <- L[order(abs(L[,3])),1:4]
+   age <- t
+   L[1,1] <- -1
    if(dropextinct == T)
    {
-      sall = which(L[,4] == -1)
-      tend = age
+      sall <- which(L[,4] == -1)
+      tend <- age
    } else {
-      sall = which(L[,4] >= -1)
-      tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
+      sall <- which(L[,4] >= -1)
+      tend <- (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
    }
-   L = L[,-4]
-   linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
-   linlist[,4] = as.character(linlist[,4])
-   names(linlist) = 1:5
-   done = 0
+   L <- L[,-4]
+   linlist <- cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
+   linlist[,4] <- as.character(linlist[,4])
+   names(linlist) <- 1:5
+   done <- 0
    while(done == 0)
    {
-      j = which.max(linlist[,1])
-      daughter = linlist[j,3]
-      parent = linlist[j,2]
-      parentj = which(parent == linlist[,3])
-      parentinlist = length(parentj)
+      j <- which.max(linlist[,1])
+      daughter <- linlist[j,3]
+      parent <- linlist[j,2]
+      parentj <- which(parent == linlist[,3])
+      parentinlist <- length(parentj)
       if(parentinlist == 1)
       {
-         spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
-         spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
-         linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
-         linlist[parentj,5] = linlist[j,1]
-         brts = c(brts,linlist[j,1])
-         linlist = linlist[-j,]
+         spec1 <- paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
+         spec2 <-paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
+         linlist[parentj,4] <- paste("(",spec1,",",spec2,")",sep = "")
+         linlist[parentj,5] <- linlist[j,1]
+         brts <- c(brts,linlist[j,1])
+         linlist <- linlist[-j,]
       } else {
-         #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
-         linlist[j,1:3] = L[which(L[,3] == parent),1:3]
+         linlist[j,1:3] <- L[which(L[,3] == parent),1:3]
       }
       if(nrow(linlist) == 1) { done = 1 }
    }
-   #linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
-   brts = rev(sort(age - brts))
+   brts <- rev(sort(age - brts))
    return(brts)
 }
 
@@ -976,9 +975,9 @@ L2brts2 = function(L,dropextinct = T)
 #' negative values indicate whether the species belongs to the left or right
 #' crown lineage \cr - the fourth column is the time of extinction of the
 #' species; if the fourth element equals -1, then the species is still extant.
+#' @param t Simulation time
 #' @param dropextinct Sets whether the phylogeny should drop species that are
 #' extinct at the present
-#' @param t Simulation time
 #' @return \item{ phy }{ A phylogeny of the phylo type }
 #' @author Rampal S. Etienne
 #' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,

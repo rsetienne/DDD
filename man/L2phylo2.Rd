@@ -5,7 +5,7 @@
 \title{Function to convert a table with speciation and extinction events to a
 phylogeny}
 \usage{
-L2phylo2(L, dropextinct = T)
+L2phylo2(L, t, dropextinct = T)
 }
 \arguments{
 \item{L}{Matrix of events as produced by dd_sim: \cr \cr - the first column
@@ -16,6 +16,8 @@ third column is the label of the daughter species itself; positive and
 negative values indicate whether the species belongs to the left or right
 crown lineage \cr - the fourth column is the time of extinction of the
 species; if the fourth element equals -1, then the species is still extant.}
+
+\item{t}{Simulation time}
 
 \item{dropextinct}{Sets whether the phylogeny should drop species that are
 extinct at the present}
@@ -28,7 +30,7 @@ Converting a table with speciation and extinction events to a phylogeny
 (reversed time scale)
 }
 \examples{
-# do not use this function, use L2phylo()
+# do not use this function, use L2phylo() instead
 
 }
 \references{
