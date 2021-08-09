@@ -254,7 +254,7 @@ edd_sim <- function(pars,
       "time" = t[-i],
       "num" = num
     )
-  nltt[nrow[nltt], 1] <- age
+  nltt[nrow(nltt), 1] <- age
 
   out <-
     list(
