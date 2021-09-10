@@ -20,8 +20,7 @@ run_dd_loglik <- function(ddmodel, lambda_0 = 0.8, mu_0 = 0.1, K = 20, r = 1, ve
     pars2 = pars2,
     brts = brts, # defined above
     missnumspec = 0,
-    methode = "ode45",
-    rhs_func_name = "dd_loglik_rhs" # so only numerical method
+    methode = "'odeint::runge_kutta_cash_karp54'"
   )
 }
 

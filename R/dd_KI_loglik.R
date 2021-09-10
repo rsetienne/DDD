@@ -73,7 +73,7 @@
 #' species in main clade and subclade respectively.
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
-#' solvers can be used, such as 'lsoda' or 'ode45'. These were used in the
+#' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
 #' @return The loglikelihood
 #' @author Rampal S. Etienne & Bart Haegeman
@@ -90,7 +90,7 @@
 #' missnumspec = 0
 #' brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
 #' brtsS = c(9.6,8.6,7.4,4.9,2.5)
-#' dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'ode45')
+#' dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec)
 #' 
 #' @export dd_KI_loglik
 dd_KI_loglik <- function(pars1,
@@ -98,7 +98,7 @@ dd_KI_loglik <- function(pars1,
                          brtsM,
                          brtsS,
                          missnumspec,
-                         methode = 'lsoda')
+                         methode = 'odeint::runge_kutta_cash_karp54')
 {
   if(length(pars2) == 4)
   {
@@ -338,8 +338,15 @@ dd_KI_logliknorm <- function(brts_k_list,
       m1 = lavec[1:lx] * nx[1:lx]
       m2 = muvec[3:(lx + 2)] * nx[3:(lx + 2)]
       m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
-      y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
-      probs = y[2,2:(lx+1)]
+
+      if (startsWith(methode, 'odeint::')) {
+        probs = dd_logliknorm1_odeint(probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
+      }
+      else {
+        y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
+        probs = y[2,2:(lx+1)]
+      }
+
     } else
     {
       probs = dd_loglik_M(pars1_list[[2]],lx,0,ddep,tt = abs(tpres - tinn),probs)
@@ -361,7 +368,7 @@ dd_KI_logliknorm <- function(brts_k_list,
     # sum(probs[1:lx,1]) = probability of extinction of second lineage
     probs[2,2] = 1 # clade M starts with two species
     # STEP 1: integrate from tcrown to tinn
-    dim(probs) = c(lx*lx,1)
+    dim(probs) = c(lx,lx)
     if(methode != 'analytical')
     {
       m1 = lavec[1:lx,2:(lx+1)] * nx1[1:lx,2:(lx+1)]
@@ -371,8 +378,14 @@ dd_KI_logliknorm <- function(brts_k_list,
       m4 = lavec[2:(lx+1),1:lx] * nx2[2:(lx+1),1:lx]
       m5 = muvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
       m6 = ma * nx2[2:(lx+1),2:(lx+1)]
-      y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-      probs = y[2,2:(lx * lx + 1)]
+      if (startsWith(methode, "odeint::")) {
+        probs = dd_logliknorm2_odeint(probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
+      }
+      else {
+        dim(probs) = c(lx*lx,1)
+        y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs = y[2,2:(lx * lx + 1)]
+      }
     } else
     {
       probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tinn - tcrown),p = probs)
@@ -385,12 +398,18 @@ dd_KI_logliknorm <- function(brts_k_list,
     nx2a = nx2[2:(lx+1),2:(lx+1)]
     probs = probs * nx1a/(nx1a+nx2a)
     probs = rbind(probs[2:lx,1:lx], rep(0,lx))
-    dim(probs) = c(lx * lx,1)
     # STEP 3: integrate from tinn to tpres
     if(methode != 'analytical')
     {
-      y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-      probs = y[2,2:(lx * lx + 1)]
+      if (startsWith(methode, "odeint::")) {
+        probs = dd_logliknorm2_odeint(probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
+      }
+      else {
+        dim(probs) = c(lx*lx,1)
+        y = deSolve::ode(probs,c(tinn, tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs = y[2,2:(lx * lx + 1)]
+        dim(probs) = c(lx,lx)
+      }
     } else
     {
       probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tpres - tinn),p = probs)
@@ -402,8 +421,8 @@ dd_KI_logliknorm <- function(brts_k_list,
     #print(log(2) + (log(PM12 + PM2) + log(PS)))
     #print(log(2) + (log(PM12) + log(PS)))
     logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) +
-                          (cond == 4) * (log(PM12 + PM2) + log(PS)) +
-                          (cond == 5) * (log(PM12) + log(PS))
+      (cond == 4) * (log(PM12 + PM2) + log(PS)) +
+      (cond == 5) * (log(PM12) + log(PS))
   }
   return(logliknorm)
 }
@@ -477,7 +496,7 @@ check_for_impossible_pars_KI <- function(S_list,
     }
     are_pars_impossible <- 
       ((ddep == 1 && ceiling(pars1_list[[i]][1]/(pars1_list[[i]][1] - pars1_list[[i]][2]) * pars1_list[[i]][3]) < S_list[[i]] + m) ||
-       (ddep == 1.3 && ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
+         (ddep == 1.3 && ceiling(pars1_list[[i]][3]) < S_list[[i]] + m))
     if(are_pars_impossible)
     {
       return(are_pars_impossible)
@@ -540,7 +559,7 @@ dd_multiple_KI_loglik <- function(pars1_list,
                                   missnumspec_list,
                                   reltol = 1e-14,
                                   abstol = 1e-16,
-                                  methode = 'lsoda')
+                                  methode = 'odeint::runge_kutta_cash_karp54')
 {
   lx_list <- create_lx_list(lmax = pars2[1],
                             ddep = pars2[2],

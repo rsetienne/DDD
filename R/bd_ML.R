@@ -62,7 +62,7 @@
 #' @param num_cycles the number of cycles of opimization. If set at Inf, it will
 #' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation under tdmodel =
-#' 4, default is 'lsoda'.
+#' 4, default is 'odeint::runge_kutta_cash_karp54'.
 #' @param verbose Show the parameters and loglikelihood for every call to the
 #' loglik function 
 #' @return A dataframe with the following elements:\cr
@@ -104,7 +104,7 @@ bd_ML = function(brts,
     changeloglikifnoconv = FALSE,
     optimmethod = 'subplex',
     num_cycles = 1,
-    methode = 'lsoda',
+    methode = 'odeint::runge_kutta_cash_karp54',
     verbose = FALSE)
 {
   #options(warn = -1)

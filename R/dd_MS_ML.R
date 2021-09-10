@@ -138,7 +138,7 @@ dd_MS_ML = function(brtsM,
     changeloglikifnoconv = FALSE,
     optimmethod = 'subplex',
     num_cycles = 1,
-    methode = 'ode45',
+    methode = 'odeint::runge_kutta_cash_karp54',
     correction = FALSE,
     verbose = FALSE)
 {
