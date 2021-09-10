@@ -131,12 +131,12 @@ test_dd_lamuN <- function(ddmodel, pars_set, exptd_rates_set) {
     n_seq = n_seq
   )
   ddd_rates <- list(
-    "la_N" = purrr::map_dbl(n_seq, function(n) {
+    "la_N" = unlist(lapply(n_seq, function(n) {
       dd_lamuN(ddmodel = ddmodel, pars = pars_set, N = n)[1]
-    }),
-    "mu_N" = purrr::map_dbl(n_seq, function(n) {
+    }), use.names = FALSE),
+    "mu_N" = unlist(lapply(n_seq, function(n) {
       dd_lamuN(ddmodel = ddmodel, pars = pars_set, N = n)[2]
-    })
+    }), use.names = FALSE)
   )
   # Test
   cat(paste("Testing ddmodel =", ddmodel, "\n"))
@@ -145,67 +145,68 @@ test_dd_lamuN <- function(ddmodel, pars_set, exptd_rates_set) {
 
 test_that("set1", {
   ddmodels <- c(5:8, 11:15)
-  purrr::walk(
+  
+  invisible(lapply(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
     pars_set = pars_set1, 
     exptd_rates_set = exptd_rates_set1
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_lambdamu, 
     pars_set = pars_set1, 
     exptd_rates_set = exptd_rates_set1
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_dd_lamuN, 
     pars_set = pars_set1, 
     exptd_rates_set = exptd_rates_set1
-  )
+  ))
 })
 
 test_that("set2", {
   ddmodels <- c(5:8, 11:15)
-  purrr::walk(
+  invisible(lapply(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
     pars_set = pars_set2, 
     exptd_rates_set = exptd_rates_set2
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_lambdamu, 
     pars_set = pars_set2, 
     exptd_rates_set = exptd_rates_set2
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_dd_lamuN, 
     pars_set = pars_set2, 
     exptd_rates_set = exptd_rates_set2
-  )
+  ))
 })
 
 test_that("set3", {
   ddmodels <- c(5:8, 11:15)
-  purrr::walk(
+  invisible(lapply(
     ddmodels, 
     test_dd_loglik_rhs_precomp, 
     pars_set = pars_set3, 
     exptd_rates_set = exptd_rates_set3
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_lambdamu, 
     pars_set = pars_set3, 
     exptd_rates_set = exptd_rates_set3
-  )
-  purrr::walk(
+  ))
+  invisible(lapply(
     ddmodels, 
     test_dd_lamuN, 
     pars_set = pars_set3, 
     exptd_rates_set = exptd_rates_set3
-  )
+  ))
 })
 
