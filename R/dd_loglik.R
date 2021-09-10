@@ -504,7 +504,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               k = soc
               t1 = brts[1] 
               t2 = brts[S + 2 - soc]
-              #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = "analytical");
+              #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = "analytical")
               #probsn = y[2,2:(lx+1)]
               probsn = dd_loglik_M(pars1,lx,k,ddep,tt = abs(t2 - t1),probsn)
               if(soc == 1) { aux = 1:lx }
@@ -521,11 +521,13 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = "analytical")
               #logliknorm = log(y[2,lx + 2])
               probsn = rep(0,lx + 1)
-              probsn[S + missnumspec + 1] = 1
-              
-              TT = 1e14 # max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
-              y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = "analytical")
-              logliknorm = log(y[2,lx + 2])
+              probsn[2] = 1
+              MM = dd_loglik_M_aux(pars1,lx + 1,k = 0,ddep)
+              MM = MM[-1,-1]
+              #probsn = SparseM::solve(-MM,probsn[2:(lx + 1)])
+              MMinv = SparseM::solve(MM)
+              probsn = -MMinv %*% probsn[2:(lx + 1)]
+              logliknorm = log(probsn[S + missnumspec])
               if(soc == 2)
               {
                 #probsn = rep(0,lx + 1)
