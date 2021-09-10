@@ -4,15 +4,7 @@
 \alias{dd_loglik}
 \title{Loglikelihood for diversity-dependent diversification models}
 \usage{
-dd_loglik(
-  pars1,
-  pars2,
-  brts,
-  missnumspec = 0,
-  methode = "analytical",
-  rhs_func_name = ifelse(pars2[3] == 3, "dd_loglik_bw_rhs_FORTRAN",
-    "dd_loglik_rhs_FORTRAN")
-)
+dd_loglik(pars1, pars2, brts, missnumspec = 0, methode = "analytical")
 }
 \arguments{
 \item{pars1}{Vector of parameters: 
