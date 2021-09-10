@@ -20,7 +20,7 @@ run_dd_loglik <- function(ddmodel, lambda_0 = 0.8, mu_0 = 0.1, K = 20, r = 1, ve
     pars2 = pars2,
     brts = brts, # defined above
     missnumspec = 0,
-    methode = "'odeint::runge_kutta_cash_karp54'"
+    methode = "odeint::runge_kutta_cash_karp54"
   )
 }
 

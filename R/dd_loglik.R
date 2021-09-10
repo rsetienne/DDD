@@ -456,7 +456,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              #y = deSolve::ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+              #y = deSolve::ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = "analytical")
               #probs2 = y[2,2:(lx+1)]
               probs = dd_loglik_M(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs)
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
@@ -478,7 +478,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
             for(k in (S + 2 - soc):2)
             {
               k1 = k + (soc - 2)
-              #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
+              #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = "analytical")
               #probs2 = y[2,2:(lx+2)]
               probs = dd_loglik_M_bw(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs[1:lx])
               probs = c(probs,0)
@@ -504,7 +504,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               k = soc
               t1 = brts[1] 
               t2 = brts[S + 2 - soc]
-              #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
+              #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = "analytical");
               #probsn = y[2,2:(lx+1)]
               probsn = dd_loglik_M(pars1,lx,k,ddep,tt = abs(t2 - t1),probsn)
               if(soc == 1) { aux = 1:lx }
@@ -518,13 +518,13 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               #probsn = rep(0,lx + 1)
               #probsn[S + missnumspec + 1] = 1 #/ (S + missnumspec)
               #TT = max(1,1/abs(la - mu)) * 100000000 * max(abs(brts)) # make this more efficient later
-              #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
+              #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = "analytical")
               #logliknorm = log(y[2,lx + 2])
               probsn = rep(0,lx + 1)
               probsn[S + missnumspec + 1] = 1
               
               TT = 1e14 # max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
-              y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
+              y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = "analytical")
               logliknorm = log(y[2,lx + 2])
               if(soc == 2)
               {
@@ -532,7 +532,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
                 #probsn[1:lx] = probs[1:lx]
                 #probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
                 #probsn = c(lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]],1) * probsn # speciation event
-                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
+                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = "analytical")
                 #logliknorm = logliknorm - log(y[2,lx + 2])
                 probsn2 = rep(0,lx)
                 probsn2 = lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]] * probs[1:lx]
