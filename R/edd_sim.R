@@ -1,10 +1,10 @@
 edd_pars_check <- function(pars, age, model, metric, offset) {
   # pars range check
-  if (pars[1] <= 0 | pars[2] <= 0) {
-    stop("per species rates should be positive")
+  if (pars[1] <= 0) {
+    stop("speciation rate should be positive")
   }
-  if (pars[2] <= 0) {
-    stop("coefficient for extinction should be positive")
+  if (pars[2] < 0) {
+    stop("extinction rate should be none-negative")
   }
   # pars and model match check
   if (model == "dsce2" && length(pars) != 4) {
