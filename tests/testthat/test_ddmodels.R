@@ -3,18 +3,18 @@ context("test_ddmodels")
 # I do not test models 1 through 4; these have been implemented for a long time
 # and I assume they have been thoroughly tested
 
-# Case 1.: 0 < r < Inf (or 0 < alpha < 1)
+# Case 1.: 0 < r < Inf (or 0 < phi < 1)
 pars_set1 <- c(
   "lambda_0" = 0.8,
   "mu_0" = 0.2,
   "K" = 20,
-  "r" = 1/3 # corresponds to alpha = 1/4
+  "r" = 1/3 # corresponds to phi = 1/4
 )
-# cat(paste("Testing ddmodels with lambda_0 =", pars_set1[1], "mu_0 =", pars_set1[2], "K =", pars_set1[3],"alpha =", round(pars_set1[4], 3), "\n"))
+# cat(paste("Testing ddmodels with lambda_0 =", pars_set1[1], "mu_0 =", pars_set1[2], "K =", pars_set1[3],"phi =", round(pars_set1[4], 3), "\n"))
 # Rates obtained on paper
 exptd_rates_set1 <- list(
-  #"lambda_cst"    = function(N) 0.8, # not with alpha != 1
-  #"mu_cst"        = function(N) 0.2, # not with alpha != 0
+  #"lambda_cst"    = function(N) 0.8, # not with phi != 1
+  #"mu_cst"        = function(N) 0.2, # not with phi != 0
   "lambda_lin"     = function(N) pmax(0.8 - 0.0225 * N, 0),
   "mu_lin"         = function(N) 0.2 + 0.0075 * N,
   "lambda_pow"     = function(N) pmax(0.8 * N ^ (-log(0.8 / 0.35) / log(20)), 0),
@@ -23,7 +23,7 @@ exptd_rates_set1 <- list(
   'mu_exp'     = function(N) 0.2 * (7 / 4) ^ (N / 20)
 )
 
-# Case 2.: r = 0 (alpha = 0)
+# Case 2.: r = 0 (phi = 0)
 pars_set2 <- c(
   "lambda_0" = 0.8,
   "mu_0" = 0.2,
@@ -31,8 +31,8 @@ pars_set2 <- c(
   "r" = 0
 )
 exptd_rates_set2 <- list(
-  #"lambda_cst"    = function(N) 0.8, # not with alpha != 1
-  #"mu_cst"        = function(N) 0.2, # not with alpha != 0
+  #"lambda_cst"    = function(N) 0.8, # not with phi != 1
+  #"mu_cst"        = function(N) 0.2, # not with phi != 0
   "lambda_lin"     = function(N) pmax(0.8 - 0.03 * N, 0),
   "mu_lin"         = function(N) rep(0.2, length(N)),
   "lambda_pow"     = function(N) pmax(0.8 * N ^ (-log(4) / log(20)), 0),
@@ -40,7 +40,7 @@ exptd_rates_set2 <- list(
   "lambda_exp" = function(N) pmax(0.8 * (1 / 4) ^ (N / 20), 0),
   'mu_exp'     = function(N) rep(0.2, length(N))
 )
-# Case 3.: r = Inf (alpha = 1)
+# Case 3.: r = Inf (phi = 1)
 pars_set3 <- c(
   "lambda_0" = 0.8,
   "mu_0" = 0.2,
@@ -48,8 +48,8 @@ pars_set3 <- c(
   "r" = Inf
 )
 exptd_rates_set3 <- list(
-  #"lambda_cst"    = function(N) 0.8, # not with alpha != 1
-  #"mu_cst"        = function(N) 0.2, # not with alpha != 0
+  #"lambda_cst"    = function(N) 0.8, # not with phi != 1
+  #"mu_cst"        = function(N) 0.2, # not with phi != 0
   "lambda_lin"     = function(N) rep(0.8, length(N)),
   "mu_lin"         = function(N) 0.2 + 0.03 * N,
   "lambda_pow"     = function(N) rep(0.8, length(N)),

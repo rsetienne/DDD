@@ -5,7 +5,7 @@ lambdamu = function(n,pars,ddep)
     mu = pars[2]
     K = pars[3]
     r = pars[4]
-    alpha <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) is NaN
+    phi <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) is NaN
     n0 = (ddep == 2 | ddep == 4)
     if(ddep == 1) {
         # linear DD on speciation (K = equilibrium diversity)
@@ -43,27 +43,27 @@ lambdamu = function(n,pars,ddep)
     } else if (ddep == 5) { 
         # linear DD on speciation
         # linear DD on extinction
-        lavec = pmax(0, la - (1 - alpha) * (la - mu) * n / K)
-        muvec = mu + alpha * (la - mu) * n / K
+        lavec = pmax(0, la - (1 - phi) * (la - mu) * n / K)
+        muvec = mu + phi * (la - mu) * n / K
     } else if (ddep == 6) {
         # linear DD on speciation
         # "exponential" DD on extinction (power function)
-        y = log(1 + alpha * (la - mu) / mu) / log(K)
-        lavec = pmax(0, la - (1 - alpha) * (la - mu) * n / K)
+        y = log(1 + phi * (la - mu) / mu) / log(K)
+        lavec = pmax(0, la - (1 - phi) * (la - mu) * n / K)
         muvec = mu * n ^ y
     } else if (ddep == 7) {
         # "exponential" DD on speciation (power function)
         # "exponential" DD on extinction (power function)
-        y1 = -log(la / (alpha * (la - mu) + mu)) / log(K)
-        y2 = log(1 + alpha * (la - mu) / mu) / log(K)
+        y1 = -log(la / (phi * (la - mu) + mu)) / log(K)
+        y2 = log(1 + phi * (la - mu) / mu) / log(K)
         lavec = pmax(0, la * n ^ y1)
         muvec = mu * n ^ y2
     } else if (ddep == 8) {
         # "exponential" DD on speciation (power function)
         # linear DD on extinction  
-        y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        y = -log(la / (phi * (la - mu) + mu)) / log(K)
         lavec = pmax(0, la * n ^ y)
-        muvec = mu + alpha * (la - mu) / K * n
+        muvec = mu + phi * (la - mu) / K * n
     } else if (ddep == 9) {
         # exponential DD on speciation (exponential function)
         # constant-rate extinction
@@ -77,30 +77,30 @@ lambdamu = function(n,pars,ddep)
     } else if (ddep == 11) {
         # linear DD on speciation 
         # exponential DD on extinction (exponential function) 
-        lavec = pmax(0, la - (1 - alpha) * (la - mu) * n / K)
-        muvec = mu * (1 + alpha * (la - mu) / mu) ^ (n / K)
+        lavec = pmax(0, la - (1 - phi) * (la - mu) * n / K)
+        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
     } else if (ddep == 12) {
         # exponential DD on speciation (exponential function) 
         # exponential DD on extinction (exponential function) 
-        lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (n / K))
-        muvec = mu * (1 + alpha * (la - mu) / mu) ^ (n / K)
+        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
+        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
     } else if (ddep == 13) {
         # exponential DD on speciation (exponential function) 
         # linear DD on extinction
-        lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (n / K))
-        muvec = mu + alpha * (la - mu) * n / K
+        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
+        muvec = mu + phi * (la - mu) * n / K
     } else if (ddep == 14) {
         # exponential DD on speciation (exponential function) 
         # exponential DD on extinction (power function)
-        y = log(1 + alpha * (la - mu) / mu) / log(K)
-        lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (n / K))
+        y = log(1 + phi * (la - mu) / mu) / log(K)
+        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
         muvec = mu * n ^ y
     } else if (ddep == 15) {
         # exponential DD on speciation (power function)
         # exponential DD on extinction (exponential function)
-        y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+        y = -log(la / (phi * (la - mu) + mu)) / log(K)
         lavec = pmax(0, la * n ^ y)
-        muvec = mu * (1 + alpha * (la - mu) / mu) ^ (n / K)
+        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
     }
     return(list(lavec,muvec))
 }
