@@ -53,28 +53,36 @@ dd_lamuN = function(ddmodel,pars,N) {
         laN = max(0, la * N ^ y)
         muN = mu + phi * (la - mu) / K * N
     } else if (ddmodel == 9) {
-        laN = max(0, la * (mu / la) ^ (N / K))
+        y = log(la / mu) / K
+        laN = max(0, la * exp(-N * y))
         muN = mu
     } else if (ddmodel == 10) {
+        y = log(la / mu) / K
         laN = la
-        muN = mu * (la / mu) ^ (N / K)
+        muN = mu * exp(N * y)
     } else if (ddmodel == 11) {
+        y = log((phi * la + (1 - phi) * mu) / mu) / K
         laN = max(0, la - (1 - phi) * (la - mu) / K * N)
-        muN = mu * (1 + phi * (la - mu) / mu) ^ (N / K)
+        muN = mu * exp(N * y)
     } else if (ddmodel == 12) {
-        laN = max(0, la * ((phi * (la - mu) + mu) / la) ^ (N / K))
-        muN = mu * (1 + phi * (la - mu) / mu) ^ (N / K)
+        y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+        y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+        laN = max(0, la * exp(-N * y1))
+        muN = mu * exp(N * y2)
     } else if (ddmodel == 13) {
-        laN = max(0, la * ((phi * (la - mu) + mu) / la) ^ (N / K))
+        y = log(la / (phi * la + (1 - phi) * mu)) / K
+        laN = max(0, la * exp(-N * y))
         muN = mu + phi * (la - mu) / K * N
     } else if (ddmodel == 14) {
-        y = log(1 + phi * (la - mu) / mu) / log(K)
-        laN = max(0, la * ((phi * (la - mu) + mu) / la) ^ (N / K))
-        muN = mu * N ^ y
+        y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+        y2 = log(1 + phi * (la - mu) / mu) / log(K)
+        laN = max(0, la * exp(-N * y1))
+        muN = mu * N ^ y2
     } else if (ddmodel == 15) {
-        y = -log(la / (phi * (la - mu) + mu)) / log(K)
-        laN = max(0, la * N ^ y)
-        muN = mu * (1 + phi * (la - mu) / mu) ^ (N / K)
+        y1 = -log(la / (phi * (la - mu) + mu)) / log(K)
+        y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+        laN = max(0, la * N ^ y1)
+        muN = mu * exp(N * y2)
     }
     return(c(laN,muN))
 }

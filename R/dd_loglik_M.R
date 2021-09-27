@@ -67,40 +67,48 @@ lambdamu = function(n,pars,ddep)
     } else if (ddep == 9) {
         # exponential DD on speciation (exponential function)
         # constant-rate extinction
-        lavec = pmax(0, la * (mu / la) ^ (n / K))
+        y = log(la / mu) / K
+        lavec = pmax(0, la * exp(-n * y))
         muvec = rep(mu, lnn)
     } else if (ddep == 10) {
         # constant-rate speciation
         # exponential DD on extinction (exponential function)
+        y = log(la / mu) / K
         lavec = rep(la, lnn)
-        muvec = mu * (la / mu) ^ (n / K)
+        muvec = mu * exp(n * y)
     } else if (ddep == 11) {
         # linear DD on speciation 
         # exponential DD on extinction (exponential function) 
+        y = log((phi * la + (1 - phi) * mu) / mu) / K
         lavec = pmax(0, la - (1 - phi) * (la - mu) * n / K)
-        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
+        muvec = mu * exp(n * y)
     } else if (ddep == 12) {
         # exponential DD on speciation (exponential function) 
         # exponential DD on extinction (exponential function) 
-        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
-        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
+        y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+        y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+        lavec = pmax(0, la * exp(-n * y1))
+        muvec = mu * exp(n * y2)
     } else if (ddep == 13) {
         # exponential DD on speciation (exponential function) 
         # linear DD on extinction
-        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
+        y = log(la / (phi * la + (1 - phi) * mu)) / K
+        lavec = pmax(0, la * exp(-n * y))
         muvec = mu + phi * (la - mu) * n / K
     } else if (ddep == 14) {
         # exponential DD on speciation (exponential function) 
         # exponential DD on extinction (power function)
-        y = log(1 + phi * (la - mu) / mu) / log(K)
-        lavec = pmax(0, la * ((phi * (la - mu) + mu) / la) ^ (n / K))
-        muvec = mu * n ^ y
+        y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+        y2 = log(1 + phi * (la - mu) / mu) / log(K)
+        lavec = pmax(0, la * exp(-n * y1))
+        muvec = mu * n ^ y2
     } else if (ddep == 15) {
         # exponential DD on speciation (power function)
         # exponential DD on extinction (exponential function)
-        y = -log(la / (phi * (la - mu) + mu)) / log(K)
-        lavec = pmax(0, la * n ^ y)
-        muvec = mu * (1 + phi * (la - mu) / mu) ^ (n / K)
+        y1 = -log(la / (phi * (la - mu) + mu)) / log(K)
+        y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+        lavec = pmax(0, la * n ^ y1)
+        muvec = mu * exp(n * y2)
     }
     return(list(lavec,muvec))
 }

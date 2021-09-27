@@ -11,7 +11,7 @@ dd_loglik_rhs_precomp = function(pars,x)
     r = pars[4]
     kk = pars[5]
     ddep = pars[6]
-    alpha <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) can be NaN
+    phi <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) can be NaN
   }
   n0 = (ddep == 2 | ddep == 4)
   
@@ -45,44 +45,52 @@ dd_loglik_rhs_precomp = function(pars,x)
     y = (log(la / mu) / log(K + n0)) ^ (ddep != 4.2)
     muvec = mu * (nn + n0) ^ y
   } else if (ddep == 5) {
-    lavec = pmax(0, la - (1 - alpha) * (la - mu) * nn / K)
-    muvec = mu + alpha * (la - mu) / K * nn
+    lavec = pmax(0, la - (1 - phi) * (la - mu) * nn / K)
+    muvec = mu + phi * (la - mu) / K * nn
   } else if (ddep == 6) {
-    y = log(1 + alpha * (la - mu) / mu) / log(K)
-    lavec = pmax(0, la - (1 - alpha) * (la - mu) * nn / K)
+    y = log(1 + phi * (la - mu) / mu) / log(K)
+    lavec = pmax(0, la - (1 - phi) * (la - mu) * nn / K)
     muvec = mu * nn ^ y
   } else if (ddep == 7) {
-    y1 = -log(la / (alpha * (la - mu) + mu)) / log(K)
-    y2 = log(1 + alpha * (la - mu) / mu) / log(K)
+    y1 = -log(la / (phi * (la - mu) + mu)) / log(K)
+    y2 = log(1 + phi * (la - mu) / mu) / log(K)
     lavec = pmax(0, la * nn ^ y1)
     muvec = mu * nn ^ y2
   } else if (ddep == 8) {
-    y = -log(la / (alpha * (la - mu) + mu)) / log(K)
+    y = -log(la / (phi * (la - mu) + mu)) / log(K)
     lavec = pmax(0, la * nn ^ y)
-    muvec = mu + alpha * (la - mu) / K * nn
+    muvec = mu + phi * (la - mu) / K * nn
   } else if (ddep == 9) {
-    lavec = pmax(0, la * (mu / la) ^ (nn / K))
+    y = log(la / mu) / K
+    lavec = pmax(0, la * exp(-nn * y))
     muvec = rep(mu, lnn)
   } else if (ddep == 10) {
+    y = log(la / mu) / K
     lavec = rep(la, lnn)
-    muvec = mu * (la / mu) ^ (nn / K)
+    muvec = mu * exp(nn * y)
   } else if (ddep == 11) {
-    lavec = pmax(0, la - (1 - alpha) * (la - mu) * nn / K )
-    muvec = mu * (1 + alpha * (la - mu) / mu) ^ (nn / K)
+    y = log((phi * la + (1 - phi) * mu) / mu) / K
+    lavec = pmax(0, la - (1 - phi) * (la - mu) * nn / K )
+    muvec = mu * exp(nn * y)
   } else if (ddep == 12) {
-    lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (nn / K))
-    muvec = mu * (1 + alpha * (la - mu) / mu) ^ (nn / K)
+    y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+    y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+    lavec = pmax(0, la * exp(-nn * y1))
+    muvec = mu * exp(nn * y2)
   } else if (ddep == 13) {
-    lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (nn / K))
-    muvec = mu + alpha * (la - mu) / K * nn
+    y = log(la / (phi * la + (1 - phi) * mu)) / K
+    lavec = pmax(0, la * exp(-nn * y))
+    muvec = mu + phi * (la - mu) / K * nn
   } else if (ddep == 14) {
-    y = log(1 + alpha * (la - mu) / mu) / log(K)
-    lavec = pmax(0, la * ((alpha * (la - mu) + mu) / la) ^ (nn / K))
-    muvec = mu * nn ^ y
+    y1 = log(la / (phi * la + (1 - phi) * mu)) / K
+    y2 = log(1 + phi * (la - mu) / mu) / log(K)
+    lavec = pmax(0, la * exp(-nn * y1))
+    muvec = mu * nn ^ y2
   } else if (ddep == 15) {
-    y = -log(la / (alpha * (la - mu) + mu)) / log(K)
-    lavec = pmax(0, la * nn ^ y)
-    muvec = mu * (1 + alpha * (la - mu) / mu) ^ (nn / K)
+    y1 = -log(la / (phi * (la - mu) + mu)) / log(K)
+    y2 = log((phi * la + (1 - phi) * mu) / mu) / K
+    lavec = pmax(0, la * nn ^ y1)
+    muvec = mu * exp(nn * y2)
   }
   return(c(lavec, muvec, nn))
 }  
