@@ -7,7 +7,7 @@ phylo <- dd_sim(
 )$tes
 brts <- ape::branching.times(phylo)
 
-# Test function
+# Shortcut function
 run_dd_loglik <- function(ddmodel, lambda_0 = 0.8, mu_0 = 0.1, K = 20, r = 1, verbose = FALSE) {
   if (both_rates_vary(ddmodel)) {
     pars1 <- c(lambda_0, mu_0, K, r)
@@ -38,7 +38,7 @@ test_that("all DD models return a likelihood", {
   expect_silent(logL_dd6 <- run_dd_loglik(ddmodel = 6))
   expect_true(logL_dd6 < 0 && is.finite(logL_dd6))
   expect_silent(logL_dd7 <- run_dd_loglik(ddmodel = 7))
-  expect_true(logL_dd7 < 7 && is.finite(logL_dd7))
+  expect_true(logL_dd7 < 0 && is.finite(logL_dd7))
   expect_silent(logL_dd8 <- run_dd_loglik(ddmodel = 8))
   expect_true(logL_dd8 < 0 && is.finite(logL_dd8))
   expect_silent(logL_dd9 <- run_dd_loglik(ddmodel = 9))
@@ -51,13 +51,19 @@ test_that("all DD models return a likelihood", {
   expect_true(logL_dd12 < 0 && is.finite(logL_dd12))
   expect_silent(logL_dd13 <- run_dd_loglik(ddmodel = 13))
   expect_true(logL_dd13 < 0 && is.finite(logL_dd13))
+  expect_silent(logL_dd14 <- run_dd_loglik(ddmodel = 14))
+  expect_true(logL_dd14 < 0 && is.finite(logL_dd14))
+  expect_silent(logL_dd15 <- run_dd_loglik(ddmodel = 15))
+  expect_true(logL_dd15 < 0 && is.finite(logL_dd15))
 })
 
-test_that("ddmodel = 1 ok", {
-  # expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 500,verbose = TRUE), -Inf) # also -Inf with 1000
-  # run_dd_loglik(ddmodel = 1, lambda_0 = 300) # NAs / NaNs introduced, not solved
+test_that("forbidden parameter values are handled properly", {
+  expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 10000), -Inf)
   # Negative parameters are not allowed
   expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = -1), -Inf)
+  expect_equal(run_dd_loglik(ddmodel = 5, mu_0 = -1), -Inf)
+  expect_equal(run_dd_loglik(ddmodel = 1, K = -1), -Inf)
+  expect_equal(run_dd_loglik(ddmodel = 15, r = -1), -Inf)
   # lambda0 = mu0 not allowed
   expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 0.8, mu_0 = 0.8), -Inf)
   expect_equal(run_dd_loglik(ddmodel = 1, lambda_0 = 0, mu_0 = 0, K = 0), -Inf)
@@ -68,13 +74,15 @@ test_that("ddmodel = 1 ok", {
   expect_silent(run_dd_loglik(ddmodel = 5, K = 8))
   # Exponential-DD extinction must have mu0 > 0 or result is NaN
   expect_equal(run_dd_loglik(ddmodel = 4, mu_0 = 0), -Inf)
-  expect_equal(run_dd_loglik(ddmodel = 6, mu_0 = 0), -Inf)  
+  expect_equal(run_dd_loglik(ddmodel = 6, mu_0 = 0), -Inf)
   expect_equal(run_dd_loglik(ddmodel = 7, mu_0 = 0), -Inf)
   # Exponential-DD speciation must have either mu0 > 0 or r > 0 or result is NaN
   expect_equal(run_dd_loglik(ddmodel = 2, mu_0 = 0), -Inf)
   expect_equal(run_dd_loglik(ddmodel = 8, mu_0 = 0, r = 0), -Inf)
+  expect_equal(run_dd_loglik(ddmodel = 14, mu_0 = 0, r = 0), -Inf)
   # Exponential(alternative)-DD extinction must have mu0 > 0 or result is NaN
   expect_equal(run_dd_loglik(ddmodel = 10, mu_0 = 0), -Inf)
   expect_equal(run_dd_loglik(ddmodel = 11, mu_0 = 0), -Inf)
   expect_equal(run_dd_loglik(ddmodel = 12, mu_0 = 0), -Inf)
+  expect_equal(run_dd_loglik(ddmodel = 15, mu_0 = 0, r = 0), -Inf)
 })

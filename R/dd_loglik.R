@@ -224,7 +224,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     } else if (la == 0) {
       if (verbose) cat('la0 cannot be zero.\n')
       loglik = -Inf
-    } else if (ddep %in% c(2, 2.1, 2.2, 4, 6, 7, 10:12) && mu == 0) {
+    } else if (ddep %in% c(2, 2.1, 2.2, 4, 6, 7, 10:12, 14:15) && mu == 0) {
       if (verbose) cat('mu0 cannot be exactly zero for this model.\n')
       loglik = -Inf
     } else if (ddep == 8 && mu == 0 && r == 0) {
