@@ -1053,15 +1053,27 @@ L2phylo2 <- function(L, t, dropextinct = T)
 #' @keywords models
 #' @export L2Phi
 L2Phi <- function(L, t, metric) {
+<<<<<<< HEAD
    # metrics
    if (metric == "pd") {
-      return(sum(DDD::L2phylo(L, dropextinct = T)$edge.length))
+      return(sum(DDD::L2phylo2(L, dropextinct = T)$edge.length))
    } else if (metric == "mpd") {
-      phy <- DDD::L2phylo(L, dropextinct = T)
+      phy <- DDD::L2phylo2(L, dropextinct = T)
       n <- length(phy$tip.label)
       dist <- ape::dist.nodes(phy)[1:n, 1:n]
       return(mean(dist[lower.tri(dist)]))
    }
+=======
+  # metrics
+  if (metric == "pd") {
+    return(sum(DDD::L2phylo2(L, t, dropextinct = T)$edge.length))
+  } else if (metric == "mpd") {
+    phy <- DDD::L2phylo2(L, t, dropextinct = T)
+    n <- length(phy$tip.label)
+    dist <- ape::dist.nodes(phy)[1:n, 1:n]
+    return(mean(dist[lower.tri(dist)]))
+  }
+>>>>>>> 1162949133d24df12ea02b689c5d804fb611d4fd
 }
 
 
