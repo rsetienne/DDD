@@ -742,10 +742,10 @@ optimizer <- function(
     if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
-      outnew <- suppressWarnings(simplex(fun = fun,
+      outnew <- simplex(fun = fun,
                                          trparsopt = trparsopt,
                                          optimpars = optimpars,
-                                         ...))
+                                         ...)
     } else
     if(optimmethod == 'subplex')
     {
@@ -754,11 +754,11 @@ optimizer <- function(
         return(-fun(trparsopt = trparsopt,...))
       }
       trparsopt[trparsopt == 0.5] <- 0.5 - jitter
-      outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
+      outnew <- subplex::subplex(par = trparsopt,
                                                   fn = minfun,
                                                   control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
                                                   fun = fun,
-                                                  ...))
+                                                  ...)
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))

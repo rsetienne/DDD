@@ -654,6 +654,34 @@ dd_ode_bw_right_open_odeint = function(initprobs, tvec, parsvec, method)
 }
 
 
+dd_ode_chunked_odeint = function(fun, initprobs, tvec, parsvec, method)
+{
+  y = initprobs
+  dy = 0.0
+  ddy = 0.0
+  while (tvec[1] + 100 < tvec[2]) {
+    y0 = y[length(y)]
+    y <- fun(y, c(tvec[1], tvec[1] + 100), parsvec, 1e-4, 1e-4, method)
+    G = y[length(y)]
+    dy = G - y0
+    ddy = dy - ddy;
+    tvec[1] = tvec[1] + 100
+    if (abs(ddy) < 1e-10) {
+      # dy became constant - extrapolate
+      return(G + (tvec[2] - tvec[1]) * dy / 100.0)
+    }
+    if (dy > 1e20) {
+      # blown up
+      return(Inf)
+    }
+    ddy = dy
+  }
+  # never reached so far...
+  y <- fun(y, c(tvec[1], tvec[2]), parsvec, 1e-6, 1e-6, method)
+  return(y[length(y)])
+}
+
+
 dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
 {
   fun = dd_rhs_odeint_map[[rhs_name]];
@@ -663,6 +691,9 @@ dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
   if (tvec[2] > 10000 && rhs_name == 'dd_loglik_bw_rhs') {
     # tends to hang if not handled 
     y[2,2:(lx+1)] <- dd_ode_bw_right_open_odeint(initprobs, tvec, parsvec, method)
+  }
+  else if (abs(tvec[2] - tvec[1]) > 10000) {
+    y[2,2:(lx+1)] <- dd_ode_chunked_odeint(fun, initprobs, tvec, parsvec, atol, rtol, method)
   }
   else {
     y[2,2:(lx+1)] <- fun(initprobs, tvec, parsvec, atol, rtol, method)
