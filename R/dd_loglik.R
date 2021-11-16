@@ -206,8 +206,10 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     }
   }
   
-  lx = min(max(1 + missnumspec, 1 + Kprime), ceiling(pars2[1]))
-  
+  lx <- min(max(1 + missnumspec, 1 + Kprime), ceiling(pars2[1]))
+  ff <- lambdamu(1:lx, pars1, ddep)
+  lx <- min(which(ff[[1]] - ff[[2]] < -100), lx)
+
   if ((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf)) {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
   } else {
@@ -393,9 +395,9 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
     pars2[6] = 2
   }
   ddep = pars2[2]
-  if (ddep > 5) {
-    stop("This DD model is not implemented for the analytical method yet.")
-  }
+  #if (ddep > 5) {
+  #  stop("This DD model is not implemented for the analytical method yet.")
+  #}
   cond = pars2[3]
   btorph = pars2[4]
   verbose <- pars2[5]
