@@ -208,7 +208,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   
   lx <- min(max(1 + missnumspec, 1 + Kprime), ceiling(pars2[1]))
   ff <- lambdamu(1:lx, pars1, ddep)
-  lx <- min(which(ff[[1]] - ff[[2]] < -100), lx)
+  lx <- min(which(ff[[2]]/ff[[1]] > 100), lx)
 
   if ((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf)) {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
