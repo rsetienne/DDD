@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // dd_integrate_bw_odeint
 NumericVector dd_integrate_bw_odeint(NumericVector ry, NumericVector times, NumericVector pars, double atol, double rtol, std::string stepper);
 RcppExport SEXP _DDD_dd_integrate_bw_odeint(SEXP rySEXP, SEXP timesSEXP, SEXP parsSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP stepperSEXP) {
