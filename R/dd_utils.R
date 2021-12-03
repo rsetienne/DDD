@@ -69,7 +69,7 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 
   class(phy) <- "phylo"
 
-  #phy <- stats::reorder(phy)
+  phy <- ape::reorder.phylo(phy)
   ## to avoid crossings when converting with as.hclust:
   phy$edge[phy$edge[, 2] <= n, 2] <- 1:n
 
