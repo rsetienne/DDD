@@ -18,10 +18,11 @@ lambdamu = function(n,pars,ddep)
         # constant-rate extinction
         lavec = pmax(0, la * (1 - n / K))
         muvec = rep(mu, lnn)
-    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2) {
+    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4) {
         # "exponential" DD on speciation (power function)
         # constant-rate extinction
-        y = -(log(la / mu) / log(K + n0)) ^ (ddep != 2.2)
+        frac <- ifelse(ddep == 2.3, 0.1, la / mu)
+        y = -(log( frac ) / log(K + n0)) ^ (ddep != 2.2)
         lavec = pmax(0, la * (n + n0) ^ y)
         muvec = rep(mu, lnn)
     } else if(ddep == 2.3) {
@@ -198,9 +199,10 @@ lambdamu2 = function(nxt,pars,ddep)
     { 
         lavec = pmax(matrix(0,lnn,lnn),laM * (1 - nxt/KM))
         muvec = muM * matrix(1,lnn,lnn)
-    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
+    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
     { 
-        x = -(log(laM/muM)/log(KM+n0))^(ddep != 2.2)
+        fracM <- ifelse(ddep == 2.4, 0.1, laM/muM)
+        x = -(log( fracM )/log(KM + n0))^(ddep != 2.2)
         lavec = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 2.3)

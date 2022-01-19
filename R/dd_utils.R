@@ -133,9 +133,10 @@ flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
    {
        lavec = pmax(rep(0,lx),la * nn/K * (1 - nn/K))
    }
-   if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
+   if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
    {
-       x = -(log(la/mu)/log(K + n0))^(ddep != 2.2)
+       frac <- ifelse(ddep == 2.4, 0.1, la / mu)
+       x = -(log( frac )/log(K + n0))^(ddep != 2.2)
        lavec = pmax(rep(0,lx),la * (nn + n0)^x)
    }
    if(ddep == 2.3)

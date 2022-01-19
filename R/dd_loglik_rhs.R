@@ -30,8 +30,9 @@ dd_loglik_rhs_precomp = function(pars,x)
   } else if(ddep == 1.5) {
     lavec = pmax(0, la * nn / K * (1 - nn / K))
     muvec = rep(mu, lnn)
-  } else if (ddep == 2 | ddep == 2.1 | ddep == 2.2) {
-    y = -(log(la / mu) / log(K + n0)) ^ (ddep != 2.2)
+  } else if (ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4) {
+    frac <- ifelse(ddep == 2.4, 0.1, la / mu)
+    y = -(log( frac ) / log(K + n0)) ^ (ddep != 2.2)
     lavec = pmax(0, la * (nn + n0) ^ y)
     muvec = rep(mu, lnn)
   } else if(ddep == 2.3) {
