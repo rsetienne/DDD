@@ -201,7 +201,7 @@ lambdamu2 = function(nxt,pars,ddep)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
     { 
-        fracM <- ifelse(ddep == 2.4, 0.1, laM/muM)
+        fracM <- ifelse(ddep == 2.4, 10, laM/muM)
         x = -(log( fracM )/log(KM + n0))^(ddep != 2.2)
         lavec = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         muvec = muM * matrix(1,lnn,lnn)
