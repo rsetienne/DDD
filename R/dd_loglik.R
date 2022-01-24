@@ -220,6 +220,10 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
       brts[length(brts) + 1] = 0
     }
     S = length(brts) + (soc - 2)
+    if ((la == 0 | K == 0) & S > soc) {
+      loglik <- -Inf
+      return(loglik)
+    }
     if (any(pars1 < 0)) {
       if (verbose) cat('Model parameters cannot be negative.\n')
       loglik = -Inf
