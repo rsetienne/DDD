@@ -153,7 +153,7 @@ edd_sim <- function(pars,
                     metric = "ed",
                     offset = "none") {
   edd_pars_check(pars, age, model, metric, offset)
-
+  
   # initialization
   t <- rep(0, 1)
   l_table <- matrix(0, 2, 4)
@@ -168,20 +168,20 @@ edd_sim <- function(pars,
   ed <- c(0, 0)
   ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
   lamu <- edd_update_lamu(ed, ed_max, params, model)
-
+  
   # store EDs and lamus and associated lineages
   eds <- list(ed)
   las <- list(lamu$newlas)
   mus <- list(lamu$newmus)
   linlists <- list(linlist)
-
+  
   # get time interval
   t[i + 1] <-
     t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
-
+  
   # main simulation circle
   while (t[i + 1] <= age) {
-    if (num[i] > 1){
+    if (num[i] > 1) {
       # time step index
       i <- i + 1
       ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
@@ -193,15 +193,8 @@ edd_sim <- function(pars,
                              sum(
                                lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
                              )
-                           )
-      )
+                           ))
       if (event_type == "real") {
-        if(length(linlist)!=length(lamu_real$newlas)){
-          catch_result<-list(l_table=l_table,t=t,eds=eds,las=las,mus=mus,linlists=linlists,
-                             lamu = lamu, lamu_real=lamu_real)
-          warning("Error catched")
-          return(catch_result)
-        }
         event <-
           edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
         ran_lin <- c(linlist, linlist)[event]
@@ -239,15 +232,13 @@ edd_sim <- function(pars,
       t[i + 1] <- Inf
     }
   }
-
+  
   tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
   tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
   ltt <-
-    data.frame(
-      "time" = t[-length(t)],
-      "num" = num
-    )
-
+    data.frame("time" = t[-length(t)],
+               "num" = num)
+  
   out <-
     list(
       tes = tes,
@@ -259,6 +250,6 @@ edd_sim <- function(pars,
       mus = mus,
       linlists = linlists
     )
-
+  
   return(out)
 }
