@@ -181,59 +181,68 @@ edd_sim <- function(pars,
 
   # main simulation circle
   while (t[i + 1] <= age) {
-    # time step index
-    i <- i + 1
-    ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
-    lamu_real <- edd_update_lamu(ed, ed, params, model)
-    event_type <- sample(c("real", "fake"),
-      1,
-      prob = c(
-        sum(lamu_real$newlas + lamu_real$newmus),
-        sum(
-          lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
-        )
+    if (num[i] > 1){
+      # time step index
+      i <- i + 1
+      ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
+      lamu_real <- edd_update_lamu(ed, ed, params, model)
+      event_type <- sample(c("real", "fake"),
+                           1,
+                           prob = c(
+                             sum(lamu_real$newlas + lamu_real$newmus),
+                             sum(
+                               lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
+                             )
+                           )
       )
-    )
-    if (event_type == "real") {
-      event <-
-        edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
-      ran_lin <- c(linlist, linlist)[event]
-
-      if (event <= length(linlist)) {
-        num[i] <- num[i - 1] + 1
-        new_lin <- new_lin + 1
-        l_table <-
-          rbind(l_table, c(t[i], ran_lin, sign(ran_lin) * new_lin, -1))
-        linlist <- c(linlist, sign(ran_lin) * new_lin)
+      if (event_type == "real") {
+        if(length(linlist)!=length(lamu_real$newlas)){
+          catch_result<-list(l_table=l_table,t=t,eds=eds,las=las,mus=mus,linlists=linlists,
+                             lamu = lamu, lamu_real=lamu_real)
+          warning("Error catched")
+          return(catch_result)
+        }
+        event <-
+          edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
+        ran_lin <- c(linlist, linlist)[event]
+        
+        if (event <= length(linlist)) {
+          num[i] <- num[i - 1] + 1
+          new_lin <- new_lin + 1
+          l_table <-
+            rbind(l_table, c(t[i], ran_lin, sign(ran_lin) * new_lin, -1))
+          linlist <- c(linlist, sign(ran_lin) * new_lin)
+        } else {
+          num[i] <- num[i - 1] - 1
+          l_table[abs(ran_lin), 4] <- t[i]
+          w <- which(linlist == ran_lin)
+          linlist <- linlist[-w]
+        }
       } else {
-        num[i] <- num[i - 1] - 1
-        l_table[abs(ran_lin), 4] <- t[i]
-        w <- which(linlist == ran_lin)
-        linlist <- linlist[-w]
+        num[i] <- num[i - 1]
       }
+      
+      ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
+      ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
+      params[1] <- num[i]
+      lamu <- edd_update_lamu(ed, ed_max, params, model)
+      
+      # append to EDs and lamus
+      eds <- c(eds, list(ed))
+      las <- c(las, list(lamu$newlas))
+      mus <- c(mus, list(lamu$newmus))
+      linlists <- c(linlists, list(linlist))
+      
+      t[i + 1] <-
+        t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
     } else {
-      num[i] <- num[i - 1]
+      t[i + 1] <- Inf
     }
-
-    ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
-    ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
-    params[1] <- num[i]
-    lamu <- edd_update_lamu(ed, ed_max, params, model)
-
-    # append to EDs and lamus
-    eds <- c(eds, list(ed))
-    las <- c(las, list(lamu$newlas))
-    mus <- c(mus, list(lamu$newmus))
-    linlists <- c(linlists, list(linlist))
-
-    t[i + 1] <-
-      t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
   }
 
   tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
   tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
-  brts <- DDD::L2brts2(l_table, age, dropextinct = T)
-  nltt <-
+  ltt <-
     data.frame(
       "time" = t[-length(t)],
       "num" = num
@@ -244,8 +253,7 @@ edd_sim <- function(pars,
       tes = tes,
       tas = tas,
       l_table = l_table,
-      brts = brts,
-      nltt = nltt,
+      ltt = ltt,
       eds = eds,
       las = las,
       mus = mus,
