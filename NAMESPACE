@@ -3,7 +3,6 @@
 export(L2ED)
 export(L2Phi)
 export(L2brts)
-export(L2brts2)
 export(L2phylo)
 export(L2phylo2)
 export(bd_ML)
