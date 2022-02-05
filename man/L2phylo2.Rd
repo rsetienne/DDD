@@ -5,7 +5,7 @@
 \title{Function to convert a table with speciation and extinction events to a
 phylogeny}
 \usage{
-L2phylo2(L, t, dropextinct = T)
+L2phylo2(L, t, dropextinct = FALSE)
 }
 \arguments{
 \item{L}{Matrix of events as produced by dd_sim: \cr \cr - the first column
@@ -39,6 +39,6 @@ doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
 180: E75-E89, doi: 10.1086/667574
 }
 \author{
-Rampal S. Etienne
+Rampal S. Etienne; Tianjian Qin
 }
 \keyword{models}
