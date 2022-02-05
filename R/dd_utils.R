@@ -887,77 +887,6 @@ rng_respecting_sample <- function(x, size, replace, prob) {
 }
 
 
-#' Function to convert a table with speciation and extinction events to a set
-#' of branching times
-#' 
-#' Converting a table with speciation and extinction events to a set of
-#' branching times (reversed time scale)
-#' 
-#' 
-#' @param L Matrix of events as produced by dd_sim: \cr \cr - the first column
-#' is the time at which a species is born in Mya\cr - the second column is the
-#' label of the parent of the species; positive and negative values indicate
-#' whether the species belongs to the left or right crown lineage \cr - the
-#' third column is the label of the daughter species itself; positive and
-#' negative values indicate whether the species belongs to the left or right
-#' crown lineage \cr - the fourth column is the time of extinction of the
-#' species; if the fourth element equals -1, then the species is still extant.
-#' @param t Simulation time
-#' @param dropextinct Sets whether the phylogeny should drop species that are
-#' extinct at the present
-#' @return \item{ brts }{ A set of branching times }
-#' @author Rampal S. Etienne
-#' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
-#' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
-#' 180: E75-E89, doi: 10.1086/667574
-#' @keywords models
-#' @examples
-#' # Do not use this function, use L2brts
-#' 
-#' @export L2brts2
-L2brts2 <- function(L, t, dropextinct = T)
-# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
-{
-   brts <- NULL
-   L <- L[order(abs(L[, 3])), 1:4]
-   age <- t
-   L[1, 1] <- -1
-   if (dropextinct == T) {
-      sall <- which(L[, 4] == -1)
-      tend <- age
-   } else {
-      sall <- which(L[, 4] >= -1)
-      tend <- (L[, 4] == -1) * age + (L[, 4] > -1) * L[, 4]
-   }
-   L <- L[, -4]
-   linlist <- cbind(data.frame(L[sall, ]), paste("t", abs(L[sall, 3]), sep = ""), tend)
-   linlist[, 4] <- as.character(linlist[, 4])
-   names(linlist) <- 1:5
-   done <- 0
-   while (done == 0) {
-      j <- which.max(linlist[, 1])
-      daughter <- linlist[j, 3]
-      parent <- linlist[j, 2]
-      parentj <- which(parent == linlist[, 3])
-      parentinlist <- length(parentj)
-      if (parentinlist == 1) {
-         spec1 <- paste(linlist[parentj, 4], ":", linlist[parentj, 5] - linlist[j, 1], sep = "")
-         spec2 <- paste(linlist[j, 4], ":", linlist[j, 5] - linlist[j, 1], sep = "")
-         linlist[parentj, 4] <- paste("(", spec1, ",", spec2, ")", sep = "")
-         linlist[parentj, 5] <- linlist[j, 1]
-         brts <- c(brts, linlist[j, 1])
-         linlist <- linlist[-j, ]
-      } else {
-         linlist[j, 1:3] <- L[which(L[, 3] == parent), 1:3]
-      }
-      if (nrow(linlist) == 1) {
-         done <- 1
-      }
-   }
-   brts <- rev(sort(age - brts))
-   return(brts)
-}
-
 
 #' Function to convert a table with speciation and extinction events to a
 #' phylogeny
@@ -978,7 +907,7 @@ L2brts2 <- function(L, t, dropextinct = T)
 #' @param dropextinct Sets whether the phylogeny should drop species that are
 #' extinct at the present
 #' @return \item{ phy }{ A phylogeny of the phylo type }
-#' @author Rampal S. Etienne
+#' @author Rampal S. Etienne; Tianjian Qin
 #' @references - Etienne, R.S. et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
 #' doi: 10.1098/rspb.2011.1439 \cr - Etienne, R.S. & B. Haegeman 2012. Am. Nat.
 #' 180: E75-E89, doi: 10.1086/667574
@@ -987,47 +916,56 @@ L2brts2 <- function(L, t, dropextinct = T)
 #' # do not use this function, use L2phylo() instead
 #' 
 #' @export L2phylo2
-L2phylo2 <- function(L, t, dropextinct = T)
-# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
+L2phylo2 <- function(L, t, dropextinct = FALSE)
+  # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
-   L <- L[order(abs(L[, 3])), 1:4]
-   age <- t
-   L[1, 1] <- -1
-   if (dropextinct == T) {
-      sall <- which(L[, 4] == -1)
-      tend <- age
-   } else {
-      sall <- which(L[, 4] >= -1)
-      tend <- (L[, 4] == -1) * age + (L[, 4] > -1) * L[, 4]
-   }
-   L <- L[, -4]
-   linlist <- cbind(data.frame(L[sall, ]), paste("t", abs(L[sall, 3]), sep = ""), tend)
-   linlist[, 4] <- as.character(linlist[, 4])
-   names(linlist) <- 1:5
-   done <- 0
-   while (done == 0) {
-      j <- which.max(linlist[, 1])
-      daughter <- linlist[j, 3]
-      parent <- linlist[j, 2]
-      parentj <- which(parent == linlist[, 3])
-      parentinlist <- length(parentj)
-      if (parentinlist == 1) {
-         spec1 <- paste(linlist[parentj, 4], ":", linlist[parentj, 5] - linlist[j, 1], sep = "")
-         spec2 <- paste(linlist[j, 4], ":", linlist[j, 5] - linlist[j, 1], sep = "")
-         linlist[parentj, 4] <- paste("(", spec1, ",", spec2, ")", sep = "")
-         linlist[parentj, 5] <- linlist[j, 1]
-         linlist <- linlist[-j, ]
-      } else {
-         linlist[j, 1:3] <- L[which(L[, 3] == parent), 1:3]
-      }
-      if (nrow(linlist) == 1) {
-         done <- 1
-      }
-   }
-   linlist[4] <- paste(linlist[4], ":", linlist[5], ";", sep = "")
-   phy <- ape::read.tree(text = linlist[1, 4])
-   tree <- ape::as.phylo(phy)
-   return(tree)
+  L2 <- L[order(abs(L[, 3])), 1:4]
+  age <- t
+  L2[1, 1] <- -1
+  sall <- which(L2[, 4] >= -1)
+  tend <- (L2[, 4] == -1) * age + (L2[, 4] > -1) * L2[, 4]
+  L2 <- L2[, -4]
+  linlist <-
+    cbind(data.frame(L2[sall,]), paste("t", abs(L2[sall, 3]), sep = ""), tend)
+  linlist[, 4] <- as.character(linlist[, 4])
+  names(linlist) <- 1:5
+  done <- 0
+  while (done == 0) {
+    j <- which.max(linlist[, 1])
+    daughter <- linlist[j, 3]
+    parent <- linlist[j, 2]
+    parentj <- which(parent == linlist[, 3])
+    parentinlist <- length(parentj)
+    if (parentinlist == 1) {
+      spec1 <-
+        paste(linlist[parentj, 4], ":", linlist[parentj, 5] - linlist[j, 1], sep = "")
+      spec2 <-
+        paste(linlist[j, 4], ":", linlist[j, 5] - linlist[j, 1], sep = "")
+      linlist[parentj, 4] <-
+        paste("(", spec1, ",", spec2, ")", sep = "")
+      linlist[parentj, 5] <- linlist[j, 1]
+      linlist <- linlist[-j,]
+    } else {
+      linlist[j, 1:3] <- L2[which(L2[, 3] == parent), 1:3]
+    }
+    if (nrow(linlist) == 1) {
+      done <- 1
+    }
+  }
+  linlist[4] <- paste(linlist[4], ":", linlist[5], ";", sep = "")
+  phy <- ape::read.tree(text = linlist[1, 4])
+  tree <- ape::as.phylo(phy)
+  
+  if (dropextinct == FALSE) {
+    return(tree)
+  } else {
+    absent <- abs(L[which(L[, 4] != -1), 3])
+    tree <- L2phylo2(L, t, dropextinct = F)
+    pruned_tree <-
+      ape::drop.tip(tree, paste0("t", absent))
+    
+    return(pruned_tree)
+  }
 }
 
 
@@ -1085,11 +1023,19 @@ L2Phi <- function(L, t, metric) {
 #' @keywords models
 #' @export L2ED
 L2ED <- function(L, t) {
-   dist.tips <- ape::cophenetic.phylo(DDD::L2phylo2(L, t, dropextinct = T))
-   dist.means <- rowSums(dist.tips) / (dim(dist.tips)[1] - 1)
-   dist.means.sorted <- dist.means[gtools::mixedorder(names(dist.means))]
+  extant <- L[which(L[, 4] == -1), 3]
+  if (length(extant) == 1) {
+    ed <- c(0)
+    return(ed)
+  }
 
-   return(dist.means.sorted)
+  dist_tips <-
+    ape::cophenetic.phylo(L2phylo2(L, t, dropextinct = TRUE))
+  dist_means <- rowSums(dist_tips) / (dim(dist_tips)[1] - 1)
+  dist_means_sorted <-
+    dist_means[gtools::mixedorder(names(dist_means))]
+  
+  return(dist_means_sorted)
 }
 
 
