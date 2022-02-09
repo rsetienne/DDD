@@ -1027,6 +1027,9 @@ L2ED <- function(L, t) {
   if (length(extant) == 1) {
     ed <- c(0)
     return(ed)
+  } else if (length(extant) == 0) {
+    ed <- NA
+    return(ed)
   }
 
   dist_tips <-
