@@ -154,35 +154,31 @@ edd_sim <- function(pars,
                     offset = "none") {
   edd_pars_check(pars, age, model, metric, offset)
   
-  # initialization
-  t <- rep(0, 1)
-  l_table <- matrix(0, 2, 4)
-  i <- 1
-  t[1] <- 0
-  num <- 2
-  l_table[1, 1:4] <- c(0, 0, -1, -1)
-  l_table[2, 1:4] <- c(0, -1, 2, -1)
-  linlist <- c(-1, 2)
-  new_lin <- 2
-  params <- c(num, pars)
-  ed <- c(0, 0)
-  ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
-  lamu <- edd_update_lamu(ed, ed_max, params, model)
-  
-  # store EDs and lamus and associated lineages
-  eds <- list(ed)
-  las <- list(lamu$newlas)
-  mus <- list(lamu$newmus)
-  linlists <- list(linlist)
-  
-  # get time interval
-  t[i + 1] <-
-    t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
-  
-  # main simulation circle
-  while (t[i + 1] <= age) {
-    if (num[i] > 1) {
-      # time step index
+  done <- 0
+  while (done == 0) {
+    t <- rep(0, 1)
+    l_table <- matrix(0, 2, 4)
+    i <- 1
+    t[1] <- 0
+    num <- 2
+    l_table[1, 1:4] <- c(0, 0, -1, -1)
+    l_table[2, 1:4] <- c(0, -1, 2, -1)
+    linlist <- c(-1, 2)
+    new_lin <- 2
+    params <- c(num, pars)
+    ed <- c(0, 0)
+    ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
+    lamu <- edd_update_lamu(ed, ed_max, params, model)
+    
+    eds <- list(ed)
+    las <- list(lamu$newlas)
+    mus <- list(lamu$newmus)
+    linlists <- list(linlist)
+    
+    t[i + 1] <-
+      t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+    
+    while (t[i + 1] <= age) {
       i <- i + 1
       ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
       lamu_real <- edd_update_lamu(ed, ed, params, model)
@@ -215,24 +211,31 @@ edd_sim <- function(pars,
         num[i] <- num[i - 1]
       }
       
-      ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
-      ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
-      params[1] <- num[i]
-      lamu <- edd_update_lamu(ed, ed_max, params, model)
-      
-      # append to EDs and lamus
-      eds <- c(eds, list(ed))
-      las <- c(las, list(lamu$newlas))
-      mus <- c(mus, list(lamu$newmus))
-      linlists <- c(linlists, list(linlist))
-      
-      t[i + 1] <-
-        t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+      if (num[i] < 2) {
+        t[i + 1] <- Inf
+      } else {
+        ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
+        ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
+        params[1] <- num[i]
+        lamu <- edd_update_lamu(ed, ed_max, params, model)
+        
+        eds <- c(eds, list(ed))
+        las <- c(las, list(lamu$newlas))
+        mus <- c(mus, list(lamu$newmus))
+        linlists <- c(linlists, list(linlist))
+        
+        t[i + 1] <-
+          t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+      }
+    }
+    
+    if (num[i] < 2) {
+      done <- 0
     } else {
-      t[i + 1] <- Inf
+      done <- 1
     }
   }
-  
+
   tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
   tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
   ltt <-
