@@ -181,7 +181,7 @@ edd_sim <- function(pars,
   
   # main simulation circle
   while (t[i + 1] <= age) {
-    if (num[i] > 1) {
+    if (num[i] >= 1) {
       # time step index
       i <- i + 1
       ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
