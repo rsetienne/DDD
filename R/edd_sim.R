@@ -224,8 +224,12 @@ edd_sim <- function(pars,
         mus <- c(mus, list(lamu$newmus))
         linlists <- c(linlists, list(linlist))
         
-        t[i + 1] <-
-          t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+        if (edd_sum_rates(lamu$newlas, lamu$newmus) == 0) {
+          t[i + 1] <- Inf
+        } else {
+          t[i + 1] <-
+            t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+        }
       }
     }
     
