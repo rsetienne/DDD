@@ -211,7 +211,7 @@ edd_sim <- function(pars,
         num[i] <- num[i - 1]
       }
       
-      if (num[i] < 2) {
+      if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
         t[i + 1] <- Inf
       } else {
         ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
@@ -219,11 +219,12 @@ edd_sim <- function(pars,
         params[1] <- num[i]
         lamu <- edd_update_lamu(ed, ed_max, params, model)
         
+        # append to EDs and lamus
         eds <- c(eds, list(ed))
         las <- c(las, list(lamu$newlas))
         mus <- c(mus, list(lamu$newmus))
         linlists <- c(linlists, list(linlist))
-        
+      
         if (edd_sum_rates(lamu$newlas, lamu$newmus) == 0) {
           t[i + 1] <- Inf
         } else {
@@ -233,7 +234,7 @@ edd_sim <- function(pars,
       }
     }
     
-    if (num[i] < 2) {
+    if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
       done <- 0
     } else {
       done <- 1

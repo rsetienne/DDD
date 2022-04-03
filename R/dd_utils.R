@@ -1023,15 +1023,6 @@ L2Phi <- function(L, t, metric) {
 #' @keywords models
 #' @export L2ED
 L2ED <- function(L, t) {
-  extant <- L[which(L[, 4] == -1), 3]
-  if (length(extant) == 1) {
-    ed <- c(0)
-    return(ed)
-  } else if (length(extant) == 0) {
-    ed <- NA
-    return(ed)
-  }
-
   dist_tips <-
     ape::cophenetic.phylo(L2phylo2(L, t, dropextinct = TRUE))
   dist_means <- rowSums(dist_tips) / (dim(dist_tips)[1] - 1)
