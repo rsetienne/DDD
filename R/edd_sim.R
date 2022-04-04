@@ -178,6 +178,7 @@ edd_sim <- function(pars,
                     model = "dsce2",
                     metric = "ed",
                     offset = "none",
+                    history = TRUE,
                     verbose = FALSE) {
   edd_pars_check(pars, age, model, metric, offset)
   if (verbose == TRUE) {
@@ -200,10 +201,12 @@ edd_sim <- function(pars,
     ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
     lamu <- edd_update_lamu(ed, ed_max, params, model)
     
-    eds <- list(ed)
-    las <- list(lamu$newlas)
-    mus <- list(lamu$newmus)
-    linlists <- list(linlist)
+    if (history = TRUE) {
+      eds <- list(ed)
+      las <- list(lamu$newlas)
+      mus <- list(lamu$newmus)
+      linlists <- list(linlist)
+    }
     
     t[i + 1] <-
       t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
@@ -279,11 +282,12 @@ edd_sim <- function(pars,
         params[1] <- num[i]
         lamu <- edd_update_lamu(ed, ed_max, params, model)
         
-        # append to EDs and lamus
-        eds <- c(eds, list(ed))
-        las <- c(las, list(lamu$newlas))
-        mus <- c(mus, list(lamu$newmus))
-        linlists <- c(linlists, list(linlist))
+        if (history = TRUE) {
+          eds <- c(eds, list(ed))
+          las <- c(las, list(lamu$newlas))
+          mus <- c(mus, list(lamu$newmus))
+          linlists <- c(linlists, list(linlist))
+        }
       
         if (edd_sum_rates(lamu$newlas, lamu$newmus) == 0) {
           t[i + 1] <- Inf
@@ -326,17 +330,27 @@ edd_sim <- function(pars,
     data.frame("time" = t[-length(t)],
                "num" = num)
   
-  out <-
-    list(
-      tes = tes,
-      tas = tas,
-      l_table = l_table,
-      ltt = ltt,
-      eds = eds,
-      las = las,
-      mus = mus,
-      linlists = linlists
-    )
+  if (history = TRUE) {
+    out <-
+      list(
+        tes = tes,
+        tas = tas,
+        l_table = l_table,
+        ltt = ltt,
+        eds = eds,
+        las = las,
+        mus = mus,
+        linlists = linlists
+      )
+  } else {
+    out <-
+      list(
+        tes = tes,
+        tas = tas,
+        l_table = l_table,
+        ltt = ltt
+      )
+  }
   
   if (verbose == TRUE) {
     message("Results recorded")
