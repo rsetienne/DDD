@@ -306,7 +306,7 @@ edd_sim <- function(pars,
         }
       }
       
-      if (verbose == TRUE) {
+      if (verbose = TRUE) {
         end_time <- Sys.time()
         times[i] <- end_time - start_time
       }
