@@ -354,7 +354,8 @@ edd_sim <- function(pars,
   
   if (verbose == TRUE) {
     message("Results recorded")
-    write.csv(times, "running_time.csv")
+    dir.create(file.path("/logs"), showWarnings = FALSE)
+    write.csv(times, paste(format(Sys.time(), "%Y-%m-%d %I-%p"), "csv", sep = "."))
   }
   
   return(out)
