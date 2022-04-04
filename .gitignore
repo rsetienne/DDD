@@ -9,6 +9,6 @@ src/*.dll
 src-i386
 src-x64
 *.RData
-
 test_functions.r
 .radian_history
+logs/

@@ -216,7 +216,6 @@ edd_sim <- function(pars,
       message("All variables initialized")
       message(paste0("The first time interval is ", t[i + 1]))
       times <- rep(0, 1)
-      message(paste0("Running time of the current step is ", times[i]))
     }
     
     while (t[i + 1] <= age) {
@@ -353,9 +352,13 @@ edd_sim <- function(pars,
   }
   
   if (verbose == TRUE) {
+    running_times <- data.frame("t" = times,
+                                "n" = num)
     message("Results recorded")
-    dir.create(file.path("/logs"), showWarnings = FALSE)
-    write.csv(times, paste0("/logs/", format(Sys.time(), "%Y-%m-%d_%H:%M"), ".csv"))
+    dir.create(file.path(getwd(),"/logs"), showWarnings = FALSE)
+    write.csv(running_times, 
+              paste0(getwd(), "/logs/", format(Sys.time(), "%Y-%m-%d_%H_%M_%S"), ".csv"), 
+              row.names = FALSE)
   }
   
   return(out)
