@@ -201,7 +201,7 @@ edd_sim <- function(pars,
     ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
     lamu <- edd_update_lamu(ed, ed_max, params, model)
     
-    if (history = TRUE) {
+    if (history == TRUE) {
       eds <- list(ed)
       las <- list(lamu$newlas)
       mus <- list(lamu$newmus)
@@ -282,7 +282,7 @@ edd_sim <- function(pars,
         params[1] <- num[i]
         lamu <- edd_update_lamu(ed, ed_max, params, model)
         
-        if (history = TRUE) {
+        if (history == TRUE) {
           eds <- c(eds, list(ed))
           las <- c(las, list(lamu$newlas))
           mus <- c(mus, list(lamu$newmus))
@@ -330,7 +330,7 @@ edd_sim <- function(pars,
     data.frame("time" = t[-length(t)],
                "num" = num)
   
-  if (history = TRUE) {
+  if (history == TRUE) {
     out <-
       list(
         tes = tes,
