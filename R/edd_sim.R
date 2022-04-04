@@ -235,7 +235,7 @@ edd_sim <- function(pars,
                            ))
       
       if (verbose == TRUE) {
-        message(paste0("Simulation step ", i, "started"))
+        message(paste0("Simulation step ", i, " started"))
         message(paste0("The next event happened is ", event_type))
       }
       
