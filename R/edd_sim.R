@@ -19,6 +19,32 @@ edd_pars_check <- function(pars, age, model, metric, offset) {
   }
 }
 
+edd_message_info <- function(pars, age, model, metric, offset) {
+  if (model == "dsce2") {
+    message("Simulation Info:")
+    message(paste0("Lambda = ", pars[1]))
+    message(paste0("Mu = ", pars[2]))
+    message(paste0("Beta_N = ", pars[3]))
+    message(paste0("Beta_Phi= ", pars[4]))
+    message(paste0("Age = ", age))
+    message(paste0("Model = ", model))
+    message(paste0("Metric = ", metric))
+    message(paste0("Offset = ", offset))
+  } else if (model == "dsde2") {
+    message("Simulation Info:")
+    message(paste0("Lambda = ", pars[1]))
+    message(paste0("Mu = ", pars[2]))
+    message(paste0("Beta_N = ", pars[3]))
+    message(paste0("Beta_Phi= ", pars[4]))
+    message(paste0("Gamma_N = ", pars[5]))
+    message(paste0("Gamma_Phi = ", pars[6]))
+    message(paste0("Age = ", age))
+    message(paste0("Model = ", model))
+    message(paste0("Metric = ", metric))
+    message(paste0("Offset = ", offset))
+  }
+}
+
 edd_update_lamu <- function(ed, ed_max, params, model) {
   num <- params[1]
   la0 <- params[2]
@@ -151,14 +177,18 @@ edd_sim <- function(pars,
                     age,
                     model = "dsce2",
                     metric = "ed",
-                    offset = "none") {
+                    offset = "none",
+                    verbose = FALSE) {
   edd_pars_check(pars, age, model, metric, offset)
+  if (verbose == TRUE) {
+    edd_message_info(pars, age, model, metric, offset)
+  }
   
   done <- 0
   while (done == 0) {
+    i <- 1
     t <- rep(0, 1)
     l_table <- matrix(0, 2, 4)
-    i <- 1
     t[1] <- 0
     num <- 2
     l_table[1, 1:4] <- c(0, 0, -1, -1)
@@ -178,10 +208,20 @@ edd_sim <- function(pars,
     t[i + 1] <-
       t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
     
+    if (verbose == TRUE) {
+      message(paste0("Simulation step ", i, " started"))
+      message("All variables initialized")
+      message(paste0("The first time interval is ", t[i + 1]))
+      times <- rep(0, 1)
+      message(paste0("Running time of the current step is ", times[i]))
+    }
+    
     while (t[i + 1] <= age) {
       i <- i + 1
+      start_time <- Sys.time()
       ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
       lamu_real <- edd_update_lamu(ed, ed, params, model)
+      
       event_type <- sample(c("real", "fake"),
                            1,
                            prob = c(
@@ -190,6 +230,12 @@ edd_sim <- function(pars,
                                lamu$newlas - lamu_real$newlas + lamu$newmus - lamu_real$newmus
                              )
                            ))
+      
+      if (verbose == TRUE) {
+        message(paste0("Simulation step ", i, "started"))
+        message(paste0("The next event happened is ", event_type))
+      }
+      
       if (event_type == "real") {
         event <-
           edd_sample_event(lamu_real$newlas, lamu_real$newmus, linlist)
@@ -201,11 +247,21 @@ edd_sim <- function(pars,
           l_table <-
             rbind(l_table, c(t[i], ran_lin, sign(ran_lin) * new_lin, -1))
           linlist <- c(linlist, sign(ran_lin) * new_lin)
+          
+          if (verbose == TRUE) {
+            message("Speciation event happened")
+            message(paste0("Current species number is ", num[i]))
+          }
         } else {
           num[i] <- num[i - 1] - 1
           l_table[abs(ran_lin), 4] <- t[i]
           w <- which(linlist == ran_lin)
           linlist <- linlist[-w]
+          
+          if (verbose == TRUE) {
+            message("Extinction event happened")
+            message(paste0("Current species number is ", num[i]))
+          }
         }
       } else {
         num[i] <- num[i - 1]
@@ -213,6 +269,10 @@ edd_sim <- function(pars,
       
       if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
         t[i + 1] <- Inf
+        
+        if (verbose == TRUE) {
+          message("One of the crown lineage goes extinct, simulation terminated")
+        }
       } else {
         ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
         ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
@@ -227,17 +287,36 @@ edd_sim <- function(pars,
       
         if (edd_sum_rates(lamu$newlas, lamu$newmus) == 0) {
           t[i + 1] <- Inf
+          
+          if (verbose == TRUE) {
+            message("Sum of the rates was 0, simulation terminated")
+          }
         } else {
           t[i + 1] <-
             t[i] + stats::rexp(1, edd_sum_rates(lamu$newlas, lamu$newmus))
+          
+          if (verbose == TRUE) {
+            message(paste0("The next time interval is ", t[i + 1]))
+          }
         }
       }
+      
+      end_time <- Sys.time()
+      times[i] <- end_time - start_time
     }
     
     if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
       done <- 0
+      
+      if (verbose == TRUE) {
+        message("One of the crown lineage is extinct, simulation will start over")
+      }
     } else {
       done <- 1
+      
+      if (verbose == TRUE) {
+        message("Simulation finished")
+      }
     }
   }
 
@@ -258,6 +337,11 @@ edd_sim <- function(pars,
       mus = mus,
       linlists = linlists
     )
+  
+  if (verbose == TRUE) {
+    message("Results recorded")
+    write.csv(times, "running_time.csv")
+  }
   
   return(out)
 }
