@@ -220,7 +220,9 @@ edd_sim <- function(pars,
     
     while (t[i + 1] <= age) {
       i <- i + 1
-      start_time <- Sys.time()
+      if (verbose == TRUE) {
+        start_time <- Sys.time()
+      }
       ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
       lamu_real <- edd_update_lamu(ed, ed, params, model)
       
@@ -304,8 +306,10 @@ edd_sim <- function(pars,
         }
       }
       
-      end_time <- Sys.time()
-      times[i] <- end_time - start_time
+      if (verbose = TRUE) {
+        end_time <- Sys.time()
+        times[i] <- end_time - start_time
+      }
     }
     
     if (sum(linlist < 0) == 0 | sum(linlist > 0) == 0) {
