@@ -16,7 +16,8 @@ Imports:
     treestats
 Suggests: 
     testthat (>= 3.0.0),
-    testit
+    testit,
+    covr
 Author: Rampal S. Etienne & Bart Haegeman
 Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
 License: GPL-3
