@@ -1005,7 +1005,23 @@ L2Phi <- function(L, t, metric) {
 
 
 #' @name L2Phi_cpp
-#' @title C Plus Plus version of L2Phi
+#' @title C++ version of L2Phi
+#' #' @description Function to convert a table with speciation and extinction events to a
+#' phylogenetic diversity metric
+#' @param L Matrix of events as produced by pdd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param t Sets whether the phylogeny should drop species that are
+#' extinct at the present
+#' @param metric Specifies which phylogenetic diversity metric should be used
+#' @return a value of one of the phylogenetic diversity metrices
+#' @author Tianjian Qin
+#' @keywords models
 #' @export L2Phi_cpp
 L2Phi_cpp <- function(L, t, metric) {
   # metrics
@@ -1052,7 +1068,20 @@ L2ED <- function(L, t) {
 
 
 #' @name L2ED_cpp
-#' @title C Plus Plus version of L2ED
+#' @title C++ version of L2ED
+#' #' @description Function to convert a table with speciation and extinction events to 
+#' mean evolutionary distances between each species and the rest of the community
+#' @param L Matrix of events as produced by pdd_sim: \cr \cr - the first column
+#' is the time at which a species is born in Mya\cr - the second column is the
+#' label of the parent of the species; positive and negative values indicate
+#' whether the species belongs to the left or right crown lineage \cr - the
+#' third column is the label of the daughter species itself; positive and
+#' negative values indicate whether the species belongs to the left or right
+#' crown lineage \cr - the fourth column is the time of extinction of the
+#' species; if the fourth element equals -1, then the species is still extant.
+#' @param t Simulation time
+#' @return a named vector of mean evolutionary distinctivenesses
+#' @author Tianjian Qin
 #' @export L2ED_cpp
 L2ED_cpp <- function(L, t) {
   dist_tips <-

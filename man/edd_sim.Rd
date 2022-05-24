@@ -34,10 +34,22 @@ beta-phi\cr \code{model == dsde2} : linear dependence
 in both speciation rate and extinction rate with parameters beta_num,
 beta_phi, gamma_num and gamma_phi}
 
-\item{metric}{Specifies which phylogenetic diversity metric should be used}
+\item{metric}{Either "pd" or "ed", Specifies which phylogenetic diversity 
+metric should be used.}
 
-\item{offset}{Specifies which method to use to offset time effect on
-evolutionary distinctiveness}
+\item{offset}{Specifies which method to use to offset the impact of tree age
+and the collinearity between pd and species richness. "none" for no offset 
+method; "simtime" for deducting tree age from pd value; "spcount" for 
+dividing pd value by species richness; "both" for applying both "simtime" and
+"spcount", by firstly deducting tree age and then dividing by species richness}
+
+\item{history}{Logical, indicating whether to record the historical states
+(of the rates and ED/PD values)}
+
+\item{verbose}{Logical, for debugging purpose, indicating whether to print
+simulation info at each step in the console, and save running time to a file}
+
+\item{converter}{Either "cpp" or "r", choose which version of L2phylo to use.}
 }
 \value{
 \item{ out }{ A list with the following nine elements: The first
@@ -56,7 +68,7 @@ fifth element is the lineage-through-time plot. \cr The sixth element is a
 list of all evolutionary distinctiveness values of all lineages. \cr The
 seventh element is a list of all the speciation rates of all lineages at all
 the time steps. \cr The eighth element is a list of all the extinction rates
-of all lineages at all the time steps. \cr The nineth element is a list of
+of all lineages at all the time steps. \cr The ninth element is a list of
 all the lineages at all the time steps.}
 }
 \description{

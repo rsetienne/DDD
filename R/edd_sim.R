@@ -207,9 +207,18 @@ edd_sample_event <- function(las, mus, linlist) {
 #' beta-phi\cr \code{model == dsde2} : linear dependence
 #' in both speciation rate and extinction rate with parameters beta_num,
 #' beta_phi, gamma_num and gamma_phi
-#' @param metric Specifies which phylogenetic diversity metric should be used
-#' @param offset Specifies which method to use to offset time effect on
-#' evolutionary distinctiveness
+#' @param metric Either "pd" or "ed", Specifies which phylogenetic diversity 
+#' metric should be used.
+#' @param offset Specifies which method to use to offset the impact of tree age
+#' and the collinearity between pd and species richness. "none" for no offset 
+#' method; "simtime" for deducting tree age from pd value; "spcount" for 
+#' dividing pd value by species richness; "both" for applying both "simtime" and
+#' "spcount", by firstly deducting tree age and then dividing by species richness
+#' @param history Logical, indicating whether to record the historical states
+#' (of the rates and ED/PD values)
+#' @param verbose Logical, for debugging purpose, indicating whether to print
+#' simulation info at each step in the console, and save running time to a file
+#' @param converter Either "cpp" or "r", choose which version of L2phylo to use.
 #' @return \item{ out }{ A list with the following nine elements: The first
 #' element is the tree of extant species in phylo format \cr The second element
 #' is the tree of all species, including extinct species, in phylo format \cr
@@ -226,7 +235,7 @@ edd_sample_event <- function(las, mus, linlist) {
 #' list of all evolutionary distinctiveness values of all lineages. \cr The
 #' seventh element is a list of all the speciation rates of all lineages at all
 #' the time steps. \cr The eighth element is a list of all the extinction rates
-#' of all lineages at all the time steps. \cr The nineth element is a list of
+#' of all lineages at all the time steps. \cr The ninth element is a list of
 #' all the lineages at all the time steps.}
 #' @author Tianjian Qin, Rampal S. Etienne
 #' @keywords models
@@ -431,7 +440,7 @@ edd_sim <- function(pars,
                                 "n" = num)
     message("Results recorded")
     dir.create(file.path(getwd(), "/logs"), showWarnings = FALSE)
-    write.csv(running_times,
+    utils::write.csv(running_times,
               paste0(
                 getwd(),
                 "/logs/",
