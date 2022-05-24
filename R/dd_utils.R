@@ -1004,6 +1004,23 @@ L2Phi <- function(L, t, metric) {
 
 
 
+#' @name L2Phi_cpp
+#' @title C Plus Plus version of L2Phi
+#' @export L2Phi_cpp
+L2Phi_cpp <- function(L, t, metric) {
+  # metrics
+  if (metric == "pd") {
+    return(sum(treestats::l_to_phylo_ed(L, t, drop_extinct = T)$edge.length))
+  } else if (metric == "mpd") {
+    phy <- treestats::l_to_phylo_ed(L, t, drop_extinct = T)
+    n <- length(phy$tip.label)
+    dist <- ape::dist.nodes(phy)[1:n, 1:n]
+    return(mean(dist[lower.tri(dist)]))
+  }
+}
+
+
+
 #' @name L2ED
 #' @title Converting a table with speciation and extinction events to evolutionary 
 #' distances
@@ -1025,6 +1042,21 @@ L2Phi <- function(L, t, metric) {
 L2ED <- function(L, t) {
   dist_tips <-
     ape::cophenetic.phylo(L2phylo2(L, t, dropextinct = TRUE))
+  dist_means <- rowSums(dist_tips) / (dim(dist_tips)[1] - 1)
+  dist_means_sorted <-
+    dist_means[gtools::mixedorder(names(dist_means))]
+  
+  return(dist_means_sorted)
+}
+
+
+
+#' @name L2ED_cpp
+#' @title C Plus Plus version of L2ED
+#' @export L2ED_cpp
+L2ED_cpp <- function(L, t) {
+  dist_tips <-
+    ape::cophenetic.phylo(treestats::l_to_phylo_ed(L, t, drop_extinct = TRUE))
   dist_means <- rowSums(dist_tips) / (dim(dist_tips)[1] - 1)
   dist_means_sorted <-
     dist_means[gtools::mixedorder(names(dist_means))]

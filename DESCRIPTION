@@ -12,7 +12,8 @@ Imports:
     Matrix,
     expm,
     SparseM,
-    gtools
+    gtools,
+    treestats
 Suggests: 
     testthat (>= 3.0.0),
     testit
@@ -33,5 +34,5 @@ Description:
  <DOI:10.1111/2041-210X.12565>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 Config/testthat/edition: 3

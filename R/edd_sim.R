@@ -83,39 +83,102 @@ edd_update_lamu <- function(ed, ed_max, params, model) {
   return(list(newlas = newlas, newmus = newmus))
 }
 
-edd_get_edmax <- function(num, l_table, t, metric, offset) {
-  if (metric == "ed") {
-    ed_max <- as.vector(DDD::L2ED(l_table, t))
-  } else if (metric == "pd") {
-    if (offset == "none") {
-      ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric)), num)
-    } else if (offset == "simtime") {
-      ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric) - t), num)
+edd_get_edmax <-
+  function(num, l_table, t, metric, offset, converter = "cpp") {
+    if (metric == "ed") {
+      if (converter == "cpp") {
+        ed_max <- as.vector(DDD::L2ED_cpp(l_table, t))
+      } else {
+        ed_max <- as.vector(DDD::L2ED(l_table, t))
+      }
+    } else if (metric == "pd") {
+      if (offset == "none") {
+        if (converter == "cpp") {
+          ed_max <- rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric)), num)
+        } else {
+          ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric)), num)
+        }
+      } else if (offset == "simtime") {
+        if (converter == "cpp") {
+          ed_max <-
+            rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric) - t), num)
+        } else {
+          ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric) - t), num)
+        }
+      } else if (offset == "spcount") {
+        if (converter == "cpp") {
+          ed_max <- rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric) / num), num)
+        } else {
+          ed_max <- rep(as.vector(DDD::L2Phi(l_table, t, metric) / num), num)
+        }
+      } else if (offset == "both") {
+        if (converter == "cpp") {
+          ed_max <-
+            rep(as.vector((
+              DDD::L2Phi_cpp(l_table, t, metric) - t
+            ) / num), num)
+        } else {
+          ed_max <-
+            rep(as.vector((
+              DDD::L2Phi_cpp(l_table, t, metric) - t
+            ) / num), num)
+        }
+      } else {
+        stop("no such offset method")
+      }
     } else {
-      stop("no such offset method")
+      stop("no such metric")
     }
-  } else {
-    stop("no such metric")
+    return(ed_max)
   }
-  return(ed_max)
-}
 
-edd_get_ed <- function(num, l_table, t, metric, offset) {
-  if (metric == "ed") {
-    ed <- as.vector(DDD::L2ED(l_table, t))
-  } else if (metric == "pd") {
-    if (offset == "none") {
-      ed <- rep(as.vector(DDD::L2Phi(l_table, t, metric)), num)
-    } else if (offset == "simtime") {
-      ed <- rep(as.vector(DDD::L2Phi(l_table, t, metric) - t), num)
+edd_get_ed <-
+  function(num, l_table, t, metric, offset, converter = "cpp") {
+    if (metric == "ed") {
+      if (converter == "cpp") {
+        ed <- as.vector(DDD::L2ED_cpp(l_table, t))
+      } else {
+        ed <- as.vector(DDD::L2ED(l_table, t))
+      }
+    } else if (metric == "pd") {
+      if (offset == "none") {
+        if (converter == "cpp") {
+          ed <- rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric)), num)
+        } else {
+          ed <- rep(as.vector(DDD::L2Phi(l_table, t, metric)), num)
+        }
+      } else if (offset == "simtime") {
+        if (converter == "cpp") {
+          ed <- rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric) - t), num)
+        } else {
+          ed <- rep(as.vector(DDD::L2Phi(l_table, t, metric) - t), num)
+        }
+      } else if (offset == "spcount") {
+        if (converter == "cpp") {
+          ed <- rep(as.vector(DDD::L2Phi_cpp(l_table, t, metric) / num), num)
+        } else {
+          ed <- rep(as.vector(DDD::L2Phi(l_table, t, metric) / num), num)
+        }
+      } else if (offset == "both") {
+        if (converter == "cpp") {
+          ed <-
+            rep(as.vector((
+              DDD::L2Phi_cpp(l_table, t, metric) - t
+            ) / num), num)
+        } else {
+          ed <-
+            rep(as.vector((
+              DDD::L2Phi_cpp(l_table, t, metric) - t
+            ) / num), num)
+        }
+      } else {
+        stop("no such offset method")
+      }
     } else {
-      stop("no such offset method")
+      stop("no such metric")
     }
-  } else {
-    stop("no such metric")
+    return(ed)
   }
-  return(ed)
-}
 
 edd_sum_rates <- function(las, mus) {
   return(sum(las) + sum(mus))
@@ -179,7 +242,8 @@ edd_sim <- function(pars,
                     metric = "ed",
                     offset = "none",
                     history = TRUE,
-                    verbose = FALSE) {
+                    verbose = FALSE,
+                    converter = "cpp") {
   edd_pars_check(pars, age, model, metric, offset)
   if (verbose == TRUE) {
     edd_message_info(pars, age, model, metric, offset)
@@ -198,7 +262,8 @@ edd_sim <- function(pars,
     new_lin <- 2
     params <- c(num, pars)
     ed <- c(0, 0)
-    ed_max <- edd_get_edmax(num, l_table, age, metric, offset)
+    ed_max <-
+      edd_get_edmax(num, l_table, age, metric, offset, converter)
     lamu <- edd_update_lamu(ed, ed_max, params, model)
     
     if (history == TRUE) {
@@ -223,7 +288,8 @@ edd_sim <- function(pars,
       if (verbose == TRUE) {
         start_time <- Sys.time()
       }
-      ed <- edd_get_ed(num[i - 1], l_table, t[i], metric, offset)
+      ed <-
+        edd_get_ed(num[i - 1], l_table, t[i], metric, offset, converter)
       lamu_real <- edd_update_lamu(ed, ed, params, model)
       
       event_type <- sample(c("real", "fake"),
@@ -255,6 +321,8 @@ edd_sim <- function(pars,
           if (verbose == TRUE) {
             message("Speciation event happened")
             message(paste0("Current species number is ", num[i]))
+            message("Current species number is\n")
+            print(l_table)
           }
         } else {
           num[i] <- num[i - 1] - 1
@@ -265,6 +333,8 @@ edd_sim <- function(pars,
           if (verbose == TRUE) {
             message("Extinction event happened")
             message(paste0("Current species number is ", num[i]))
+            message("Current species number is\n")
+            print(l_table)
           }
         }
       } else {
@@ -278,8 +348,9 @@ edd_sim <- function(pars,
           message("One of the crown lineage goes extinct, simulation terminated")
         }
       } else {
-        ed <- edd_get_ed(num[i], l_table, t[i], metric, offset)
-        ed_max <- edd_get_edmax(num[i], l_table, age, metric, offset)
+        ed <- edd_get_ed(num[i], l_table, t[i], metric, offset, converter)
+        ed_max <-
+          edd_get_edmax(num[i], l_table, age, metric, offset, converter)
         params[1] <- num[i]
         lamu <- edd_update_lamu(ed, ed_max, params, model)
         
@@ -289,7 +360,7 @@ edd_sim <- function(pars,
           mus <- c(mus, list(lamu$newmus))
           linlists <- c(linlists, list(linlist))
         }
-      
+        
         if (edd_sum_rates(lamu$newlas, lamu$newmus) == 0) {
           t[i + 1] <- Inf
           
@@ -326,7 +397,7 @@ edd_sim <- function(pars,
       }
     }
   }
-
+  
   tes <- DDD::L2phylo2(l_table, age, dropextinct = T)
   tas <- DDD::L2phylo2(l_table, age, dropextinct = F)
   ltt <-
@@ -359,9 +430,14 @@ edd_sim <- function(pars,
     running_times <- data.frame("t" = times,
                                 "n" = num)
     message("Results recorded")
-    dir.create(file.path(getwd(),"/logs"), showWarnings = FALSE)
-    write.csv(running_times, 
-              paste0(getwd(), "/logs/", format(Sys.time(), "%Y-%m-%d_%H_%M_%S"), ".csv"), 
+    dir.create(file.path(getwd(), "/logs"), showWarnings = FALSE)
+    write.csv(running_times,
+              paste0(
+                getwd(),
+                "/logs/",
+                format(Sys.time(), "%Y-%m-%d_%H_%M_%S"),
+                ".csv"
+              ),
               row.names = FALSE)
   }
   

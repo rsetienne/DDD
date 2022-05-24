@@ -5,7 +5,16 @@
 \title{Function to simulate the evolutionary distinctiveness dependent
 diversification process}
 \usage{
-edd_sim(pars, age, model = "dsce2", metric = "ed", offset = "none")
+edd_sim(
+  pars,
+  age,
+  model = "dsce2",
+  metric = "ed",
+  offset = "none",
+  history = TRUE,
+  verbose = FALSE,
+  converter = "cpp"
+)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to
