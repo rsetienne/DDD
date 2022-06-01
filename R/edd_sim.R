@@ -34,8 +34,11 @@ edd_simulation <-
            history = FALSE,
            verbose = FALSE,
            nrep = 5) {
-    return(edd_sim_rep(combo = combo,
-                      history = history,
-                      verbose = verbose,
-                      nrep = nrep))
+    lapply(
+      combo,
+      edd_sim_rep,
+      history = history,
+      verbose = verbose,
+      nrep = nrep
+    )
   }
