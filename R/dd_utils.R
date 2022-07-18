@@ -751,39 +751,39 @@ optimizer <- function(
                                          trparsopt = trparsopt,
                                          optimpars = optimpars,
                                          ...))
-    } else
-      if(optimmethod == 'subplex')
-      {
-        minfun <- function(fun,trparsopt,...)
-        {           
-          return(-fun(trparsopt = trparsopt,...))
-        }
-        trparsopt[trparsopt == 0.5] <- 0.5 - jitter
-        outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
-                                                    fn = minfun,
-                                                    control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
-                                                    fun = fun,
-                                                    ...))
-        outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
-      } else
-        if(optimmethod == 'DEoptim')
-        {
-          minfun <- function(trparsopt, fun, ...)
-          {           
-            return(-fun(trparsopt = trparsopt, ...))
-          }
-          outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun,
-                                                      lower = rep(0, length(trparsopt)),
-                                                      upper = rep(1, length(trparsopt)),
-                                                      control = list(reltol = optimpars[1],
-                                                                     strategy = 2,
-                                                                     steptol = 100,
-                                                                     trace = FALSE,
-                                                                     itermax = optimpars[4]),
-                                                      fun = fun,
-                                                      ...))
-          outnew <- list(par = outnew$optim$bestmem, fvalues = -outnew$optim$bestval, conv = 0)
-        }
+    } else if(optimmethod == 'subplex')
+    {
+      minfun <- function(fun,trparsopt,...)
+      {           
+        return(-fun(trparsopt = trparsopt,...))
+      }
+      trparsopt[trparsopt == 0.5] <- 0.5 - jitter
+      outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
+                                                  fn = minfun,
+                                                  control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'DEoptim')
+    {
+      minfun <- function(trparsopt, fun, ...)
+      {           
+        return(-fun(trparsopt = trparsopt, ...))
+      }
+      outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun,
+                                                  lower = rep(0, length(trparsopt)),
+                                                  upper = rep(1, length(trparsopt)),
+                                                  control = list(reltol = optimpars[1],
+                                                                 strategy = 2,
+                                                                 steptol = 100,
+                                                                 trace = FALSE,
+                                                                 itermax = optimpars[4],
+                                                                 packages = c('DDD')),
+                                                  fun = fun,
+  
+                                                  ...))$optim
+      outnew <- list(par = outnew$bestmem, fvalues = -outnew$bestval, conv = 0)
+    }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
       cat('The last cycle failed; second last cycle result is returned.\n')
