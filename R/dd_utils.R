@@ -753,24 +753,24 @@ optimizer <- function(
                                          ...))
     } else if(optimmethod == 'subplex')
     {
-      minfun <- function(fun,trparsopt,...)
+      minfun1 <- function(fun,trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
       trparsopt[trparsopt == 0.5] <- 0.5 - jitter
       outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
-                                                  fn = minfun,
+                                                  fn = minfun1,
                                                   control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
                                                   fun = fun,
                                                   ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'DEoptim')
     {
-      minfun <- function(trparsopt, fun, ...)
+      minfun2 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
       }
-      outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun,
+      outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun2,
                                                   lower = rep(0, length(trparsopt)),
                                                   upper = rep(1, length(trparsopt)),
                                                   control = list(reltol = optimpars[1],
