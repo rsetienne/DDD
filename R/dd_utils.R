@@ -68,7 +68,7 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 
   class(phy) <- "phylo"
 
-  phy <- stats::reorder(phy)
+  phy <- ape::reorder.phylo(phy)
   ## to avoid crossings when converting with as.hclust:
   phy$edge[phy$edge[, 2] <= n, 2] <- 1:n
 
@@ -720,13 +720,13 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' 
 #' @export optimizer
 optimizer <- function(
-  optimmethod = 'simplex',
-  optimpars = c(1E-4,1E-4,1E-6,1000),
-  num_cycles = 1,
-  fun,
-  trparsopt,
-  jitter = 0,
-  ...)
+    optimmethod = 'simplex',
+    optimpars = c(1E-4,1E-4,1E-6,1000),
+    num_cycles = 1,
+    fun,
+    trparsopt,
+    jitter = 0,
+    ...)
 {
   if(num_cycles == Inf)
   {
@@ -735,42 +735,64 @@ optimizer <- function(
   {
     max_cycles <- num_cycles
   }
+  if(optimmethod == 'DEoptim')
+  {
+    max_cycles <- 1 # cycles are of no use in global optimization
+  }
   cy <- 1
   fvalue <- rep(-Inf,max_cycles)
   out <- NULL
   while(cy <= max_cycles)
   {
-    if(num_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
+    if(max_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
       outnew <- suppressWarnings(simplex(fun = fun,
                                          trparsopt = trparsopt,
                                          optimpars = optimpars,
                                          ...))
-    } else
-    if(optimmethod == 'subplex')
+    } else if(optimmethod == 'subplex')
     {
-      minfun <- function(fun,trparsopt,...)
+      minfun1 <- function(fun,trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
       trparsopt[trparsopt == 0.5] <- 0.5 - jitter
       outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
-                                                  fn = minfun,
+                                                  fn = minfun1,
                                                   control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
                                                   fun = fun,
                                                   ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'DEoptim')
+    {
+      minfun2 <- function(trparsopt, fun, ...)
+      {           
+        return(-fun(trparsopt = trparsopt, ...))
+      }
+      outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun2,
+                                                  lower = rep(0, length(trparsopt)),
+                                                  upper = rep(1, length(trparsopt)),
+                                                  control = list(reltol = optimpars[1],
+                                                                 strategy = 2,
+                                                                 steptol = 100,
+                                                                 trace = FALSE,
+                                                                 itermax = optimpars[4],
+                                                                 packages = c('DDD')),
+                                                  fun = fun,
+  
+                                                  ...))$optim
+      outnew <- list(par = outnew$bestmem, fvalues = -outnew$bestval, conv = 0)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-       cat('The last cycle failed; second last cycle result is returned.\n')
-       return(out) 
+      cat('The last cycle failed; second last cycle result is returned.\n')
+      return(out) 
     } else
     {
-       out <- outnew
-       trparsopt <- out$par
-       fvalue[cy] <- out$fvalues
+      out <- outnew
+      trparsopt <- out$par
+      fvalue[cy] <- out$fvalues
     }  
     if(cy > 1)
     {
@@ -787,7 +809,6 @@ optimizer <- function(
   }
   return(out)
 }
-
 #' @name transform_pars
 #' @title Transforming parameters from -Inf to Inf into parameters
 #' from -1 to 1
