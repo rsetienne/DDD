@@ -1,6 +1,5 @@
 context("test_DDD")
 
-# file named z_DDD so tests run last
 test_that("DDD works", {
   expect_equal_x64 <- function(object, expected, ...)
   {
