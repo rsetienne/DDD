@@ -24,11 +24,11 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
     n <- n-1
   }
   nbr <- 2*n - 2
-
+  
   # create the data types for edges and edge-lengths
   edge <- matrix(NA, nbr, 2)
   edge.length <- numeric(nbr)
-
+  
   h <- numeric(2*n - 1) # initialized with 0's
   pool <- 1:n
   # VERY VERY IMPORTANT: the root MUST have index n+1 !!!
@@ -54,24 +54,24 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
       nextnode <- nextnode - 1L
     }
   }
-
+  
   phy <- list(edge = edge, edge.length = edge.length)
   if (is.null(tip.label))
     tip.label <- paste("t", 1:n, sep = "")
   phy$tip.label <- sample(tip.label)
   phy$Nnode <- n - 1L
-
+  
   if ( root ) {
     phy$root.edge <- times[n] - times[n-1]
     phy$root <- times[n] - times[n-1]
   }
-
+  
   class(phy) <- "phylo"
-
+  
   phy <- ape::reorder.phylo(phy)
   ## to avoid crossings when converting with as.hclust:
   phy$edge[phy$edge[, 2] <= n, 2] <- 1:n
-
+  
   return(phy)
 }
 
@@ -94,17 +94,17 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 #' @export conv
 conv = function(x,y)
 {
-   lx = length(x)
-   ly = length(y)
-   lxy = length(x) + length(y)
-   x = c(x,rep(0,lxy - lx))
-   y = c(y,rep(0,lxy - ly))
-   cvxy = rep(0,lxy)
-   for(i in 2:lxy)
-   {
-      cvxy[i] = crossprod(x[(i-1):1],y[1:(i-1)])
-   }
-   return(cvxy[2:lxy])
+  lx = length(x)
+  ly = length(y)
+  lxy = length(x) + length(y)
+  x = c(x,rep(0,lxy - lx))
+  y = c(y,rep(0,lxy - ly))
+  cvxy = rep(0,lxy)
+  for(i in 2:lxy)
+  {
+    cvxy[i] = crossprod(x[(i-1):1],y[1:(i-1)])
+  }
+  return(cvxy[2:lxy])
 }
 
 flavec <- function(ddep,la,mu,K,r,lx,kk)
@@ -116,39 +116,39 @@ flavec <- function(ddep,la,mu,K,r,lx,kk)
 
 flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
 {
-   nn = (0:(lx - 1)) + kk
-   if(ddep == 1 | ddep == 5)
-   {
-       lavec = pmax(rep(0,lx),la - 1/(r + 1) * (la - mu)/K * nn)
-   }
-   if(ddep == 1.3)
-   {
-       lavec = pmax(rep(0,lx),la * (1 - nn/K))
-   }
-   if(ddep == 1.4)
-   {
-     lavec = pmax(rep(0,lx),la * nn/(nn + K))
-   }
-   if(ddep == 1.5)
-   {
-       lavec = pmax(rep(0,lx),la * nn/K * (1 - nn/K))
-   }
-   if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
-   {
-       frac <- ifelse(ddep == 2.4, 10, la / mu)
-       x = -(log( frac )/log(K + n0))^(ddep != 2.2)
-       lavec = pmax(rep(0,lx),la * (nn + n0)^x)
-   }
-   if(ddep == 2.3)
-   {
-       x = -K
-       lavec = pmax(rep(0,lx),la * (nn + n0)^x)
-   }
-   if(ddep == 3 | ddep == 4 | ddep == 4.1 | ddep == 4.2)
-   {
-       lavec = la * rep(1,lx)
-   }
-   return(lavec)
+  nn = (0:(lx - 1)) + kk
+  if(ddep == 1 | ddep == 5)
+  {
+    lavec = pmax(rep(0,lx),la - 1/(r + 1) * (la - mu)/K * nn)
+  }
+  if(ddep == 1.3)
+  {
+    lavec = pmax(rep(0,lx),la * (1 - nn/K))
+  }
+  if(ddep == 1.4)
+  {
+    lavec = pmax(rep(0,lx),la * nn/(nn + K))
+  }
+  if(ddep == 1.5)
+  {
+    lavec = pmax(rep(0,lx),la * nn/K * (1 - nn/K))
+  }
+  if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
+  {
+    frac <- ifelse(ddep == 2.4, 10, la / mu)
+    x = -(log( frac )/log(K + n0))^(ddep != 2.2)
+    lavec = pmax(rep(0,lx),la * (nn + n0)^x)
+  }
+  if(ddep == 2.3)
+  {
+    x = -K
+    lavec = pmax(rep(0,lx),la * (nn + n0)^x)
+  }
+  if(ddep == 3 | ddep == 4 | ddep == 4.1 | ddep == 4.2)
+  {
+    lavec = la * rep(1,lx)
+  }
+  return(lavec)
 }
 
 
@@ -183,51 +183,51 @@ flavec2 = function(ddep,la,mu,K,r,lx,kk,n0)
 #' 
 #' @export L2phylo
 L2phylo = function(L,dropextinct = T)
-# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
+  # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
-   L = L[order(abs(L[,3])),1:4]
-   age = L[1,1]
-   L[,1] = age - L[,1]
-   L[1,1] = -1
-   notmin1 = which(L[,4] != -1)
-   L[notmin1,4] = age - L[notmin1,4]
-   if(dropextinct == T)
-   {
-      sall = which(L[,4] == -1)
-      tend = age
-   } else {
-      sall = which(L[,4] >= -1)
-      tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
-   }
-   L = L[,-4]
-   linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
-   linlist[,4] = as.character(linlist[,4])
-   names(linlist) = 1:5
-   done = 0
-   while(done == 0)
-   {
-      j = which.max(linlist[,1])
-      daughter = linlist[j,3]
-      parent = linlist[j,2]
-      parentj = which(parent == linlist[,3])
-      parentinlist = length(parentj)
-      if(parentinlist == 1)
-      {
-         spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
-         spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
-         linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
-         linlist[parentj,5] = linlist[j,1]
-         linlist = linlist[-j,]
-      } else {
-         #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
-         linlist[j,1:3] = L[which(L[,3] == parent),1:3]
-      }
-      if(nrow(linlist) == 1) { done = 1 }
-   }
-   linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
-   phy = ape::read.tree(text = linlist[1,4])
-   tree = ape::as.phylo(phy)
-   return(tree)
+  L = L[order(abs(L[,3])),1:4]
+  age = L[1,1]
+  L[,1] = age - L[,1]
+  L[1,1] = -1
+  notmin1 = which(L[,4] != -1)
+  L[notmin1,4] = age - L[notmin1,4]
+  if(dropextinct == T)
+  {
+    sall = which(L[,4] == -1)
+    tend = age
+  } else {
+    sall = which(L[,4] >= -1)
+    tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
+  }
+  L = L[,-4]
+  linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
+  linlist[,4] = as.character(linlist[,4])
+  names(linlist) = 1:5
+  done = 0
+  while(done == 0)
+  {
+    j = which.max(linlist[,1])
+    daughter = linlist[j,3]
+    parent = linlist[j,2]
+    parentj = which(parent == linlist[,3])
+    parentinlist = length(parentj)
+    if(parentinlist == 1)
+    {
+      spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
+      spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
+      linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
+      linlist[parentj,5] = linlist[j,1]
+      linlist = linlist[-j,]
+    } else {
+      #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
+      linlist[j,1:3] = L[which(L[,3] == parent),1:3]
+    }
+    if(nrow(linlist) == 1) { done = 1 }
+  }
+  linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
+  phy = ape::read.tree(text = linlist[1,4])
+  tree = ape::as.phylo(phy)
+  return(tree)
 }
 
 
@@ -385,52 +385,52 @@ phylo2L = function(phy)
 #' 
 #' @export L2brts
 L2brts = function(L,dropextinct = T)
-# makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
+  # makes a phylogeny out of a matrix with branching times, parent and daughter species, and extinction times
 {
-   brts = NULL
-   L = L[order(abs(L[,3])),1:4]
-   age = L[1,1]
-   L[,1] = age - L[,1]
-   L[1,1] = -1
-   notmin1 = which(L[,4] != -1)
-   L[notmin1,4] = age - L[notmin1,4]
-   if(dropextinct == T)
-   {
-      sall = which(L[,4] == -1)
-      tend = age
-   } else {
-      sall = which(L[,4] >= -1)
-      tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
-   }
-   L = L[,-4]
-   linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
-   linlist[,4] = as.character(linlist[,4])
-   names(linlist) = 1:5
-   done = 0
-   while(done == 0)
-   {
-      j = which.max(linlist[,1])
-      daughter = linlist[j,3]
-      parent = linlist[j,2]
-      parentj = which(parent == linlist[,3])
-      parentinlist = length(parentj)
-      if(parentinlist == 1)
-      {
-         spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
-         spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
-         linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
-         linlist[parentj,5] = linlist[j,1]
-         brts = c(brts,linlist[j,1])
-         linlist = linlist[-j,]
-      } else {
-         #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
-         linlist[j,1:3] = L[which(L[,3] == parent),1:3]
-      }
-      if(nrow(linlist) == 1) { done = 1 }
-   }
-   #linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
-   brts = rev(sort(age - brts))
-   return(brts)
+  brts = NULL
+  L = L[order(abs(L[,3])),1:4]
+  age = L[1,1]
+  L[,1] = age - L[,1]
+  L[1,1] = -1
+  notmin1 = which(L[,4] != -1)
+  L[notmin1,4] = age - L[notmin1,4]
+  if(dropextinct == T)
+  {
+    sall = which(L[,4] == -1)
+    tend = age
+  } else {
+    sall = which(L[,4] >= -1)
+    tend = (L[,4] == -1) * age + (L[,4] > -1) * L[,4]
+  }
+  L = L[,-4]
+  linlist = cbind(data.frame(L[sall,]),paste("t",abs(L[sall,3]),sep = ""),tend)
+  linlist[,4] = as.character(linlist[,4])
+  names(linlist) = 1:5
+  done = 0
+  while(done == 0)
+  {
+    j = which.max(linlist[,1])
+    daughter = linlist[j,3]
+    parent = linlist[j,2]
+    parentj = which(parent == linlist[,3])
+    parentinlist = length(parentj)
+    if(parentinlist == 1)
+    {
+      spec1 = paste(linlist[parentj,4],":",linlist[parentj,5] - linlist[j,1],sep = "")
+      spec2 = paste(linlist[j,4],":",linlist[j,5] - linlist[j,1],sep = "")
+      linlist[parentj,4] = paste("(",spec1,",",spec2,")",sep = "")
+      linlist[parentj,5] = linlist[j,1]
+      brts = c(brts,linlist[j,1])
+      linlist = linlist[-j,]
+    } else {
+      #linlist[j,1:3] = L[abs(as.numeric(parent)),1:3]
+      linlist[j,1:3] = L[which(L[,3] == parent),1:3]
+    }
+    if(nrow(linlist) == 1) { done = 1 }
+  }
+  #linlist[4] = paste(linlist[4],":",linlist[5],";",sep = "")
+  brts = rev(sort(age - brts))
+  return(brts)
 }
 
 
@@ -459,9 +459,9 @@ L2brts = function(L,dropextinct = T)
 #' @export roundn
 roundn = function(x, digits = 0)
 {
-    fac = 10^digits
-    n = trunc(fac * x + 0.5)/fac
-    return(n)
+  fac = 10^digits
+  n = trunc(fac * x + 0.5)/fac
+  return(n)
 }
 
 
@@ -490,21 +490,21 @@ roundn = function(x, digits = 0)
 #' @export sample2
 sample2 = function(x,size,replace = FALSE,prob = NULL)
 {
-    if(length(x) == 1)
-    { 
-        x = c(x,x)
-        prob = c(prob,prob)
-        if(is.null(size))
-        {
-          size = 1
-        }
-        if(replace == FALSE & size > 1)
-        {
-          stop('It is not possible to sample without replacement multiple times from a single item.')
-        }
+  if(length(x) == 1)
+  { 
+    x = c(x,x)
+    prob = c(prob,prob)
+    if(is.null(size))
+    {
+      size = 1
     }
-    sam = sample(x,size,replace,prob)
-    return(sam)
+    if(replace == FALSE & size > 1)
+    {
+      stop('It is not possible to sample without replacement multiple times from a single item.')
+    }
+  }
+  sam = sample(x,size,replace,prob)
+  return(sam)
 }
 
 #' Carries out optimization using a simplex algorithm (finding a minimum)
@@ -536,26 +536,26 @@ simplex = function(fun,trparsopt,optimpars,...)
   reltolf = optimpars[2]
   abstolx = optimpars[3]
   maxiter = optimpars[4]
-
+  
   ## Setting up initial simplex
   v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
   for(i in 1:numpar)
   {
-      parsoptff = 1.05 * untransform_pars(trparsopt[i])
-      trparsoptff = transform_pars(parsoptff)
-      fac = trparsoptff/trparsopt[i]
-      if(v[i,i + 1] == 0)
-      {
-         v[i,i + 1] = 0.00025
-      } else {
-         v[i,i + 1] = v[i,i + 1] * min(1.05,fac)
-      }
+    parsoptff = 1.05 * untransform_pars(trparsopt[i])
+    trparsoptff = transform_pars(parsoptff)
+    fac = trparsoptff/trparsopt[i]
+    if(v[i,i + 1] == 0)
+    {
+      v[i,i + 1] = 0.00025
+    } else {
+      v[i,i + 1] = v[i,i + 1] * min(1.05,fac)
+    }
   }
   
   fv = rep(0,numpar + 1)
   for(i in 1:(numpar + 1))
   {
-     fv[i] = -fun(trparsopt = v[,i], ...)
+    fv[i] = -fun(trparsopt = v[,i], ...)
   }
   
   how = "initial"
@@ -563,7 +563,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   string = itercount
   for(i in 1:numpar)
   {
-     string = paste(string, untransform_pars(v[i,1]), sep = " ")
+    string = paste(string, untransform_pars(v[i,1]), sep = " ")
   }
   string = paste(string, -fv[1], how, "\n", sep = " ")
   cat(string)
@@ -572,9 +572,9 @@ simplex = function(fun,trparsopt,optimpars,...)
   tmp = order(fv)
   if(numpar == 1)
   {
-     v = matrix(v[tmp],nrow = 1,ncol = 2)
+    v = matrix(v[tmp],nrow = 1,ncol = 2)
   } else {
-     v = v[,tmp]
+    v = v[,tmp]
   }
   fv = fv[tmp]
   
@@ -588,100 +588,100 @@ simplex = function(fun,trparsopt,optimpars,...)
   
   while(itercount <= maxiter & ( ( is.nan(max(abs(fv - fv[1]))) | (max(abs(fv - fv[1])) - reltolf * abs(fv[1]) > 0) ) + ( (max(abs(v - v2) - reltolx * abs(v2)) > 0) | (max(abs(v - v2)) - abstolx > 0) ) ) )
   { 
-     ## Calculate reflection point
-  
-     if(numpar == 1)
-     {
-         xbar = v[1]
-     } else {
-         xbar = rowSums(v[,1:numpar])/numpar
-     }
-     xr = (1 + rh) * xbar - rh * v[,numpar + 1]
-     fxr = -fun(trparsopt = xr, ...)
-   
-     if(fxr < fv[1])
-     {
-         ## Calculate expansion point
-         xe = (1 + rh * ch) * xbar - rh * ch * v[,numpar + 1]
-         fxe = -fun(trparsopt = xe, ...)
-         if(fxe < fxr)
-         {
-             v[,numpar + 1] = xe
-             fv[numpar + 1] = fxe
-             how = "expand"
-         } else {
-             v[,numpar + 1] = xr
-             fv[numpar + 1] = fxr
-             how = "reflect"
-         }
-     } else {
-         if(fxr < fv[numpar])
-         {      
-             v[,numpar + 1] = xr
-             fv[numpar + 1] = fxr
-             how = "reflect"
-         } else {
-             if(fxr < fv[numpar + 1])
-             {
-                ## Calculate outside contraction point
-                xco = (1 + ps * rh) * xbar - ps * rh * v[,numpar + 1]
-                fxco = -fun(trparsopt = xco, ...)
-                if(fxco <= fxr)
-                {
-                   v[,numpar + 1] = xco
-                   fv[numpar + 1] = fxco            
-                   how = "contract outside"
-                } else {
-                   how = "shrink"
-                }
-             } else {
-                ## Calculate inside contraction point
-                xci = (1 - ps) * xbar + ps * v[,numpar + 1]
-                fxci = -fun(trparsopt = xci, ...)
-                if(fxci < fv[numpar + 1])
-                {  
-                   v[,numpar + 1] = xci
-                   fv[numpar + 1] = fxci
-                   how = "contract inside"
-                } else {
-                   how = "shrink"
-                }
-             }
-             if(how == "shrink")
-             {
-                 for(j in 2:(numpar + 1))
-                 {
-  
-                     v[,j] = v[,1] + si * (v[,j] - v[,1])
-                     fv[j] = -fun(trparsopt = v[,j], ...)
-                 }
-             }
-         }
-     }
-     tmp = order(fv)
-     if(numpar == 1)
-     {
-        v = matrix(v[tmp],nrow = 1,ncol = 2)
-     } else {
-        v = v[,tmp]
-     }
-     fv = fv[tmp]
-     itercount = itercount + 1
-     string = itercount;
-     for(i in 1:numpar)
-     {
-         string = paste(string, untransform_pars(v[i,1]), sep = " ")
-     }
-     string = paste(string, -fv[1], how, "\n", sep = " ")
-     cat(string)
-     utils::flush.console()
-     v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
+    ## Calculate reflection point
+    
+    if(numpar == 1)
+    {
+      xbar = v[1]
+    } else {
+      xbar = rowSums(v[,1:numpar])/numpar
+    }
+    xr = (1 + rh) * xbar - rh * v[,numpar + 1]
+    fxr = -fun(trparsopt = xr, ...)
+    
+    if(fxr < fv[1])
+    {
+      ## Calculate expansion point
+      xe = (1 + rh * ch) * xbar - rh * ch * v[,numpar + 1]
+      fxe = -fun(trparsopt = xe, ...)
+      if(fxe < fxr)
+      {
+        v[,numpar + 1] = xe
+        fv[numpar + 1] = fxe
+        how = "expand"
+      } else {
+        v[,numpar + 1] = xr
+        fv[numpar + 1] = fxr
+        how = "reflect"
+      }
+    } else {
+      if(fxr < fv[numpar])
+      {      
+        v[,numpar + 1] = xr
+        fv[numpar + 1] = fxr
+        how = "reflect"
+      } else {
+        if(fxr < fv[numpar + 1])
+        {
+          ## Calculate outside contraction point
+          xco = (1 + ps * rh) * xbar - ps * rh * v[,numpar + 1]
+          fxco = -fun(trparsopt = xco, ...)
+          if(fxco <= fxr)
+          {
+            v[,numpar + 1] = xco
+            fv[numpar + 1] = fxco            
+            how = "contract outside"
+          } else {
+            how = "shrink"
+          }
+        } else {
+          ## Calculate inside contraction point
+          xci = (1 - ps) * xbar + ps * v[,numpar + 1]
+          fxci = -fun(trparsopt = xci, ...)
+          if(fxci < fv[numpar + 1])
+          {  
+            v[,numpar + 1] = xci
+            fv[numpar + 1] = fxci
+            how = "contract inside"
+          } else {
+            how = "shrink"
+          }
+        }
+        if(how == "shrink")
+        {
+          for(j in 2:(numpar + 1))
+          {
+            
+            v[,j] = v[,1] + si * (v[,j] - v[,1])
+            fv[j] = -fun(trparsopt = v[,j], ...)
+          }
+        }
+      }
+    }
+    tmp = order(fv)
+    if(numpar == 1)
+    {
+      v = matrix(v[tmp],nrow = 1,ncol = 2)
+    } else {
+      v = v[,tmp]
+    }
+    fv = fv[tmp]
+    itercount = itercount + 1
+    string = itercount;
+    for(i in 1:numpar)
+    {
+      string = paste(string, untransform_pars(v[i,1]), sep = " ")
+    }
+    string = paste(string, -fv[1], how, "\n", sep = " ")
+    cat(string)
+    utils::flush.console()
+    v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)
   {
-     cat("Optimization has terminated successfully.","\n")
+    cat("Optimization has terminated successfully.","\n")
   } else {
-     cat("Maximum number of iterations has been exceeded.","\n")
+    cat("Maximum number of iterations has been exceeded.","\n")
   }
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
@@ -780,7 +780,7 @@ optimizer <- function(
                                                                  itermax = optimpars[4],
                                                                  packages = c('DDD')),
                                                   fun = fun,
-  
+                                                  
                                                   ...))$optim
       outnew <- list(par = outnew$bestmem, fvalues = -outnew$bestval, conv = 0)
     }
@@ -949,5 +949,64 @@ get_Kprime <- function(ddmodel, pars) {
     Kprime <- Inf
   }
   return(Kprime)
+}
+
+#' Helper function to quickly find what a ddmodel contains
+#' 
+#' Given a ddmodel code, returns a short description of the contents of the model
+#'
+#' @param ddmodel a integer code between 1 and 15, corresponding to one of the
+#' diversity-dependent models taken as input e.g. in [dd_ML()] and [dd_loglik()].
+#' @param short logical. If FALSE (the default), returns a description of the
+#' diversity-dependent functions used for speciation and extinction. If TRUE,
+#' instead returns a 2-letter  code (speciation + extinction) summarising these 
+#' functions: L for liner DD, P for a power DD function, X for an exponential DD
+#' function, and C for a constant rate (no DD).
+#' 
+#' @export
+#' @author Theo Pannetier
+what_is_this_ddmodel <- function(ddmodel, short = FALSE) {
+  if (!ddmodel %in% 1:15) {
+    stop("ddmodel not found")
+  }
+  if (!short) {
+    switch(
+      as.character(ddmodel),
+      "1" = "linear DD on speciation, constant-rate extinction",
+      "2" = "exponential (power function) DD on speciation, constant-rate extinction",
+      "3" = "constant-rate speciation, linear DD on extinction",
+      "4" = "constant-rate speciation, exponential (power function) DD on extinction",
+      "5" = "linear DD on speciation, linear DD on extinction",
+      "6" = "linear DD on speciation, exponential DD (power function) on extinction",
+      "7" = "exponential (power function) DD on speciation, exponential (power function) DD on extinction",
+      "8" = "exponential (power function) DD on speciation, linear DD on extinction",
+      "9" = "exponential (exponential function) DD on speciation, constant-rate extinction",
+      "10" = "constant-rate speciation, exponential (exponential function) DD on extinction",
+      "11" = "linear DD on speciation, exponential (exponential function) DD on extinction",
+      "12" = "exponential (exponential function) DD on speciation, exponential (exponential function) DD on extinction",
+      "13" = "exponential (exponential function) DD on speciation, linear DD on speciation",
+      "14" = "exponential (exponential function) DD on speciation, exponential (power function) DD on extinction",
+      "15" = "exponential (power function) DD on speciation, exponential (exponential function) DD on extinction"
+    )
+  } else {
+    switch (
+      as.character(ddmodel),
+      "1" = "LC",
+      "2" = "PC",
+      "3" = "CL",
+      "4" = "CP",
+      "5" = "LL",
+      "6" = "LP",
+      "7" = "PP",
+      "8" = "PL",
+      "9" = "XC",
+      "10" = "CX",
+      "11" = "LX",
+      "12" = "XX",
+      "13" = "XL",
+      "14" = "XP",
+      "15" = "PX"
+    )
+  }
 }
 

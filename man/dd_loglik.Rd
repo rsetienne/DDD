@@ -59,6 +59,11 @@ dependence (exponential function) in extinction\cr
 speciation and extinction\cr
 \cr - \code{pars2[2] == 13} exponential dependence (exponential function) in 
 speciation, linear dependence in extinction \cr
+\cr - \code{pars2[2] == 14} exponential dependence (exponential function) in 
+speciation, exponential dependence (power function) in extinction \cr
+\cr - \code{pars2[2] == 15} exponential dependence (power function) in 
+speciation, exponential dependence (exponential function) in extinction \cr
+
 \cr \cr \code{pars2[3]} sets the conditioning:
 \cr - \code{pars2[3] == 0} conditioning on stem or crown age
 \cr - \code{pars2[3] == 1} conditioning on stem or crown age and

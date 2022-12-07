@@ -16,7 +16,7 @@ dd_multiple_KI_loglik(
 )
 }
 \arguments{
-\item{pars1_list}{list of paramater sets one for each rate regime (subclade).
+\item{pars1_list}{list of parameter sets one for each rate regime (subclade).
 The parameters are: lambda (speciation rate), mu (extinction rate), and K
 (clade-level carrying capacity).}
 

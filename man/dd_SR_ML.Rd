@@ -7,8 +7,8 @@ diversification model with a shift in the parameters}
 \usage{
 dd_SR_ML(
   brts,
-  initparsopt = c(0.5, 0.1, 2 * (1 + length(brts) + missnumspec), 2 * (1 + length(brts)
-    + missnumspec), max(brts)/2),
+  initparsopt = c(0.5, 0.1, 2 * (1 + length(brts) + missnumspec), 2 * (1 + length(brts) +
+    missnumspec), max(brts)/2),
   parsfix = NULL,
   idparsopt = c(1:3, 6:7),
   idparsfix = NULL,
