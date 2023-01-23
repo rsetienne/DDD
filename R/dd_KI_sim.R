@@ -305,9 +305,11 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
-graphics::par(mfrow = c(2,1))
-graphics::plot(tes)
-graphics::plot(tas)
+if (out_plot) {
+  graphics::par(mfrow = c(2,1))
+  graphics::plot(tes)
+  graphics::plot(tas)
+}
 cols = c("blue","red")
 names(cols) = c(0,1)
 if(length(linlistS) > 0)
@@ -327,7 +329,9 @@ if(length(linlistS) > 0)
    m0 = tes$edge[which(tes$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tes)[m0]
    tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[7] - b2)/(b1 - b2))
+   if (out_plot) {
    phytools::plotSimmap(tes2,cols,lwd = 3,pts = F)
+   }
 }
 tasS = NULL
 tas2 = NULL
