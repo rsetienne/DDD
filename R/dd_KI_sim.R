@@ -129,7 +129,7 @@ dd_KI_lamuN = function(ddmodel,pars,N)
 #' @examples
 #'  dd_KI_sim(c(0.2,0.1,20,0.1,0.05,30,4),10) 
 #' @export dd_KI_sim
-dd_KI_sim = function(pars,age,ddmodel = 1)
+dd_KI_sim = function(pars,age,ddmodel = 1, out_plot = FALSE)
 {
 # Simulation of diversity-dependent process
 #  . start from crown age
@@ -348,7 +348,9 @@ if(length(allS) > 0)
    m0 = tas$edge[which(tas$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tas)[m0]
    tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[7] - b2)/(b1 - b2))
-   phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)   
+   if (out_plot) {
+     phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)
+   }
 }
 out = list(tes = tes,tas = tas,L = L,tesS = tesS,tasS = tasS,tes2 = tes2,tas2 = tas2)
 return(out)
