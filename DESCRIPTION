@@ -7,7 +7,10 @@ Depends: R (>= 3.5.0)
 SystemRequirements: C++14
 Imports: deSolve, ape, phytools, subplex, DEoptim, Matrix, expm, SparseM, Rcpp (>= 1.0.5), igraph
 LinkingTo: Rcpp, BH
-Suggests: testthat, testit
+Suggests: 
+    testthat,
+    testit,
+    covr
 Author: Rampal S. Etienne & Bart Haegeman
 Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
 License: GPL-3
