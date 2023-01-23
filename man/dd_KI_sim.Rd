@@ -6,7 +6,7 @@
 clade decoupling from the diversity-dependent diversification dynamics of
 the main clade}
 \usage{
-dd_KI_sim(pars, age, ddmodel = 1)
+dd_KI_sim(pars, age, ddmodel = 1, out_plot = FALSE)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to
