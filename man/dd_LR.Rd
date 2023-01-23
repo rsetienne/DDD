@@ -48,7 +48,7 @@ the bootstrap data}
 
 \item{alpha}{The significance level of the test}
 
-\item{plotit}{Boolean to plot results or not}
+\item{plotit}{Logical, \code{TRUE} if plot should be produced.}
 
 \item{res}{Sets the maximum number of species for which a probability must
 be computed, must be larger than 1 + length(brts)}

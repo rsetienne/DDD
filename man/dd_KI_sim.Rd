@@ -6,7 +6,7 @@
 clade decoupling from the diversity-dependent diversification dynamics of
 the main clade}
 \usage{
-dd_KI_sim(pars, age, ddmodel = 1, out_plot = FALSE)
+dd_KI_sim(pars, age, ddmodel = 1, plotit = FALSE)
 }
 \arguments{
 \item{pars}{Vector of parameters: \cr \cr \code{pars[1]} corresponds to
@@ -36,7 +36,7 @@ extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
 dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
 4.2} : 1/n dependence in extinction rate with offset at infinity}
 
-\item{out_plot}{Logical, \code{TRUE} if plot should be produced.}
+\item{plotit}{Logical, \code{TRUE} if plot should be produced.}
 }
 \value{
 \item{ out }{ A list with the following elements: The first element

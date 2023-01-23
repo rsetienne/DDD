@@ -21,7 +21,7 @@
 #' the bootstrap data
 #' @param endmc The number of bootstraps
 #' @param alpha The significance level of the test
-#' @param plotit Boolean to plot results or not
+#' @param plotit Logical, \code{TRUE} if plot should be produced.
 #' @param res Sets the maximum number of species for which a probability must
 #' be computed, must be larger than 1 + length(brts)
 #' @param ddmodel Sets the model of diversity-dependence: \cr \code{ddmodel ==

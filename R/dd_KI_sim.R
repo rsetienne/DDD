@@ -102,7 +102,7 @@ dd_KI_lamuN = function(ddmodel,pars,N)
 #' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
 #' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
 #' 4.2} : 1/n dependence in extinction rate with offset at infinity
-#' @param out_plot Logical, \code{TRUE} if plot should be produced.
+#' @param plotit Logical, \code{TRUE} if plot should be produced.
 #' @return \item{ out }{ A list with the following elements: The first element
 #' is the tree of extant species in phylo format \cr The second element is the
 #' tree of all species, including extinct species, in phylo format \cr The
@@ -130,7 +130,7 @@ dd_KI_lamuN = function(ddmodel,pars,N)
 #' @examples
 #'  dd_KI_sim(c(0.2,0.1,20,0.1,0.05,30,4),10) 
 #' @export dd_KI_sim
-dd_KI_sim = function(pars,age,ddmodel = 1, out_plot = FALSE)
+dd_KI_sim = function(pars,age,ddmodel = 1, plotit = FALSE)
 {
 # Simulation of diversity-dependent process
 #  . start from crown age
@@ -305,7 +305,7 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
-if (out_plot) {
+if (plotit) {
   graphics::par(mfrow = c(2,1))
   graphics::plot(tes)
   graphics::plot(tas)
@@ -329,7 +329,7 @@ if(length(linlistS) > 0)
    m0 = tes$edge[which(tes$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tes)[m0]
    tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[7] - b2)/(b1 - b2))
-   if (out_plot) {
+   if (plotit) {
    phytools::plotSimmap(tes2,cols,lwd = 3,pts = F)
    }
 }
@@ -353,7 +353,7 @@ if(length(allS) > 0)
    m0 = tas$edge[which(tas$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tas)[m0]
    tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[7] - b2)/(b1 - b2))
-   if (out_plot) {
+   if (plotit) {
      phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)
    }
 }
