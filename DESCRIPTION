@@ -1,9 +1,10 @@
 Package: DDD
 Type: Package
 Title: Diversity-Dependent Diversification
-Version: 5.1
-Date: 2022-07-17
+Version: 5.2
+Date: 2023-01-23
 Depends: R (>= 3.5.0)
+SystemRequirements: C++14
 Imports: deSolve, ape, phytools, subplex, DEoptim, Matrix, expm, SparseM, Rcpp (>= 1.0.5), igraph
 LinkingTo: Rcpp, BH
 Suggests: testthat, testit
