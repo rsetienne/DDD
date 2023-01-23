@@ -6,7 +6,7 @@ on:
       - main
       - master
       - develop
-      - richel
+      - example_fail
 
   pull_request:
     branches:
