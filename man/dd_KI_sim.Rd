@@ -35,6 +35,8 @@ extinction rate \cr \code{ddmodel == 4} : exponential dependence in
 extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
 dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
 4.2} : 1/n dependence in extinction rate with offset at infinity}
+
+\item{out_plot}{Logical, \code{TRUE} if plot should be produced.}
 }
 \value{
 \item{ out }{ A list with the following elements: The first element

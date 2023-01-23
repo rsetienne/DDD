@@ -102,6 +102,7 @@ dd_KI_lamuN = function(ddmodel,pars,N)
 #' extinction rate \cr \code{ddmodel == 4.1} : variant of exponential
 #' dependence in extinction rate with offset at infinity \cr \code{ddmodel ==
 #' 4.2} : 1/n dependence in extinction rate with offset at infinity
+#' @param out_plot Logical, \code{TRUE} if plot should be produced.
 #' @return \item{ out }{ A list with the following elements: The first element
 #' is the tree of extant species in phylo format \cr The second element is the
 #' tree of all species, including extinct species, in phylo format \cr The
