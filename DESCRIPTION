@@ -14,7 +14,7 @@ Imports:
   Matrix,
   expm,
   SparseM,
-  igraph
+  igraph,
   Rcpp (>= 1.0.10)
 LinkingTo: 
   Rcpp,
@@ -33,7 +33,7 @@ Authors@R: c(
            family = "Haegeman",
            email = "bart.haegeman@sete.cnrs.fr",
            role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2325-4727"))
+           comment = c(ORCID = "0000-0003-2325-4727")))
 Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
 License: GPL-3
 Encoding: UTF-8
