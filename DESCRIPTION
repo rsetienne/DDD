@@ -1,17 +1,10 @@
-Package:
-  DDD
-Type:
-  Package
-Title:
-  Diversity-Dependent Diversification
-Version:
-  5.2
-Date:
-  2023-02-06
-Depends:
-  R (>= 3.5.0)
-SystemRequirements:
-  C++14
+Package: DDD
+Type: Package
+Title: Diversity-Dependent Diversification
+Version: 5.2
+Date: 2023-02-06
+Depends: R (>= 3.5.0)
+SystemRequirements: C++14
 Imports:
   deSolve,
   ape,
@@ -40,13 +33,10 @@ Authors@R: c(
            family = "Haegeman",
            email = "bart.haegeman@sete.cnrs.fr",
            role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2325-4727")),
-Maintainer:
-  Rampal S. Etienne <r.s.etienne@rug.nl>
-License:
-  GPL-3
-Encoding:
-  UTF-8
+           comment = c(ORCID = "0000-0003-2325-4727"))
+Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
+License: GPL-3
+Encoding: UTF-8
 Description:
  Implements maximum likelihood and bootstrap methods based on
  the diversity-dependent birth-death process to test whether
@@ -62,5 +52,4 @@ Description:
  <DOI:10.1093/sysbio/syaa048>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote:
-  7.1.2
+RoxygenNote: 7.1.2
