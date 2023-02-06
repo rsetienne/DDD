@@ -29,12 +29,22 @@ Authors@R: c(
            email = "r.s.etienne@rug.nl",
            role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2142-7612")),
-   person(given = "Bart",
+    person(given = "Bart",
            family = "Haegeman",
            email = "bart.haegeman@sete.cnrs.fr",
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2325-4727")))
-Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
+           role = c("aut"),
+           comment = c(ORCID = "0000-0003-2325-4727")),
+    person(given = "Hanno",
+           family = "Hildenbrandt",
+           email = "h.hildenbrandt@rug.nl",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0002-6784-1037")),
+    person(given = "Giovanni",
+           family = "Laudanno",
+           email = "glaudanno@gmail.com",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0002-2952-3345"))
+           )
 License: GPL-3
 Encoding: UTF-8
 Description:
