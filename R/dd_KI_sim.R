@@ -330,7 +330,7 @@ if(length(linlistS) > 0)
    b1 = age - ape::node.depth.edgelength(tes)[m0]
    tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[7] - b2)/(b1 - b2))
    phytools::plotSimmap(tes2,cols,lwd = 3,pts = F, mar = c(0.1,0.1,1,0.1))
-   title('Reconstructed tree', cex.main = 0.7)
+   graphics::title('Reconstructed tree', cex.main = 0.7)
 }
 tasS = NULL
 tas2 = NULL
@@ -353,7 +353,7 @@ if(length(allS) > 0)
    b1 = age - ape::node.depth.edgelength(tas)[m0]
    tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[7] - b2)/(b1 - b2))
    phytools::plotSimmap(tas2,cols,lwd = 3,pts = F, mar = c(0.1,0.1,1,0.1)) 
-   title('Complete tree', cex.main = 0.7)
+   graphics::title('Complete tree', cex.main = 0.7)
 }
 out = list(tes = tes,tas = tas,L = L,tesS = tesS,tasS = tasS,tes2 = tes2,tas2 = tas2)
 return(out)
