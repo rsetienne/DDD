@@ -304,9 +304,12 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
-graphics::par(mfrow = c(2,1))
+graphics::par(mfrow = c(1,2))
+graphics::par(mai=c(0,0.5,0.5,0))
 graphics::plot(tes)
+title('Reconstructed tree', cex.main = 0.7)
 graphics::plot(tas)
+title('Complete tree', cex.main = 0.7)
 cols = c("blue","red")
 names(cols) = c(0,1)
 if(length(linlistS) > 0)
@@ -326,7 +329,8 @@ if(length(linlistS) > 0)
    m0 = tes$edge[which(tes$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tes)[m0]
    tes2 = phytools::paintSubTree(tes,node = m,state = "1",anc.state = "0",stem = (pars[7] - b2)/(b1 - b2))
-   phytools::plotSimmap(tes2,cols,lwd = 3,pts = F)
+   phytools::plotSimmap(tes2,cols,lwd = 3,pts = F, mar = c(0.1,0.1,1,0.1))
+   title('Reconstructed tree', cex.main = 0.7)
 }
 tasS = NULL
 tas2 = NULL
@@ -348,7 +352,8 @@ if(length(allS) > 0)
    m0 = tas$edge[which(tas$edge[,2] == m),1]
    b1 = age - ape::node.depth.edgelength(tas)[m0]
    tas2 = phytools::paintSubTree(tas,node = m,state = "1",anc.state = "0", stem = (pars[7] - b2)/(b1 - b2))
-   phytools::plotSimmap(tas2,cols,lwd = 3,pts = F)   
+   phytools::plotSimmap(tas2,cols,lwd = 3,pts = F, mar = c(0.1,0.1,1,0.1)) 
+   title('Complete tree', cex.main = 0.7)
 }
 out = list(tes = tes,tas = tas,L = L,tesS = tesS,tasS = tasS,tes2 = tes2,tas2 = tas2)
 return(out)
