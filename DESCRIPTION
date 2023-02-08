@@ -14,7 +14,6 @@ Imports:
   Matrix,
   expm,
   SparseM,
-  igraph,
   Rcpp (>= 1.0.10)
 LinkingTo: 
   Rcpp,
@@ -62,4 +61,4 @@ Description:
  <DOI:10.1093/sysbio/syaa048>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
