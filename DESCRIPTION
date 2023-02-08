@@ -13,10 +13,9 @@ Imports:
   DEoptim,
   Matrix,
   expm,
-  SparseM,
-  Rcpp (>= 1.0.10)
+  SparseM
 LinkingTo: 
-  Rcpp,
+  Rcpp (>= 1.0.10),
   RcppEigen,
   BH (>= 1.81.0-1)
 Suggests:
