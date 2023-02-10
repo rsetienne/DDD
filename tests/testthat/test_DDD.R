@@ -358,11 +358,11 @@ test_that("DDD_MS works",
   brtsS <- c(9.6,8.6,7.4,4.9,2.5)
   dd_MS_analytical <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
   dd_MS_odeint <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
-  testthat::expect_equal(dd_MS_odeint,dd_MS_analytical,tol = 1E-4)
+  testthat::expect_equal(dd_MS_odeint,dd_MS_analytical,tolerance = 1E-4)
   
   pars1[3] <- Inf
   dd_MS_DI <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
   pars1a <- c(pars1[1:5],Inf,pars1[6])
   dd_KI_DI <- DDD::dd_KI_loglik(pars1a,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
-  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tol = 1E-4)
+  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tolerance = 1E-4)
 })  
