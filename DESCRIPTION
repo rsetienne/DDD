@@ -13,7 +13,8 @@ Imports:
   DEoptim,
   Matrix,
   expm,
-  SparseM
+  SparseM,
+  Rcpp (>= 1.0.10)
 LinkingTo: 
   Rcpp (>= 1.0.10),
   RcppEigen,
