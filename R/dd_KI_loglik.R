@@ -85,11 +85,11 @@
 #' @keywords models
 #' @examples
 #' 
-#' pars1 = c(0.25,0.12,25.51,1.0,0.16,8.61,9.8)
-#' pars2 = c(200,1,0,18.8,1,2)
-#' missnumspec = 0
-#' brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
-#' brtsS = c(9.6,8.6,7.4,4.9,2.5)
+#' pars1 <- c(0.25,0.12,25.51,1.0,0.16,8.61,9.8)
+#' pars2 <- c(200,1,0,18.8,1,2)
+#' missnumspec <- 0
+#' brtsM <- c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
+#' brtsS <- c(9.6,8.6,7.4,4.9,2.5)
 #' dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec)
 #' 
 #' @export dd_KI_loglik
@@ -102,46 +102,46 @@ dd_KI_loglik <- function(pars1,
 {
   if(length(pars2) == 4)
   {
-    pars2[5] = 0
-    pars2[6] = 2
-    pars2[7] = 1
+    pars2[5] <- 0
+    pars2[6] <- 2
+    pars2[7] <- 1
   }
   if(is.na(pars2[7]))
   {
-    pars2[7] = 0
+    pars2[7] <- 0
   }
   #pars2 <- as.data.frame(rbind(pars2))
-  names(pars2) = c('lx','ddep','cond','t_split','verbose','soc','corr')
-  tinn = -abs(pars1[7])
-  soc = pars2[6]
+  names(pars2) <- c('lx','ddep','cond','t_split','verbose','soc','corr')
+  tinn <- -abs(pars1[7])
+  soc <- pars2[6]
   #pars2 <- as.vector(pars2)
   # order branching times
-  brts = -sort(abs(c(brtsM,brtsS)),decreasing = TRUE)
+  brts <- -sort(abs(c(brtsM,brtsS)),decreasing = TRUE)
   if(sum(brts == 0) == 0)
   { 
-    brts[length(brts) + 1] = 0
+    brts[length(brts) + 1] <- 0
   }
-  S = length(brts) + (soc - 2)
-  brtsM = -sort(abs(brtsM),decreasing = TRUE)
-  brtsS = -sort(abs(brtsS),decreasing = TRUE)
+  S <- length(brts) + (soc - 2)
+  brtsM <- -sort(abs(brtsM),decreasing = TRUE)
+  brtsS <- -sort(abs(brtsS),decreasing = TRUE)
   tinn <- -abs(pars1[7])
   if(!any(brtsM == 0))
   { 
-    brtsM = c(brtsM,0)
+    brtsM <- c(brtsM,0)
   }
   if(!any(brtsS == 0))
   { 
-    brtsS = c(brtsS,0)
+    brtsS <- c(brtsS,0)
   }
   if(!any(brtsS == tinn))
   { 
-    brtsS = c(tinn,brtsS)
+    brtsS <- c(tinn,brtsS)
   }
   
   # avoid coincidence of branching time and key innovation time
-  if(sum(abs(brtsM - tinn) < 1E-14) == 1) { tinn = tinn - 1E-8 }
+  if(sum(abs(brtsM - tinn) < 1E-14) == 1) { tinn <- tinn - 1E-8 }
   
-  ka = sum(brtsM < tinn)
+  ka <- sum(brtsM < tinn)
   brtsMtinn <- sort(c(tinn,brtsM),decreasing = FALSE)
   kvec <- c(soc:(soc + ka - 1),
             (soc + ka - 2):(soc + length(brtsMtinn) - 4),
@@ -174,15 +174,15 @@ dd_KI_loglik <- function(pars1,
   
   if(pars2[5])
   {
-    s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
-    s2 = sprintf('Loglikelihood: %f',loglik)
+    s1 <- sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
+    s2 <- sprintf('Loglikelihood: %f',loglik)
     cat(s1,s2,"\n",sep = "")
     utils::flush.console()
   }
-  loglik = as.numeric(loglik)
+  loglik <- as.numeric(loglik)
   if(is.nan(loglik) || is.na(loglik))
   {
-    loglik = -Inf
+    loglik <- -Inf
   }
   return(loglik)
 }   
@@ -309,7 +309,7 @@ dd_KI_logliknorm <- function(brts_k_list,
 {
   if(cond == 0 || loglik == -Inf)
   {
-    logliknorm = 0
+    logliknorm <- 0
   } else {
     if(length(brts_k_list) > 2 && cond == 1)
     {
@@ -326,101 +326,101 @@ dd_KI_logliknorm <- function(brts_k_list,
     tpres <- 0
     # COMPUTE NORMALIZATION
     # compute survival probability of clade S
-    lx = lx_list[[2]]
-    nx = -1:lx
+    lx <- lx_list[[2]]
+    nx <- -1:lx
     lambdamu_nk <- lambdamu(nx,pars = c(pars1_list[[2]],0),ddep = ddep)
     lavec <- lambdamu_nk[[1]]
     muvec <- lambdamu_nk[[2]]
-    probs = rep(0,lx) # probs[1] = extinction probability
-    probs[2] = 1 # clade S starts with one species
+    probs <- rep(0,lx) # probs[1] = extinction probability
+    probs[2] <- 1 # clade S starts with one species
     if(methode != 'analytical')
     {
-      m1 = lavec[1:lx] * nx[1:lx]
-      m2 = muvec[3:(lx + 2)] * nx[3:(lx + 2)]
-      m3 = (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
+      m1 <- lavec[1:lx] * nx[1:lx]
+      m2 <- muvec[3:(lx + 2)] * nx[3:(lx + 2)]
+      m3 <- (lavec[2:(lx + 1)] + muvec[2:(lx + 1)]) * nx[2:(lx + 1)]
 
       if (startsWith(methode, 'odeint::')) {
-        probs = dd_logliknorm1_odeint(probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
+        probs <- dd_logliknorm1_odeint(probs, c(tinn,tpres), c(m1,m2,m3), abstol, reltol, methode)
       }
       else {
-        y = deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
-        probs = y[2,2:(lx+1)]
+        y <- deSolve::ode(probs,c(tinn,tpres),dd_logliknorm_rhs1,c(m1,m2,m3),rtol = reltol,atol = abstol,method = methode)
+        probs <- y[2,2:(lx+1)]
       }
 
     } else
     {
-      probs = dd_loglik_M(pars1_list[[2]],lx,0,ddep,tt = abs(tpres - tinn),probs)
+      probs <- dd_loglik_M(pars1_list[[2]],lx,0,ddep,tt = abs(tpres - tinn),probs)
     }
-    PS = 1 - probs[1]
+    PS <- 1 - probs[1]
     
     # compute survival probability of clade M
-    lx = lx_list[[1]]
+    lx <- lx_list[[1]]
     n <- -1:lx
-    nx1 = rep(n,lx + 2)
-    dim(nx1) = c(lx + 2,lx + 2) # row index = number of species in first group 
-    nx2 = t(nx1) # column index = number of species in second group
-    nxt = nx1 + nx2
+    nx1 <- rep(n,lx + 2)
+    dim(nx1) <- c(lx + 2,lx + 2) # row index = number of species in first group 
+    nx2 <- t(nx1) # column index = number of species in second group
+    nxt <- nx1 + nx2
     lambdamu_n <- lambdamu2(nxt,pars1_list[[1]],ddep)
     lavec <- lambdamu_n[[1]]
     muvec <- lambdamu_n[[2]]
-    probs = matrix(0,lx,lx)
+    probs <- matrix(0,lx,lx)
     # probs[1,1] = probability of extinction of both lineages
     # sum(probs[1:lx,1]) = probability of extinction of second lineage
-    probs[2,2] = 1 # clade M starts with two species
+    probs[2,2] <- 1 # clade M starts with two species
     # STEP 1: integrate from tcrown to tinn
-    dim(probs) = c(lx,lx)
+    dim(probs) <- c(lx,lx)
     if(methode != 'analytical')
     {
-      m1 = lavec[1:lx,2:(lx+1)] * nx1[1:lx,2:(lx+1)]
-      m2 = muvec[3:(lx+2),2:(lx+1)] * nx1[3:(lx+2),2:(lx+1)]
-      ma = lavec[2:(lx+1),2:(lx+1)] + muvec[2:(lx+1),2:(lx+1)]
-      m3 = ma * nx1[2:(lx+1),2:(lx+1)]
-      m4 = lavec[2:(lx+1),1:lx] * nx2[2:(lx+1),1:lx]
-      m5 = muvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
-      m6 = ma * nx2[2:(lx+1),2:(lx+1)]
+      m1 <- lavec[1:lx,2:(lx+1)] * nx1[1:lx,2:(lx+1)]
+      m2 <- muvec[3:(lx+2),2:(lx+1)] * nx1[3:(lx+2),2:(lx+1)]
+      ma <- lavec[2:(lx+1),2:(lx+1)] + muvec[2:(lx+1),2:(lx+1)]
+      m3 <- ma * nx1[2:(lx+1),2:(lx+1)]
+      m4 <- lavec[2:(lx+1),1:lx] * nx2[2:(lx+1),1:lx]
+      m5 <- muvec[2:(lx+1),3:(lx+2)] * nx2[2:(lx+1),3:(lx+2)]
+      m6 <- ma * nx2[2:(lx+1),2:(lx+1)]
       if (startsWith(methode, "odeint::")) {
-        probs = dd_logliknorm2_odeint(probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
+        probs <- dd_logliknorm2_odeint(probs, c(tcrown,tinn), list(m1,m2,m3,m4,m5,m6), reltol, abstol, methode)
       }
       else {
-        dim(probs) = c(lx*lx,1)
-        y = deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-        probs = y[2,2:(lx * lx + 1)]
+        dim(probs) <- c(lx*lx,1)
+        y <- deSolve::ode(probs,c(tcrown,tinn),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs <- y[2,2:(lx * lx + 1)]
       }
     } else
     {
-      probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tinn - tcrown),p = probs)
+      probs <- dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tinn - tcrown),p = probs)
     }
-    dim(probs) = c(lx,lx)
-    probs[1,1:lx] = 0
-    probs[1:lx,1] = 0
+    dim(probs) <- c(lx,lx)
+    probs[1,1:lx] <- 0
+    probs[1:lx,1] <- 0
     # STEP 2: transformation at tinn
-    nx1a = nx1[2:(lx+1),2:(lx+1)]
-    nx2a = nx2[2:(lx+1),2:(lx+1)]
-    probs = probs * nx1a/(nx1a+nx2a)
-    probs = rbind(probs[2:lx,1:lx], rep(0,lx))
+    nx1a <- nx1[2:(lx+1),2:(lx+1)]
+    nx2a <- nx2[2:(lx+1),2:(lx+1)]
+    probs <- probs * nx1a/(nx1a+nx2a)
+    probs <- rbind(probs[2:lx,1:lx], rep(0,lx))
     # STEP 3: integrate from tinn to tpres
     if(methode != 'analytical')
     {
       if (startsWith(methode, "odeint::")) {
-        probs = dd_logliknorm2_odeint(probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
+        probs <- dd_logliknorm2_odeint(probs, c(tinn, tpres), list(m1,m2,m3,m4,m5,m6), reltol, abstol, 'odeint::runge_kutta_fehlberg78')
       }
       else {
-        dim(probs) = c(lx*lx,1)
-        y = deSolve::ode(probs,c(tinn, tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
-        probs = y[2,2:(lx * lx + 1)]
-        dim(probs) = c(lx,lx)
+        dim(probs) <- c(lx*lx,1)
+        y <- deSolve::ode(probs,c(tinn, tpres),dd_logliknorm_rhs2,list(m1,m2,m3,m4,m5,m6),rtol = reltol,atol = abstol, method = "ode45") 
+        probs <- y[2,2:(lx * lx + 1)]
+        dim(probs) <- c(lx,lx)
       }
     } else
     {
-      probs = dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tpres - tinn),p = probs)
+      probs <- dd_loglik_M2(pars = pars1_list[[1]],lx = lx,ddep = ddep,tt = abs(tpres - tinn),p = probs)
     }
-    dim(probs) = c(lx,lx)
-    PM12 = sum(probs[2:lx,2:lx])
-    PM2 = sum(probs[1,2:lx])
+    dim(probs) <- c(lx,lx)
+    PM12 <- sum(probs[2:lx,2:lx])
+    PM2 <- sum(probs[1,2:lx])
     #print(log(2) + log(PM12 + PS * PM2))
     #print(log(2) + (log(PM12 + PM2) + log(PS)))
     #print(log(2) + (log(PM12) + log(PS)))
-    logliknorm = log(2) + (cond == 1) * log(PM12 + PS * PM2) +
+    logliknorm <- log(2) + (cond == 1) * log(PM12 + PS * PM2) +
       (cond == 4) * (log(PM12 + PM2) + log(PS)) +
       (cond == 5) * (log(PM12) + log(PS))
   }
@@ -538,7 +538,7 @@ check_for_impossible_pars <- function(pars1,
 #' the dynamics of main clades, potentially accompanied by a
 #' shift in parameters.
 #' @inheritParams dd_KI_loglik
-#' @param pars1_list list of paramater sets one for each rate regime (subclade).
+#' @param pars1_list list of parameter sets one for each rate regime (subclade).
 #' The parameters are: lambda (speciation rate), mu (extinction rate), and K
 #' (clade-level carrying capacity).
 #' @param brts_k_list list of matrices, one for each rate regime (subclade). Each

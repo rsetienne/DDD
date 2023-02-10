@@ -1,7 +1,7 @@
 Package: DDD
 Type: Package
 Title: Diversity-Dependent Diversification
-Version: 5.2
+Version: 5.2.0
 Date: 2023-02-06
 Depends: R (>= 3.5.0)
 SystemRequirements: C++14
