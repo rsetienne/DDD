@@ -1,5 +1,3 @@
-context("test_DDD")
-
 test_that("DDD works", {
   expect_equal_x64 <- function(object, expected, ...)
   {
@@ -58,8 +56,6 @@ test_that("DDD works", {
   r11 <- DDD::bd_loglik(pars1 = c(0.4,0.1,20),pars2 = c(4,0,1,0,2), brts = 1:10, missnumspec = 0)
   expect_equal_x64(r11,-27.7337684064852610,tolerance = 1E-10)
 })
-
-context("test_DDD_KI")
 
 test_that("DDD_KI works",
 {
@@ -266,7 +262,6 @@ test_that("DDD_KI works",
   testthat::expect_equal(result1,result2)
 })           
 
-context("test_DDD_KI_conditioning")
 
 test_that("conditioning_DDD_KI works",
 {          
@@ -353,7 +348,6 @@ test_that("conditioning_DDD_KI works",
 })
 
 
-context("test_DDD_MS")
 
 test_that("DDD_MS works",
 {
