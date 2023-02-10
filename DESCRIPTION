@@ -20,7 +20,8 @@ LinkingTo:
   BH (>= 1.81.0-1)
 Suggests:
   testthat,
-  testit
+  testit,
+  igraph
 Authors@R: c(
     person(given = "Rampal S.",
            family = "Etienne",

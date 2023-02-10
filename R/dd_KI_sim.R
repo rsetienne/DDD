@@ -305,7 +305,7 @@ tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
 graphics::par(mfrow = c(1,2))
-graphics::par(mai=c(0,0.5,0.5,0))
+graphics::par(mai = c(0,0.5,0.5,0))
 graphics::plot(tes)
 graphics::title('Reconstructed tree', cex.main = 0.7)
 graphics::plot(tas)
