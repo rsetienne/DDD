@@ -19,9 +19,9 @@ LinkingTo:
   RcppEigen,
   BH (>= 1.81.0-1)
 Suggests:
-  testthat,
-  testit,
-  igraph
+    testthat (>= 3.0.0),
+    testit,
+    igraph
 Authors@R: c(
     person(given = "Rampal S.",
            family = "Etienne",
@@ -62,3 +62,4 @@ Description:
  Also contains functions to simulate the diversity-dependent
  process.
 RoxygenNote: 7.2.3
+Config/testthat/edition: 3
