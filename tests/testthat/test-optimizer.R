@@ -1,5 +1,3 @@
-context("test_optimizer")
-
 test_that("optimizer works", {
   brts <- 1:10
   initparsopt <- c(0.3,0.05,12)

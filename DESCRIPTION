@@ -1,14 +1,50 @@
 Package: DDD
 Type: Package
 Title: Diversity-Dependent Diversification
-Version: 5.0
-Date: 2021-07-16
+Version: 5.2
+Date: 2023-02-06
 Depends: R (>= 3.5.0)
-Imports: deSolve, ape, phytools, subplex, Matrix, expm, SparseM, Rcpp (>= 1.0.5)
-LinkingTo: Rcpp, BH
-Suggests: testthat, testit
-Author: Rampal S. Etienne & Bart Haegeman
-Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
+SystemRequirements: C++14
+Imports:
+  deSolve,
+  ape,
+  phytools,
+  subplex,
+  DEoptim,
+  Matrix,
+  expm,
+  SparseM,
+  Rcpp (>= 1.0.10)
+LinkingTo: 
+  Rcpp (>= 1.0.10),
+  RcppEigen,
+  BH (>= 1.81.0-1)
+Suggests:
+    testthat (>= 3.0.0),
+    testit,
+    igraph
+Authors@R: c(
+    person(given = "Rampal S.",
+           family = "Etienne",
+           email = "r.s.etienne@rug.nl",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2142-7612")),
+    person(given = "Bart",
+           family = "Haegeman",
+           email = "bart.haegeman@sete.cnrs.fr",
+           role = c("aut"),
+           comment = c(ORCID = "0000-0003-2325-4727")),
+    person(given = "Hanno",
+           family = "Hildenbrandt",
+           email = "h.hildenbrandt@rug.nl",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0002-6784-1037")),
+    person(given = "Giovanni",
+           family = "Laudanno",
+           email = "glaudanno@gmail.com",
+           role = c("ctb"),
+           comment = c(ORCID = "0000-0002-2952-3345"))
+           )
 License: GPL-3
 Encoding: UTF-8
 Description:
@@ -19,9 +55,12 @@ Description:
  See Etienne et al. 2012, Proc. Roy. Soc. B 279: 1300-1309,
  <DOI:10.1098/rspb.2011.1439>,
  Etienne & Haegeman 2012, Am. Nat. 180: E75-E89,
- <DOI:10.1086/667574> and
+ <DOI:10.1086/667574>,
  Etienne et al. 2016. Meth. Ecol. Evol. 7: 1092-1099,
- <DOI:10.1111/2041-210X.12565>.
+ <DOI:10.1111/2041-210X.12565> and
+ Laudanno et al. 2021. Syst. Biol. 70: 389–407,
+ <DOI:10.1093/sysbio/syaa048>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
+Config/testthat/edition: 3
