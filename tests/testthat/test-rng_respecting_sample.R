@@ -1,5 +1,3 @@
-context("rng_respecting_sample")
-
 test_that("use, zero probability at end", {
 
   n <- 1000
