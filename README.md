@@ -35,7 +35,7 @@ Install `DDD` from this GitHub repository by running:
 ``` r
 install.packages("remotes")
 remotes::install_github("rsetienne/DDD")
-```
+``` 
 
 ## References
 * Etienne et al. 2012, Proc. Roy. Soc. B 279: 1300-1309, https://doi.org/10.1098/rspb.2011.1439
