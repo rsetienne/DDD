@@ -1,4 +1,3 @@
-// [[Rcpp::plugins(cpp14)]]
 // [[Rcpp::depends(BH)]]
 
 

@@ -1,6 +1,5 @@
 # DDD: Diversity-Dependent Diversification
 
-
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/DDD)](https://cran.r-project.org/package=DDD)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/DDD)]( https://CRAN.R-project.org/package=DDD)
 [![](http://cranlogs.r-pkg.org/badges/DDD)](https://CRAN.R-project.org/package=DDD)
