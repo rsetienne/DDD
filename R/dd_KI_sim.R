@@ -304,6 +304,8 @@ tes = L2phylo(L[,1:4],dropextinct = T)
 tas = L2phylo(L[,1:4],dropextinct = F)
 tesS = NULL
 tes2 = NULL
+tasS = NULL
+tas2 = NULL
 graphics::par(mfrow = c(1,2))
 graphics::par(mai = c(0,0.5,0.5,0))
 graphics::plot(tes)
@@ -332,8 +334,6 @@ if(length(linlistS) > 0)
    phytools::plotSimmap(tes2,cols,lwd = 3,pts = F, mar = c(0.1,0.1,1,0.1))
    graphics::title('Reconstructed tree', cex.main = 0.7)
 }
-tasS = NULL
-tas2 = NULL
 allS = which(L[,5] == 1)
 if(length(allS) > 0)
 {
