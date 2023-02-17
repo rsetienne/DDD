@@ -46,6 +46,7 @@ Authors@R: c(
            )
 License: GPL-3
 Encoding: UTF-8
+SystemRequirements: C++14
 Description:
  Implements maximum likelihood and bootstrap methods based on
  the diversity-dependent birth-death process to test whether
