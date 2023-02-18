@@ -1,4 +1,5 @@
 // [[Rcpp::depends(BH)]]
+// [[Rcpp::plugins(cpp14)]]   
 
 
 #ifndef ODEINT_HELPER_HPP_INCLUDED
