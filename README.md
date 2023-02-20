@@ -18,7 +18,6 @@ Also contains functions to simulate the diversity-dependent
 process.
 
 ## Installing DDD
-
 ### From CRAN
 
 From within R, do:
