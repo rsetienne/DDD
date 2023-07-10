@@ -519,15 +519,15 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     y <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
   } else
   {  
-    rhs_func_name <- 'no_name'
-    if(is.character(rhs_func))
-    {
+    #rhs_func_name <- 'no_name'
+    #if(is.character(rhs_func))
+    #{
       rhs_func_name <- rhs_func
-      if(rhs_func_name != 'dd_loglik_rhs' & rhs_func_name != 'dd_loglik_bw_rhs')
-      {
+      #if(rhs_func_name != 'dd_loglik_rhs' & rhs_func_name != 'dd_loglik_bw_rhs')
+      #{
         rhs_func = match.fun(rhs_func)
-      }
-    }
+      #}
+    #}
     if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs')
     {
       parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
