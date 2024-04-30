@@ -760,7 +760,9 @@ optimizer <- function(
       trparsopt[trparsopt == 0.5] <- 0.5 - jitter
       outnew <- suppressWarnings(subplex::subplex(par = trparsopt,
                                                   fn = minfun1,
-                                                  control = list(abstol = optimpars[3],reltol = optimpars[1],maxit = optimpars[4]),
+                                                  control = list(abstol = optimpars[3],
+                                                                 reltol = optimpars[1],
+                                                                 maxit = optimpars[4]),
                                                   fun = fun,
                                                   ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
@@ -783,6 +785,21 @@ optimizer <- function(
   
                                                   ...))$optim
       outnew <- list(par = outnew$bestmem, fvalues = -outnew$bestval, conv = 0)
+    } else if(substr(optimmethod,1,7) == 'optim::')
+    {
+      minfun3 <- function(trparsopt, fun, ...)
+      {           
+        return(-fun(trparsopt = trparsopt, ...))
+      }
+      outnew <- suppressWarnings(optim(par = trparsopt,
+                                       fn = minfun3,
+                                       method = substr(optimmethod,8,nchar(optimmethod)),
+                                       control = list(reltol = optimpars[1],
+                                                      abstol = optimpars[3],
+                                                      maxit = optimpars[4]),
+                                       fun = fun,
+                                       ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
