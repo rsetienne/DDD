@@ -698,7 +698,7 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' 'subplex'
 #' @param optimpars Parameters of the optimization: relative tolerance in
 #' function arguments, relative tolerance in function value, absolute tolerance
-#' in function arguments, and maximum number of iterations
+#' in function arguments as well as the function value, and maximum number of iterations
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
 #' equal to the starting values, with a maximum of 10 cycles.
@@ -775,7 +775,7 @@ optimizer <- function(
       outnew <- suppressWarnings(DEoptim::DEoptim(fn = minfun2,
                                                   lower = rep(0, length(trparsopt)),
                                                   upper = rep(1, length(trparsopt)),
-                                                  control = list(reltol = optimpars[1],
+                                                  control = list(reltol = optimpars[2],
                                                                  strategy = 2,
                                                                  steptol = 100,
                                                                  trace = FALSE,
@@ -794,7 +794,7 @@ optimizer <- function(
       outnew <- suppressWarnings(optim(par = trparsopt,
                                        fn = minfun3,
                                        method = substr(optimmethod,8,nchar(optimmethod)),
-                                       control = list(reltol = optimpars[1],
+                                       control = list(reltol = optimpars[2],
                                                       abstol = optimpars[3],
                                                       maxit = optimpars[4]),
                                        fun = fun,
