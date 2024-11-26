@@ -10,15 +10,35 @@
 #  . ddep == 1 : linear dependence in speciation rate with parameter K
 #  . ddep == 1.3 : linear dependence in speciation rate with parameter K'
 #  . ddep == 1.4 : positive and negative linear diversity-dependence in speciation rate with parameter K'
-#  . ddep == 2 : exponential dependence in speciation rate
+#  . ddep == 2 : exponential dependence (power function) in speciation rate
 #  . ddep == 2.1: variant with offset at infinity
 #  . ddep == 2.2: 1/n dependence in speciation rate
-#  . ddep == 2.3: exponential dependence in speciation rate with parameter x
+#  . ddep == 2.3: exponential dependence (power function) in speciation rate with parameter x
 #  . ddep == 3 : linear dependence in extinction rate
-#  . ddep == 4 : exponential dependence in extinction rate
+#  . ddep == 4 : exponential dependence (power function) in extinction rate
 #  . ddep == 4.1: variant with offset at infinity
 #  . ddep == 4.2: 1/n dependence in speciation rate
 #  . ddep == 5 : linear dependence in speciation and extinction rate
+# . ddep == 6 : linear dependence in speciation, exponential dependence 
+# (power function) in extinction rate
+# . ddep == 7 : exponential dependence (power function) in speciation
+# and extinction rate
+# . ddep == 8 : exponential dependence (power function) in speciation rate,
+# linear dependence in extinction rate
+# . ddep == 9 : exponential dependence (exponential function) in speciation,
+# constant-rate extinction
+# . ddep == 10 : constant-rate speciation, exponential dependence 
+# (exponential function) in extinction
+# . ddep == 11 : linear dependence in speciation, exponential 
+# dependence (exponential function) in extinction
+# . ddep == 12 : exponential dependence (exponential function) in 
+# speciation and extinction
+# . ddep == 13 : exponential dependence (exponential function) in 
+# speciation, linear dependence in extinction
+# . ddep == 14 : exponential dependence (exponential function) in 
+# speciation, exponential dependence (power function) in extinction
+# . ddep == 15 : exponential dependence (power function) in 
+# speciation, exponential dependence (exponential function) in extinction
 # - pars2[3] = cond = conditioning
 #  . cond == 0 : conditioning on stem or crown age
 #  . cond == 1 : conditioning on stem or crown age and non-extinction of the phylogeny
@@ -32,11 +52,9 @@
 
 dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rhs_func_name = 'dd_loglik_rhs')
 {
-  if(methode == 'analytical')
-  {
+  if (methode == 'analytical') {
     out = dd_loglik2(pars1,pars2,brts,missnumspec)
-  } else
-  {
+  } else {
     out = dd_loglik1(pars1,pars2,brts,missnumspec,methode = methode,rhs_func_name = rhs_func_name)
   }
   return(out)
@@ -61,11 +79,9 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' \cr \cr \code{pars2[1]} sets the
 #' maximum number of species for which a probability must be computed.  This
 #' must be larger than 1 + missnumspec + length(brts).
-#' \cr \cr \code{pars2[2]}
-#' sets the model of diversity-dependence:
-#' \cr - \code{pars2[2] == 1} linear
-#' dependence in speciation rate with parameter K (= diversity where speciation
-#' = extinction)
+#' \cr \cr \code{pars2[2]} sets the model of diversity-dependence:
+#' \cr - \code{pars2[2] == 1} linear dependence in speciation rate with 
+#' parameter K (= diversity where speciation = extinction)
 #' \cr - \code{pars2[2] == 1.3} linear dependence in speciation
 #' rate with parameter K' (= diversity where speciation = 0)
 #' \cr - \code{pars2[2] == 1.4} : positive diversity-dependence in speciation rate
@@ -74,28 +90,43 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' \cr - \code{pars2[2] == 1.5} : positive and negative diversity-dependence in
 #' speciation rate with parameter K' (= diversity where speciation = 0); lambda
 #' = lambda0 * S/K' * (1 - S/K') where S is species richness
-#' \cr - \code{pars2[2] == 2} exponential dependence in speciation rate with
+#' \cr - \code{pars2[2] == 2} exponential dependence (power function) in speciation rate with
 #' parameter K (= diversity where speciation = extinction)
 #' \cr - \code{pars2[2]
-#' == 2.1} variant of exponential dependence in speciation rate with offset at
+#' == 2.1} variant of exponential dependence (power function) in speciation rate with offset at
 #' infinity
 #' \cr - \code{pars2[2] == 2.2} 1/n dependence in speciation rate
-#' \cr - \code{pars2[2] == 2.3} exponential dependence in speciation rate with
+#' \cr - \code{pars2[2] == 2.3} exponential dependence (power function) in speciation rate with
 #' parameter x (= exponent)
-#' \cr - \code{pars2[2] == 3} linear dependence in
-#' extinction rate
-#' \cr - \code{pars2[2] == 4} exponential dependence in
-#' extinction rate
-#' \cr - \code{pars2[2] == 4.1} variant of exponential
-#' dependence in extinction rate with offset at infinity
-#' \cr - \code{pars2[2] ==
-#' 4.2} 1/n dependence in extinction rate
-#' \cr - \code{pars2[2] == 5} linear
-#' dependence in speciation and extinction rate
-#' \cr \cr \code{pars2[3]} sets
-#' the conditioning:
-#' \cr - \code{pars2[3] == 0} conditioning on stem or crown
-#' age
+#' \cr - \code{pars2[2] == 3} linear dependence in extinction rate
+#' \cr - \code{pars2[2] == 4} exponential dependence (power function) in extinction rate
+#' \cr - \code{pars2[2] == 4.1} variant of exponential dependence (power function) in extinction 
+#' rate with offset at infinity
+#' \cr - \code{pars2[2] == 4.2} 1/n dependence in extinction rate
+#' \cr - \code{pars2[2] == 5} linear dependence in speciation and extinction rate
+#' \cr - \code{pars2[2] == 6} linear dependence in speciation rate, exponential
+#' dependence (power function) in extinction rate \cr
+#' \cr - \code{pars2[2] == 7} exponential dependence (power function) in speciation
+#' and extinction rate \cr
+#' \cr - \code{pars2[2] == 8} exponential dependence (power function) in speciation rate,
+#' linear dependence in extinction rate \cr
+#' \cr - \code{pars2[2] == 9} exponential dependence (exponential function) in speciation,
+#' constant-rate extinction \cr
+#' \cr - \code{pars2[2] == 10} constant-rate speciation, exponential dependence 
+#' (exponential function) in extinction \cr
+#' \cr - \code{pars2[2] == 11} linear dependence in speciation, exponential 
+#' dependence (exponential function) in extinction\cr
+#' \cr - \code{pars2[2] == 12} exponential dependence (exponential function) in 
+#' speciation and extinction\cr
+#' \cr - \code{pars2[2] == 13} exponential dependence (exponential function) in 
+#' speciation, linear dependence in extinction \cr
+#' \cr - \code{pars2[2] == 14} exponential dependence (exponential function) in 
+#' speciation, exponential dependence (power function) in extinction \cr
+#' \cr - \code{pars2[2] == 15} exponential dependence (power function) in 
+#' speciation, exponential dependence (exponential function) in extinction \cr
+#' 
+#' \cr \cr \code{pars2[3]} sets the conditioning:
+#' \cr - \code{pars2[3] == 0} conditioning on stem or crown age
 #' \cr - \code{pars2[3] == 1} conditioning on stem or crown age and
 #' non-extinction of the phylogeny
 #' \cr - \code{pars2[3] == 2} conditioning on
@@ -130,29 +161,30 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' @examples
 #' dd_loglik(pars1 = c(0.5,0.1,100), pars2 = c(100,1,1,1,0,2), brts = 1:10, missnumspec = 0) 
 #' @export dd_loglik
-dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
-{
-   if(pars2[3] == 3)
-   {
-     rhs_func_name = 'dd_loglik_bw_rhs'
-   } else
-   {
-     rhs_func_name = 'dd_loglik_rhs'
-   }
-   if(methode == 'analytical')
-   {
-     out = dd_loglik2(pars1,pars2,brts,missnumspec)
-   } else
-   {
-     out = dd_loglik1(pars1,pars2,brts,missnumspec,methode = methode,rhs_func_name = rhs_func_name)
-   }
-   return(out)
+dd_loglik = function(pars1,
+                     pars2,
+                     brts,
+                     missnumspec = 0,
+                     methode = "analytical"
+) {
+  if(pars2[3] == 3)
+  {
+    rhs_func_name = 'dd_loglik_bw_rhs'
+  } else
+  {
+    rhs_func_name = 'dd_loglik_rhs'
+  }
+  if (methode == 'analytical') {
+    out = dd_loglik2(pars1,pars2,brts,missnumspec)
+  } else {
+    out = dd_loglik1(pars1,pars2,brts,missnumspec,methode = methode,rhs_func_name = rhs_func_name)
+  }
+  return(out)
 }
 
-dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs')
-{
-  if(length(pars2) == 4)
-  {
+dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs') {
+  # Unpack pars2
+  if (length(pars2) == 4) {
     pars2[5] = 0
     pars2[6] = 2
   }
@@ -161,28 +193,252 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   btorph = pars2[4]
   verbose = pars2[5]
   soc = pars2[6]
-  if(cond == 3) { soc = 2 }
+  if(cond == 3) { 
+    soc = 2 
+  }
+  # Unpack pars1
   la = pars1[1]
   mu = pars1[2]
   K = pars1[3]
-  if(ddep == 5) {r = pars1[4]} else {r = 0}
+  r <- ifelse(both_rates_vary(ddep), pars1[4], 0)
+  Kprime <- get_Kprime(ddep, pars1)
+  is_speciation_linear <- ddep %in% c(1, 1.3, 5, 6, 11)
+  if (verbose) {
+    if (both_rates_vary(ddep)) {
+      cat("loglik for la0 =", la, "mu0 =", mu, "K =", K, "r =", r, "\n")
+    } else {
+      cat("loglik for la0 =", la, "mu0 =", mu, "K =", K, "\n")
+    }
+  }
+  
+  if ((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf)) {
+    loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
+  } else {
+    abstol = 1e-10
+    reltol = 1e-8 
+    brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
+    if (sum(brts == 0) == 0) {
+      brts[length(brts) + 1] = 0
+    }
+    S = length(brts) + (soc - 2)
+    if ((la == 0 | K == 0) & S > soc) {
+      loglik <- -Inf
+      return(loglik)
+    }
+    lx <- min(max(1 + missnumspec, 1 + Kprime), ceiling(pars2[1]))
+    ff <- lambdamu(1:lx, pars1, ddep)
+    lx <- min(which(ff[[2]]/ff[[1]] > 100), lx)
+    if (any(pars1 < 0)) {
+      if (verbose) cat('Model parameters cannot be negative.\n')
+      loglik = -Inf
+    } else if (la == 0) {
+      if (verbose) cat('la0 cannot be zero.\n')
+      loglik = -Inf
+    } else if (ddep %in% c(2, 2.1, 2.2, 4, 6, 7, 10:12, 14:15) && mu == 0) {
+      if (verbose) cat('mu0 cannot be exactly zero for this model.\n')
+      loglik = -Inf
+    } else if (ddep == 8 && mu == 0 && r == 0) {
+      if (verbose) cat('mu0 and r cannot both be zero for this model.\n')
+      loglik = -Inf
+    } else if (is_speciation_linear && Kprime < missnumspec + S) {
+      if (verbose) cat('K\' cannot be smaller than the nb of species in the tree.\n')
+      loglik = -Inf
+    } else if (la <= mu) {
+      if(verbose) cat("lambda0 cannot be smaller than mu0.\n")
+      loglik = -Inf
+    } else {
+      loglik = (btorph == 0) * lgamma(S)
+      if (cond != 3) {
+        qn_vec = rep(0,lx)
+        qn_vec[1] = 1 # change if other species at stem/crown age 
+        for (k in 2:(S + 2 - soc)) {
+          k1 = k + (soc - 2)
+          y <- dd_integrate(
+            initprobs = qn_vec,
+            tvec = brts[(k-1):k],
+            rhs_func = rhs_func_name,
+            pars = c(pars1,k1,ddep),
+            rtol = reltol,
+            atol = abstol,
+            method = methode
+          )
+          qn_vec = y[2, 2:(lx+1)]
+          
+          if (any(is.na(qn_vec)) && pars1[2] / pars1[1] < 1E-4 && missnumspec == 0) { 
+            loglik = dd_loglik_high_lambda(pars1 = pars1, pars2 = pars2, brts = brts)
+            if (verbose) cat('High lambda approximation has been applied.\n')
+            return(loglik)
+          }
+          if (k < (S + 2 - soc)) {
+            qn_vec <- flavec(ddep, la, mu, K, r, lx, k1) * qn_vec # transition vector
+          }
+          cp <- check_probs(loglik, qn_vec, verbose)
+          loglik <- cp[[1]]
+          qn_vec <- cp[[2]]
+          if (loglik == -Inf | is.na(loglik) | is.nan(loglik)) break()
+        }    
+      } else { # cond == 3
+        qn_vec = rep(0,lx + 1)
+        qn_vec[1 + missnumspec] = 1
+        for (k in (S + 2 - soc):2) {
+          k1 = k + (soc - 2)
+          y = dd_integrate(
+            initprobs = qn_vec, 
+            tvec = -brts[k:(k-1)], 
+            rhs_func = rhs_func_name, 
+            pars = c(pars1,k1,ddep), 
+            rtol = reltol, 
+            atol = abstol, 
+            method = methode
+          )
+          qn_vec = y[2,2:(lx+2)]
+          if(k > soc) {
+            qn_vec = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * qn_vec # speciation event
+          }
+          cp <- check_probs(loglik,qn_vec[1:lx],verbose)
+          loglik <- cp[[1]]
+          qn_vec[1:lx] <- cp[[2]]
+          if (loglik == -Inf | is.na(loglik) | is.nan(loglik))  break()
+        }
+      }
+      if (qn_vec[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik)) {
+        if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
+        loglik = -Inf
+      } else {
+        loglik = loglik + (cond != 3 | soc == 1) * log(qn_vec[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+        
+        logliknorm = 0
+        if(cond == 1 | cond == 2) {
+          probsn = rep(0, lx)
+          probsn[1] = 1 # change if other species at stem or crown age
+          k = soc
+          t1 = brts[1] 
+          t2 = brts[S + 2 - soc]
+          y = dd_integrate(
+            initprobs = probsn,
+            tvec = c(t1,t2),
+            rhs_func = rhs_func_name,
+            pars = c(pars1,k,ddep),
+            rtol = reltol,
+            atol = abstol,
+            method = methode
+          )
+          probsn = y[2, 2:(lx + 1)]
+          if(soc == 1) {
+            aux = 1:lx
+          }
+          if(soc == 2) {
+            aux = (2:(lx + 1)) * (3:(lx + 2)) / 6
+          }
+          probsc = probsn / aux
+          cp <- check_probs(logliknorm,probsc,verbose)
+          logliknorm <- cp[[1]]
+          probsc <- cp[[2]]
+          if (cond == 1) { 
+            logliknorm = logliknorm + log(sum(probsc)) 
+          }
+          if (cond == 2) {
+            logliknorm = logliknorm + log(probsc[S + missnumspec - soc + 1])
+          }             
+        }
+        if (cond == 3) {
+          probsn = rep(0, lx + 1)
+          probsn[S + missnumspec + 1] = 1
+          TT = max(1, 1 / abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
+          y = dd_integrate(
+            initprobs = probsn,
+            tvec = c(0, TT),
+            rhs_func = rhs_func_name,
+            pars = c(pars1, 0, ddep),
+            rtol = reltol,
+            atol = abstol,
+            method = methode
+          )
+          logliknorm = log(y[2,lx + 2])
+          if(soc == 2) {
+            probsn = rep(0,lx + 1)
+            probsn[1:lx] = qn_vec[1:lx]
+            probsn = c(flavec(ddep, la, mu, K, r, lx, 1), 1) * probsn # speciation event
+            y = dd_integrate(
+              initprobs = probsn,
+              tvec = c(max(abs(brts)), TT),
+              rhs_func = rhs_func_name,
+              pars = c(pars1,1,ddep),
+              rtol = reltol,
+              atol = abstol,
+              method = methode
+            )
+            logliknorm = logliknorm - log(y[2,lx + 2])
+          }
+        }
+        if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf) {
+          if(verbose) cat('The normalization did not yield a number.\n')
+          loglik = -Inf
+        } else {
+          loglik = loglik - logliknorm
+        }
+      }
+    }
+  }
+  if(verbose)
+  {
+    s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
+    if(both_rates_vary(ddep)) {s1 = sprintf('%s %f',s1,pars1[4])}
+    s2 = sprintf(', Loglikelihood: %f',loglik)
+    cat(s1,s2,"\n",sep = "")
+    utils::flush.console()
+  }
+  loglik = as.numeric(loglik)
+  if(is.nan(loglik) | is.na(loglik)) {
+    loglik = -Inf
+  }
+  return(loglik)
+}
+
+dd_loglik2 = function(pars1,pars2,brts,missnumspec)
+{
+  if(length(pars2) == 4)
+  {
+    pars2[5] = 0
+    pars2[6] = 2
+  }
+  ddep = pars2[2]
+  #if (ddep > 5) {
+  #  stop("This DD model is not implemented for the analytical method yet.")
+  #}
+  cond = pars2[3]
+  btorph = pars2[4]
+  verbose <- pars2[5]
+  soc = pars2[6]
+  if(cond == 3)
+  { 
+    soc = 2
+  }
+  la = pars1[1]
+  mu = pars1[2]
+  K = pars1[3]
+  if(ddep == 5)
+  {
+    r = pars1[4]
+  } else
+  {
+    r = 0
+  }
   if(ddep == 1 | ddep == 5)
   { 
     lx = min(max(1 + missnumspec,1 + ceiling(la/(la - mu) * (r + 1) * K)),ceiling(pars2[1]))
+  } else if(ddep == 1.3)
+  {
+    lx = min(ceiling(K),ceiling(pars2[1]))
   } else {
-    if(ddep == 1.3)
-    {
-      lx = min(ceiling(K),ceiling(pars2[1]))
-    } else {
-      lx = round(pars2[1])
-    }
+    lx = round(pars2[1])
   }
   if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
   } else {
-    abstol = 1e-10
-    reltol = 1e-8 
+    abstol = 1e-16
+    reltol = 1e-10 
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
@@ -191,7 +447,6 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     S = length(brts) + (soc - 2)
     if(min(pars1) < 0)
     {
-      if(verbose) cat('The parameters are negative.\n')
       loglik = -Inf
     } else {
       if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
@@ -199,9 +454,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
         if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
-        if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
+        if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & ((S + missnumspec) > ceiling(K))))
         {
-          if(verbose) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
@@ -212,19 +466,21 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-              probs = y[2,2:(lx+1)]
+              #y = deSolve::ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = "analytical")
+              #probs2 = y[2,2:(lx+1)]
+              probs = dd_loglik_M(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs)
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
-              { 
+              {
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
                 if(verbose) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
               {
-                probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
+                #probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
+                probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
               }
-              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
+              cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
             }    
           } else {
             probs = rep(0,lx + 1)
@@ -232,20 +488,22 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             for(k in (S + 2 - soc):2)
             {
               k1 = k + (soc - 2)
-              y = dd_integrate(probs,-brts[k:(k-1)],rhs_func_name,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-              probs = y[2,2:(lx+2)]
+              #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = "analytical")
+              #probs2 = y[2,2:(lx+2)]
+              probs = dd_loglik_M_bw(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs[1:lx])
+              probs = c(probs,0)
               if(k > soc)
               {
-                probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
-              }
+                #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
+                probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1,ddep)[[1]],1) * probs
+              }    
               cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
           }
-          if(probs[1 + missnumspec] <= 0 | loglik == -Inf | is.na(loglik) | is.nan(loglik))
+          if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)
           {
-            if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
-          } else {        
+          } else  {        
             loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             
             logliknorm = 0
@@ -256,44 +514,51 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               k = soc
               t1 = brts[1] 
               t2 = brts[S + 2 - soc]
-              y = dd_integrate(probsn,c(t1,t2),rhs_func_name,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
-              probsn = y[2,2:(lx+1)]
+              #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = "analytical")
+              #probsn = y[2,2:(lx+1)]
+              probsn = dd_loglik_M(pars1,lx,k,ddep,tt = abs(t2 - t1),probsn)
               if(soc == 1) { aux = 1:lx }
               if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
               probsc = probsn/aux
-              cp <- check_probs(logliknorm,probsc,verbose); logliknorm <- cp[[1]]; probsc <- cp[[2]];
-              if(cond == 1) { logliknorm = logliknorm + log(sum(probsc)) }
-              if(cond == 2) { logliknorm = logliknorm + log(probsc[S + missnumspec - soc + 1])}             
+              if(cond == 1) { logliknorm = log(sum(probsc)) }
+              if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
             }
             if(cond == 3)
             { 
+              #probsn = rep(0,lx + 1)
+              #probsn[S + missnumspec + 1] = 1 #/ (S + missnumspec)
+              #TT = max(1,1/abs(la - mu)) * 100000000 * max(abs(brts)) # make this more efficient later
+              #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = "analytical")
+              #logliknorm = log(y[2,lx + 2])
               probsn = rep(0,lx + 1)
-              probsn[S + missnumspec + 1] = 1
-              
-              TT = 1e14 # max(1,1/abs(la - mu)) * 1E+10 * max(abs(brts)) # make this more efficient later
-              y = dd_integrate(probsn,c(0,TT),rhs_func_name,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
-              logliknorm = log(y[2,lx + 2])
+              probsn[2] = 1
+              MM = dd_loglik_M_aux(pars1,lx + 1,k = 0,ddep)
+              MM = MM[-1,-1]
+              #probsn = SparseM::solve(-MM,probsn[2:(lx + 1)])
+              MMinv = SparseM::solve(MM)
+              probsn = -MMinv %*% probsn[2:(lx + 1)]
+              logliknorm = log(probsn[S + missnumspec])
               if(soc == 2)
               {
-                probsn = rep(0,lx + 1)
-                probsn[1:lx] = probs[1:lx]
-                probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
-                y = dd_integrate(probsn,c(max(abs(brts)),TT),rhs_func_name,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
-                logliknorm = logliknorm - log(y[2,lx + 2])
+                #probsn = rep(0,lx + 1)
+                #probsn[1:lx] = probs[1:lx]
+                #probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
+                #probsn = c(lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]],1) * probsn # speciation event
+                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = "analytical")
+                #logliknorm = logliknorm - log(y[2,lx + 2])
+                probsn2 = rep(0,lx)
+                probsn2 = lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]] * probs[1:lx]
+                MM = dd_loglik_M_bw_aux(pars1,lx,k = 1,ddep)
+                MMinv = SparseM::solve(MM)
+                #probsn2 = SparseM::solve(-MM,probsn2[1:lx])
+                probsn2 = -MMinv %*% probsn2[1:lx]
+                logliknorm = logliknorm - log(probsn2[1])            
               }
             }
-            if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
-            {
-              if(verbose) cat('The normalization did not yield a number.\n')
-              loglik = -Inf
-            } else
-            {
-              loglik = loglik - logliknorm
-            }
+            loglik = loglik - logliknorm
           }
         }
-      }
-    }
+      }}
     if(verbose)
     {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
@@ -304,189 +569,11 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     }
   }
   loglik = as.numeric(loglik)
-  if(is.nan(loglik) | is.na(loglik))
+  if(is.nan(loglik) | is.na(loglik) | loglik == Inf)
   {
     loglik = -Inf
   }
   return(loglik)
-}
-
-dd_loglik2 = function(pars1,pars2,brts,missnumspec)
-{
-if(length(pars2) == 4)
-{
-    pars2[5] = 0
-    pars2[6] = 2
-}
-ddep = pars2[2]
-cond = pars2[3]
-btorph = pars2[4]
-verbose <- pars2[5]
-soc = pars2[6]
-if(cond == 3)
-{ 
-    soc = 2
-}
-la = pars1[1]
-mu = pars1[2]
-K = pars1[3]
-if(ddep == 5)
-{
-    r = pars1[4]
-} else
-{
-    r = 0
-}
-if(ddep == 1 | ddep == 5)
-{ 
-    lx = min(max(1 + missnumspec,1 + ceiling(la/(la - mu) * (r + 1) * K)),ceiling(pars2[1]))
-} else if(ddep == 1.3)
-{
-    lx = min(ceiling(K),ceiling(pars2[1]))
-} else {
-    lx = round(pars2[1])
-}
-if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.05) | K == Inf))
-{
-    loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
-} else {
-abstol = 1e-16
-reltol = 1e-10 
-brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
-if(sum(brts == 0) == 0)
-{
-   brts[length(brts) + 1] = 0
-}
-S = length(brts) + (soc - 2)
-if(min(pars1) < 0)
-{
-    loglik = -Inf
-} else {
-if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
-{ 
-    if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
-    loglik = -Inf
-} else {
-    if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & ((S + missnumspec) > ceiling(K))))
-    {
-       loglik = -Inf
-    } else {
-       loglik = (btorph == 0) * lgamma(S)
-       if(cond != 3)
-       {
-          probs = rep(0,lx)
-          probs[1] = 1 # change if other species at stem/crown age 
-          for(k in 2:(S + 2 - soc))
-          {
-             k1 = k + (soc - 2)
-             #y = deSolve::ode(probs,brts[(k-1):k],rhs_func,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-             #probs2 = y[2,2:(lx+1)]
-             probs = dd_loglik_M(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs)
-             if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
-             {
-               loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-               if(verbose) cat('High lambda approximation has been applied.\n')
-               return(loglik)
-             }
-             if(k < (S + 2 - soc))
-             {
-                 #probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
-                 probs = lambdamu(0:(lx - 1) + k1,c(pars1[1:3],r),ddep)[[1]] * probs
-             }
-             cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs<- cp[[2]];
-          }    
-       } else {
-          probs = rep(0,lx + 1)
-          probs[1 + missnumspec] = 1
-          for(k in (S + 2 - soc):2)
-          {
-             k1 = k + (soc - 2)
-             #y = deSolve::ode(probs,-brts[k:(k-1)],dd_loglik_bw_rhs,c(pars1,k1,ddep),rtol = reltol,atol = abstol,method = methode)
-             #probs2 = y[2,2:(lx+2)]
-             probs = dd_loglik_M_bw(pars1,lx,k1,ddep,tt = abs(brts[k] - brts[k-1]),probs[1:lx])
-             probs = c(probs,0)
-             if(k > soc)
-             {
-                 #probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
-                 probs = c(lambdamu(0:(lx - 1) + k1 - 1,pars1,ddep)[[1]],1) * probs
-             }    
-             cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
-          }
-       }
-       if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)
-       {
-          loglik = -Inf
-       } else  {        
-          loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
-  
-          logliknorm = 0
-          if(cond == 1 | cond == 2)
-          {
-             probsn = rep(0,lx)
-             probsn[1] = 1 # change if other species at stem or crown age
-             k = soc
-             t1 = brts[1] 
-             t2 = brts[S + 2 - soc]
-             #y = deSolve::ode(probsn,c(t1,t2),rhs_func,c(pars1,k,ddep),rtol = reltol,atol = abstol,method = methode);
-             #probsn = y[2,2:(lx+1)]
-             probsn = dd_loglik_M(pars1,lx,k,ddep,tt = abs(t2 - t1),probsn)
-             if(soc == 1) { aux = 1:lx }
-             if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
-             probsc = probsn/aux
-             if(cond == 1) { logliknorm = log(sum(probsc)) }
-             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
-          }
-          if(cond == 3)
-          { 
-             #probsn = rep(0,lx + 1)
-             #probsn[S + missnumspec + 1] = 1 #/ (S + missnumspec)
-             #TT = max(1,1/abs(la - mu)) * 100000000 * max(abs(brts)) # make this more efficient later
-             #y = deSolve::ode(probsn,c(0,TT),dd_loglik_bw_rhs,c(pars1,0,ddep),rtol = reltol,atol = abstol,method = methode)
-             #logliknorm = log(y[2,lx + 2])
-             probsn = rep(0,lx + 1)
-             probsn[2] = 1
-             MM = dd_loglik_M_aux(pars1,lx + 1,k = 0,ddep)
-             MM = MM[-1,-1]
-             #probsn = SparseM::solve(-MM,probsn[2:(lx + 1)])
-             MMinv = SparseM::solve(MM)
-             probsn = -MMinv %*% probsn[2:(lx + 1)]
-             logliknorm = log(probsn[S + missnumspec])
-             if(soc == 2)
-             {
-                #probsn = rep(0,lx + 1)
-                #probsn[1:lx] = probs[1:lx]
-                #probsn = c(flavec(ddep,la,mu,K,r,lx,1),1) * probsn # speciation event
-                #probsn = c(lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]],1) * probsn # speciation event
-                #y = deSolve::ode(probsn,c(max(abs(brts)),TT),dd_loglik_bw_rhs,c(pars1,1,ddep),rtol = reltol,atol = abstol,method = methode)
-                #logliknorm = logliknorm - log(y[2,lx + 2])
-                probsn2 = rep(0,lx)
-                probsn2 = lambdamu(0:(lx - 1) + 1,pars1,ddep)[[1]] * probs[1:lx]
-                MM = dd_loglik_M_bw_aux(pars1,lx,k = 1,ddep)
-                MMinv = SparseM::solve(MM)
-                #probsn2 = SparseM::solve(-MM,probsn2[1:lx])
-                probsn2 = -MMinv %*% probsn2[1:lx]
-                logliknorm = logliknorm - log(probsn2[1])            
-             }
-          }
-          loglik = loglik - logliknorm
-       }
-    }
-}}
-if(verbose)
-{
-    s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
-    if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
-    s2 = sprintf(', Loglikelihood: %f',loglik)
-    cat(s1,s2,"\n",sep = "")
-    utils::flush.console()
-}
-}
-loglik = as.numeric(loglik)
-if(is.nan(loglik) | is.na(loglik) | loglik == Inf)
-{
-    loglik = -Inf
-}
-return(loglik)
 }
 
 dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
@@ -508,8 +595,7 @@ dd_int <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 
 dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
 {
-  if(method == 'analytical')
-  {
+  if(method == 'analytical') {
     probs <- dd_loglik_M(pars = pars[1:3],
                          lx = length(initprobs),
                          k = pars[4],
@@ -517,11 +603,9 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
                          tt = abs(tvec[2] - tvec[1]),
                          initprobs)
     y <- cbind(c(NA,NA),rbind(rep(NA,length(probs)),probs))
-  } else
-  {  
-    #rhs_func_name <- 'no_name'
-    #if(is.character(rhs_func))
-    #{
+  } else {
+    rhs_func_name <- 'no_name'
+    if (is.character(rhs_func)) {
       rhs_func_name <- rhs_func
       #if(rhs_func_name != 'dd_loglik_rhs' & rhs_func_name != 'dd_loglik_bw_rhs')
       #{
@@ -531,8 +615,7 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs')
     {
       parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
-    } else 
-    {
+    } else {
       parsvec = pars
     }
     if (startsWith(method, "odeint::")) {

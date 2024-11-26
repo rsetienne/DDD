@@ -1,41 +1,116 @@
 lambdamu = function(n,pars,ddep)
 {
     lnn = length(n)
-    zeros = rep(0,lnn)
-    ones = rep(1,lnn)
     la = pars[1]
     mu = pars[2]
     K = pars[3]
     r = pars[4]
-    lavec = la * ones
-    muvec = mu * ones
+    phi <- ifelse(r == Inf, 1, r / (1 + r)) # else r/(1+r) is NaN
+    eq_rate <- phi * la + (1 - phi) * mu
     n0 = (ddep == 2 | ddep == 4)
-    if(ddep == 1)
-    {
-       lavec = pmax(zeros,la - (la - mu) * n / K)
-    } else if(ddep == 1.3)
-    {
-       lavec = pmax(zeros,la * (1 - n/K))
-    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
-    {
-       y = -(log(la/mu)/log(K+n0))^(ddep != 2.2)
-       lavec = pmax(zeros,la * (n + n0)^y)
-    } else if(ddep == 2.3)
-    {
-       y = -K
-       lavec = pmax(zeros,la * (n + n0)^y)
-    } else if(ddep == 3)
-    {
-       lavec = la * ones
-       muvec = mu + (la - mu) * n/K
-    } else if(ddep == 4 | ddep == 4.1 | ddep == 4.2)
-    {
-       y = (log(la/mu)/log(K+n0))^(ddep != 4.2)
-       muvec = mu * (n + n0)^y
-    } else if(ddep == 5)
-    { 
-       lavec = pmax(zeros,la - 1/(r + 1)*(la - mu)/K * n)
-       muvec = muvec = mu + r/(r + 1)*(la - mu)/K * n
+    if(ddep == 1) {
+        # linear DD on speciation (K = equilibrium diversity)
+        # constant-rate extinction
+        lavec = pmax(0, la - (la - mu) * n / K)
+        muvec = rep(mu, lnn)
+    } else if(ddep == 1.3) {
+        # linear DD on speciation (K = carrying capacity)
+        # constant-rate extinction
+        lavec = pmax(0, la * (1 - n / K))
+        muvec = rep(mu, lnn)
+    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4) {
+        # "exponential" DD on speciation (power function)
+        # constant-rate extinction
+        frac <- ifelse(ddep == 2.3, 0.1, la / mu)
+        y = -(log( frac ) / log(K + n0)) ^ (ddep != 2.2)
+        lavec = pmax(0, la * (n + n0) ^ y)
+        muvec = rep(mu, lnn)
+    } else if(ddep == 2.3) {
+        # "exponential" DD on speciation (power function)
+        # constant-rate extinction
+        y = -K
+        lavec = pmax(0, la * (n + n0) ^ y)
+        muvec = rep(mu, lnn)
+    } else if(ddep == 3) {
+        # constant-rate speciation
+        # linear DD on extinction
+        lavec = rep(la, lnn)
+        muvec = mu + (la - mu) * n/K
+    } else if (ddep == 4 | ddep == 4.1 | ddep == 4.2) {
+        # constant-rate speciation
+        # "exponential" DD on extinction (power function)
+        y = (log(la / mu) / log(K + n0)) ^ (ddep != 4.2)
+        lavec = rep(la, lnn)
+        muvec = mu * (n + n0) ^ y
+    } else if (ddep == 5) { 
+        # linear DD on speciation
+        # linear DD on extinction
+        lavec = pmax(0, la - (la  - eq_rate) * n / K)
+        muvec = mu + (eq_rate - mu) * n / K
+    } else if (ddep == 6) {
+        # linear DD on speciation
+        # "exponential" DD on extinction (power function)
+        y = log(eq_rate / mu) / log(K)
+        lavec = pmax(0, la - (la  - eq_rate) * n / K)
+        muvec = mu * n ^ y
+    } else if (ddep == 7) {
+        # "exponential" DD on speciation (power function)
+        # "exponential" DD on extinction (power function)
+        y1 = -log(la / eq_rate) / log(K)
+        y2 = log(eq_rate / mu) / log(K)
+        lavec = pmax(0, la * n ^ y1)
+        muvec = mu * n ^ y2
+    } else if (ddep == 8) {
+        # "exponential" DD on speciation (power function)
+        # linear DD on extinction  
+        y = -log(la / eq_rate) / log(K)
+        lavec = pmax(0, la * n ^ y)
+        muvec = mu + (eq_rate - mu) / K * n
+    } else if (ddep == 9) {
+        # exponential DD on speciation (exponential function)
+        # constant-rate extinction
+        y = log(la / mu) / K
+        lavec = pmax(0, la * exp(-n * y))
+        muvec = rep(mu, lnn)
+    } else if (ddep == 10) {
+        # constant-rate speciation
+        # exponential DD on extinction (exponential function)
+        y = log(la / mu) / K
+        lavec = rep(la, lnn)
+        muvec = mu * exp(n * y)
+    } else if (ddep == 11) {
+        # linear DD on speciation 
+        # exponential DD on extinction (exponential function) 
+        y = log(eq_rate / mu) / K
+        lavec = pmax(0, la - (la - eq_rate) * n / K)
+        muvec = mu * exp(n * y)
+    } else if (ddep == 12) {
+        # exponential DD on speciation (exponential function) 
+        # exponential DD on extinction (exponential function) 
+        y1 = log(la / eq_rate) / K
+        y2 = log(eq_rate / mu) / K
+        lavec = pmax(0, la * exp(-n * y1))
+        muvec = mu * exp(n * y2)
+    } else if (ddep == 13) {
+        # exponential DD on speciation (exponential function) 
+        # linear DD on extinction
+        y = log(la / eq_rate) / K
+        lavec = pmax(0, la * exp(-n * y))
+        muvec = mu + (eq_rate - mu) * n / K
+    } else if (ddep == 14) {
+        # exponential DD on speciation (exponential function) 
+        # exponential DD on extinction (power function)
+        y1 = log(la / eq_rate) / K
+        y2 = log(eq_rate / mu) / log(K)
+        lavec = pmax(0, la * exp(-n * y1))
+        muvec = mu * n ^ y2
+    } else if (ddep == 15) {
+        # exponential DD on speciation (power function)
+        # exponential DD on extinction (exponential function)
+        y1 = -log(la / eq_rate) / log(K)
+        y2 = log(eq_rate / mu) / K
+        lavec = pmax(0, la * n ^ y1)
+        muvec = mu * exp(n * y2)
     }
     return(list(lavec,muvec))
 }
@@ -58,21 +133,21 @@ changepars = function(pars)
 {
     if(length(pars) <= 3)
     {
-       sel = 1:2
+        sel = 1:2
     } else {
-       sel = c(1:2,4:min(length(pars),5))
+        sel = c(1:2,4:min(length(pars),5))
     }
     if(sum(pars[sel] == Inf) > 0)
     {
-       pars[which(pars[sel] == Inf)] = 1E+10
+        pars[which(pars[sel] == Inf)] = 1E+10
     }
     if(sum(pars[sel] == 0) > 0)
     {
-       pars[which(pars[sel] == 0)] = 1E-14
+        pars[which(pars[sel] == 0)] = 1E-14
     }
     if(sum(pars[sel] == 1) > 0)
     {
-       pars[which(pars[sel] == 1)] = pars[which(pars[sel] == 1)] - 1E-14
+        pars[which(pars[sel] == 1)] = pars[which(pars[sel] == 1)] - 1E-14
     }
     return(pars)
 }
@@ -124,9 +199,10 @@ lambdamu2 = function(nxt,pars,ddep)
     { 
         lavec = pmax(matrix(0,lnn,lnn),laM * (1 - nxt/KM))
         muvec = muM * matrix(1,lnn,lnn)
-    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
+    } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2 | ddep == 2.4)
     { 
-        x = -(log(laM/muM)/log(KM+n0))^(ddep != 2.2)
+        fracM <- ifelse(ddep == 2.4, 10, laM/muM)
+        x = -(log( fracM )/log(KM + n0))^(ddep != 2.2)
         lavec = pmax(matrix(0,lnn,lnn),laM * (nxt + n0)^x)
         muvec = muM * matrix(1,lnn,lnn)
     } else if(ddep == 2.3)

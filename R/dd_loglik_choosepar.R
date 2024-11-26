@@ -1,9 +1,9 @@
 dd_loglik_choosepar = function(trparsopt,trparsfix,idparsopt,idparsfix,pars2,brts,missnumspec,methode)
 {
-   trpars1 = rep(0,3)
-   if(pars2[2] == 5)
-   {   
+   if (both_rates_vary(pars2[2])) {   
       trpars1 = rep(0,4)
+   } else {
+      trpars1 = rep(0,3)
    }
    trpars1[idparsopt] = trparsopt
    if(length(idparsfix) != 0)
