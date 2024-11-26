@@ -4,8 +4,8 @@
 [![](http://cranlogs.r-pkg.org/badges/grand-total/DDD)]( https://CRAN.R-project.org/package=DDD)
 [![](http://cranlogs.r-pkg.org/badges/DDD)](https://CRAN.R-project.org/package=DDD)
 
-Branch|[GitHub Actions](https://github.com/rsetienne/DDD/actions)|[Codecov](https://www.codecov.io)
----|---|---
+Branch|[![GitHub Actions logo](man/figures/github_actions_logo.png)](https://github.com/features/actions)|[![Codecov logo](man/figures/Codecov.png)](https://www.codecov.io)
+--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 `master`|[![Build Status](https://github.com/rsetienne/DDD/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/rsetienne/DDD/actions)|[![codecov.io](https://codecov.io/github/rsetienne/DDD/coverage.svg?branch=master)](https://codecov.io/github/rsetienne/DDD/branch/master)
 `develop`|[![Build Status](https://github.com/rsetienne/DDD/workflows/R-CMD-check/badge.svg?branch=develop)](https://github.com/rsetienne/DDD/actions)|[![codecov.io](https://codecov.io/github/rsetienne/DDD/coverage.svg?branch=develop)](https://codecov.io/github/rsetienne/DDD/branch/develop)
 
