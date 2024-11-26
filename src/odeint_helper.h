@@ -1,7 +1,6 @@
-// [[Rcpp::plugins(cpp14)]]
 // [[Rcpp::depends(BH)]]
-
-
+// [[Rcpp::plugins(cpp14)]]
+#include "config.h"
 #ifndef ODEINT_HELPER_HPP_INCLUDED
 #define ODEINT_HELPER_HPP_INCLUDED
 

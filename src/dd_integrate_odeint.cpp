@@ -2,6 +2,7 @@
 
 
 #define STRICT_R_HEADERS
+#include "config.h"
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>

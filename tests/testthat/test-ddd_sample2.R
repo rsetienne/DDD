@@ -1,5 +1,3 @@
-context("ddd_sample2")
-
 test_that("DDD::sample2 with zero probability gives different series", {
   
   n <- 1000

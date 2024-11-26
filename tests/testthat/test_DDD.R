@@ -1,5 +1,3 @@
-context("test_DDD")
-
 test_that("DDD works", {
   expect_equal_x64 <- function(object, expected, ...)
   {
@@ -48,6 +46,24 @@ test_that("DDD works", {
   r8 <- dd_loglik(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
   r9 <- dd_loglik(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = methode)
   expect_equal_x64(r8,r9,tolerance = .00001)
+
+  #skip the following tests due to numerical issues with cond = 3
+  #brts = 1:5
+  #pars2 = c(100,1,3,0,0,2)
+  #r5 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs',methode = methode)
+  #r6 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_bw_rhs_FORTRAN',methode = methode)
+  #r7 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,methode = 'analytical')
+  
+  #testthat::expect_equal(r5,r6,tolerance = .00001)
+  #testthat::expect_equal(r5,r7,tolerance = .01)
+  #expect_equal_x64(-8.579058,r7,tolerance = .00001) #was -8.582413 before
+  
+  #pars1 = c(0.2,0.05,1000000)
+  #pars2 = c(1000,1,1,0,0,2)
+  #brts = 1:10
+  #r8 <- DDD:::dd_loglik_test(pars1 = pars1,pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  #r9 <- DDD:::dd_loglik_test(pars1 = c(pars1[1:2],Inf),pars2 = pars2,brts = brts,missnumspec = missnumspec,rhs_func_name = 'dd_loglik_rhs_FORTRAN',methode = methode)
+  #expect_equal_x64(r8,r9,tolerance = .00001)
   
   pars1 <- c(0.2,0.05,15)
   pars2 <- c(4,1,0,0,2)
@@ -58,8 +74,6 @@ test_that("DDD works", {
   r11 <- DDD::bd_loglik(pars1 = c(0.4,0.1,20),pars2 = c(4,0,1,0,2), brts = 1:10, missnumspec = 0)
   expect_equal_x64(r11,-27.7337684064852610,tolerance = 1E-10)
 })
-
-context("test_DDD_KI")
 
 test_that("DDD_KI works",
 {
@@ -266,7 +280,6 @@ test_that("DDD_KI works",
   testthat::expect_equal(result1,result2)
 })           
 
-context("test_DDD_KI_conditioning")
 
 test_that("conditioning_DDD_KI works",
 {          
@@ -353,7 +366,6 @@ test_that("conditioning_DDD_KI works",
 })
 
 
-context("test_DDD_MS")
 
 test_that("DDD_MS works",
 {
@@ -364,11 +376,11 @@ test_that("DDD_MS works",
   brtsS <- c(9.6,8.6,7.4,4.9,2.5)
   dd_MS_analytical <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'analytical')
   dd_MS_odeint <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
-  testthat::expect_equal(dd_MS_odeint,dd_MS_analytical,tol = 1E-4)
+  testthat::expect_equal(dd_MS_odeint,dd_MS_analytical,tolerance = 1E-4)
   
   pars1[3] <- Inf
   dd_MS_DI <- DDD::dd_MS_loglik(pars1,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
   pars1a <- c(pars1[1:5],Inf,pars1[6])
   dd_KI_DI <- DDD::dd_KI_loglik(pars1a,pars2,brtsM,brtsS,missnumspec,methode = 'odeint::runge_kutta_cash_karp54')
-  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tol = 1E-4)
+  testthat::expect_equal(dd_KI_DI,dd_MS_DI,tolerance = 1E-4)
 })  
