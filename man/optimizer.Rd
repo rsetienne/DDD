@@ -20,7 +20,7 @@ optimizer(
 
 \item{optimpars}{Parameters of the optimization: relative tolerance in
 function arguments, relative tolerance in function value, absolute tolerance
-in function arguments, and maximum number of iterations}
+in function arguments as well as the function value, and maximum number of iterations}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to Inf, the
 optimization will be repeated until the result is, within the tolerance,

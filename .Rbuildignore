@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^README\.md
 ^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
