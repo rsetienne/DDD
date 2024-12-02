@@ -1,57 +1,89 @@
-dd_lamuN = function(ddmodel,pars,N)
-{
+dd_lamuN = function(ddmodel,pars,N) {
+    testthat::expect_length(N, 1)
     la = pars[1]
     mu = pars[2]
     K = pars[3]
     n0 = (ddmodel == 2 | ddmodel == 4)
-    if(length(pars) == 4)
-    {
+    if (length(pars) == 4) {
         r = pars[4]
+        phi <- ifelse(r == Inf, 1, r / (1 + r))
+        eq_rate <- phi * la + (1 - phi) * mu
     }
-    if(ddmodel == 1)
-    {
+    if (ddmodel == 1) {
         # linear dependence in speciation rate
         laN = max(0,la - (la - mu) * N/K)
         muN = mu
-    }
-    if(ddmodel == 1.3)
-    {
+    } else if (ddmodel == 1.3) {
         # linear dependence in speciation rate
         laN = max(0,la * (1 - N/K))
         muN = mu
-    }
-    if(ddmodel == 2 | ddmodel == 2.1 | ddmodel == 2.2)
-    {
+    } else if (ddmodel == 2 | ddmodel == 2.1 | ddmodel == 2.2) {
         # exponential dependence in speciation rate
         al = (log(la/mu)/log(K+n0))^(ddmodel != 2.2)
         laN = la * (N + n0)^(-al)
         muN = mu
-    }
-    if(ddmodel == 2.3)
-    {
+    } else if(ddmodel == 2.3) {
         # exponential dependence in speciation rate
         al = K
         laN = la * (N + n0)^(-al)
         muN = mu
-    }
-    if(ddmodel == 3)
-    {
+    } else if(ddmodel == 3) {
         # linear dependence in extinction rate
         laN = la
         muN = mu + (la - mu) * N/K
-    }
-    if(ddmodel == 4 | ddmodel == 4.1 | ddmodel == 4.2)
-    {
+    } else if(ddmodel == 4 | ddmodel == 4.1 | ddmodel == 4.2) {
         # exponential dependence in extinction rate
         al = (log(la/mu)/log(K+n0))^(ddmodel != 4.2)
         laN = la
         muN = mu * (N + n0)^al
-    }
-    if(ddmodel == 5)
-    {
+    } else if (ddmodel == 5) {
         # linear dependence in speciation rate and extinction rate
-        laN = max(0,la - 1/(r+1)*(la-mu) * N/K)
-        muN = mu + r/(r+1)*(la-mu)/K * N
+        laN = max(0, la - (la - eq_rate) * N / K)
+        muN = mu + (eq_rate - mu) * N / K
+    } else if (ddmodel == 6) {
+        y = log(eq_rate / mu) / log(K)
+        laN = max(0, la - (1 - phi) * (la - mu) * N / K)
+        muN = mu * N ^ y
+    } else if (ddmodel == 7) {
+        y1 = -log(la / eq_rate) / log(K)
+        y2 = log(eq_rate / mu) / log(K)
+        laN = max(0, la * N ^ y1)
+        muN = mu * N ^ y2
+    } else if (ddmodel == 8) {
+        y = -log(la / eq_rate) / log(K)
+        laN = max(0, la * N ^ y)
+        muN = mu + (eq_rate - mu) / K * N
+    } else if (ddmodel == 9) {
+        y = log(la / mu) / K
+        laN = max(0, la * exp(-N * y))
+        muN = mu
+    } else if (ddmodel == 10) {
+        y = log(la / mu) / K
+        laN = la
+        muN = mu * exp(N * y)
+    } else if (ddmodel == 11) {
+        y = log(eq_rate / mu) / K
+        laN = max(0, la - (la - eq_rate) / K * N)
+        muN = mu * exp(N * y)
+    } else if (ddmodel == 12) {
+        y1 = log(la / eq_rate) / K
+        y2 = log(eq_rate / mu) / K
+        laN = max(0, la * exp(-N * y1))
+        muN = mu * exp(N * y2)
+    } else if (ddmodel == 13) {
+        y = log(la / eq_rate) / K
+        laN = max(0, la * exp(-N * y))
+        muN = mu + (eq_rate - mu) / K * N
+    } else if (ddmodel == 14) {
+        y1 = log(la / eq_rate) / K
+        y2 = log(eq_rate / mu) / log(K)
+        laN = max(0, la * exp(-N * y1))
+        muN = mu * N ^ y2
+    } else if (ddmodel == 15) {
+        y1 = -log(la / eq_rate) / log(K)
+        y2 = log(eq_rate / mu) / K
+        laN = max(0, la * N ^ y1)
+        muN = mu * exp(N * y2)
     }
     return(c(laN,muN))
 }
