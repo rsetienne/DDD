@@ -514,11 +514,12 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' 
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
-#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' @param ... Any other arguments of the function to be optimimized, or settings
 #' of the optimization routine
 #' @param optimpars Parameters of the optimization: relative tolerance in
 #' function arguments, relative tolerance in function value, absolute tolerance
 #' in function arguments, and maximum number of iterations
+#' @param verbose adds verbose output of intermediate evaluations
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
 #' optimization converged (\code{conv})}.
@@ -529,7 +530,8 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' cat("No examples")
 #' 
 #' @export simplex
-simplex = function(fun,trparsopt,optimpars,verbose = TRUE,...)
+simplex = function(fun,trparsopt,optimpars,
+                   verbose = TRUE,...)
 {
   numpar = length(trparsopt)
   reltolx = optimpars[1]

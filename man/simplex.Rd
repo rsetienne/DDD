@@ -15,7 +15,9 @@ simplex(fun, trparsopt, optimpars, verbose = TRUE, ...)
 function arguments, relative tolerance in function value, absolute tolerance
 in function arguments, and maximum number of iterations}
 
-\item{...}{Any other arguments of the function to be optimimzed, or settings
+\item{verbose}{adds verbose output of intermediate evaluations}
+
+\item{...}{Any other arguments of the function to be optimimized, or settings
 of the optimization routine}
 }
 \value{

@@ -99,7 +99,7 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
 #' does not converge
 #' @param optimmethod Method used in optimization of the likelihood. Current
-#' default is 'subplex'. Alternative is 'simplex' (default of previous
+#' default is 'simplex'. Alternative is 'subplex' (default of previous
 #' versions)
 #' @param num_cycles the number of cycles of opimization. If set at Inf, it will
 #' do as many cycles as needed to meet the tolerance set for the target function.
@@ -147,7 +147,7 @@ dd_ML = function(
   tol = c(1E-3, 1E-4, 1E-6),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
-  optimmethod = 'subplex',
+  optimmethod = 'simplex',
   num_cycles = 1,
   methode = 'analytical',
   verbose = FALSE)

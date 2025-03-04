@@ -60,7 +60,7 @@
 #' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
 #' does not converge
 #' @param optimmethod Method used in optimization of the likelihood. Current
-#' default is 'subplex'. Alternative is 'simplex' (default of previous
+#' default is 'simplex'. Alternative is 'subplex' (default of previous
 #' versions)
 #' @param methode The method used to solve the master equation, default is
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
@@ -120,7 +120,7 @@ dd_LR = function(
    tol = c(1E-3,1E-4,1E-6),
    maxiter = 2000,
    changeloglikifnoconv = FALSE,
-   optimmethod = 'subplex',
+   optimmethod = 'simplex',
    methode = 'analytical'   
    )
 {
