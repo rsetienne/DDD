@@ -11,6 +11,7 @@ optimizer(
   fun,
   trparsopt,
   jitter = 0,
+  verbose = TRUE,
   ...
 )
 }
@@ -33,6 +34,8 @@ equal to the starting values, with a maximum of 10 cycles.}
 \item{jitter}{Perturbation of an initial parameter value when precisely equal to 0.5;
 this is only relevant when subplex is chosen. The default value is 0, so no jitter
 is applied. A recommended value when using it is 1E-5.}
+
+\item{verbose}{if TRUE, prints intermediate output}
 
 \item{...}{Any other arguments of the function to be optimimzed, or settings
 of the optimization routine}

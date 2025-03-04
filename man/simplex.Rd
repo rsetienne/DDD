@@ -4,7 +4,7 @@
 \alias{simplex}
 \title{Carries out optimization using a simplex algorithm (finding a minimum)}
 \usage{
-simplex(fun, trparsopt, optimpars, ...)
+simplex(fun, trparsopt, optimpars, verbose = TRUE, ...)
 }
 \arguments{
 \item{fun}{Function to be optimized}

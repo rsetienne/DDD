@@ -529,7 +529,7 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' cat("No examples")
 #' 
 #' @export simplex
-simplex = function(fun,trparsopt,optimpars,...)
+simplex = function(fun,trparsopt,optimpars,verbose = TRUE,...)
 {
   numpar = length(trparsopt)
   reltolx = optimpars[1]
@@ -566,7 +566,7 @@ simplex = function(fun,trparsopt,optimpars,...)
      string = paste(string, untransform_pars(v[i,1]), sep = " ")
   }
   string = paste(string, -fv[1], how, "\n", sep = " ")
-  cat(string)
+  if (verbose) cat(string)
   utils::flush.console()
   
   tmp = order(fv)
@@ -673,15 +673,15 @@ simplex = function(fun,trparsopt,optimpars,...)
          string = paste(string, untransform_pars(v[i,1]), sep = " ")
      }
      string = paste(string, -fv[1], how, "\n", sep = " ")
-     cat(string)
+     if (verbose) cat(string)
      utils::flush.console()
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)
   {
-     cat("Optimization has terminated successfully.","\n")
+    if (verbose) cat("Optimization has terminated successfully.","\n")
   } else {
-     cat("Maximum number of iterations has been exceeded.","\n")
+    if (verbose) cat("Maximum number of iterations has been exceeded.","\n")
   }
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
@@ -707,6 +707,7 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' @param jitter Perturbation of an initial parameter value when precisely equal to 0.5;
 #' this is only relevant when subplex is chosen. The default value is 0, so no jitter
 #' is applied. A recommended value when using it is 1E-5.
+#' @param verbose if TRUE, prints intermediate output
 #' @param ... Any other arguments of the function to be optimimzed, or settings
 #' of the optimization routine
 #' @return \item{out}{ A list containing optimal function arguments
@@ -726,6 +727,7 @@ optimizer <- function(
     fun,
     trparsopt,
     jitter = 0,
+    verbose = TRUE,
     ...)
 {
   if(num_cycles == Inf)
@@ -744,16 +746,19 @@ optimizer <- function(
   out <- NULL
   while(cy <= max_cycles)
   {
-    if(max_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
+    if(max_cycles > 1) {
+      if (verbose) cat(paste('Cycle ',cy,'\n',sep =''))
+    }
     if(optimmethod == 'simplex')
     {
       outnew <- suppressWarnings(simplex(fun = fun,
                                          trparsopt = trparsopt,
                                          optimpars = optimpars,
+                                         verbose = verbose,
                                          ...))
     } else if(optimmethod == 'subplex')
     {
-      minfun1 <- function(fun,trparsopt,...)
+      minfun1 <- function(fun, trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))
       }
@@ -803,7 +808,7 @@ optimizer <- function(
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-      cat('The last cycle failed; second last cycle result is returned.\n')
+      if (verbose) cat('The last cycle failed; second last cycle result is returned.\n')
       return(out) 
     } else
     {
@@ -815,11 +820,11 @@ optimizer <- function(
     {
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
-        if(cy < max_cycles) cat('No more cycles needed.\n')
+        if(cy < max_cycles) if (verbose) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        cat('More cycles in optimization recommended.\n')
+        if (verbose) cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
