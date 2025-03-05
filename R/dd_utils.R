@@ -536,6 +536,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   reltolf = optimpars[2]
   abstolx = optimpars[3]
   maxiter = optimpars[4]
+  verbose <- optimpars[5]
 
   ## Setting up initial simplex
   v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
@@ -557,18 +558,18 @@ simplex = function(fun,trparsopt,optimpars,...)
   {
      fv[i] = -fun(trparsopt = v[,i], ...)
   }
-  
-  how = "initial"
-  itercount = 1
-  string = itercount
-  for(i in 1:numpar)
-  {
-     string = paste(string, untransform_pars(v[i,1]), sep = " ")
+  if(verbose) {
+    how = "initial"
+    itercount = 1
+    string = itercount
+    for(i in 1:numpar)
+    {
+      string = paste(string, untransform_pars(v[i,1]), sep = " ")
+    }
+    string = paste(string, -fv[1], how, "\n", sep = " ")
+    cat(string)
+    utils::flush.console()
   }
-  string = paste(string, -fv[1], how, "\n", sep = " ")
-  cat(string)
-  utils::flush.console()
-  
   tmp = order(fv)
   if(numpar == 1)
   {
@@ -667,14 +668,16 @@ simplex = function(fun,trparsopt,optimpars,...)
      }
      fv = fv[tmp]
      itercount = itercount + 1
-     string = itercount;
-     for(i in 1:numpar)
-     {
+     if(verbose) {
+       string = itercount;
+       for(i in 1:numpar)
+       {
          string = paste(string, untransform_pars(v[i,1]), sep = " ")
+       }
+       string = paste(string, -fv[1], how, "\n", sep = " ")
+       cat(string)
+       utils::flush.console()
      }
-     string = paste(string, -fv[1], how, "\n", sep = " ")
-     cat(string)
-     utils::flush.console()
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)
