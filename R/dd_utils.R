@@ -709,7 +709,7 @@ simplex = function(fun,trparsopt,optimpars,
 #' @param jitter Perturbation of an initial parameter value when precisely equal to 0.5;
 #' this is only relevant when subplex is chosen. The default value is 0, so no jitter
 #' is applied. A recommended value when using it is 1E-5.
-#' @param verbose if TRUE, prints intermediate output
+#' @param verbose if TRUE, prints intermediate output when using simplex
 #' @param ... Any other arguments of the function to be optimimzed, or settings
 #' of the optimization routine
 #' @return \item{out}{ A list containing optimal function arguments
@@ -729,7 +729,7 @@ optimizer <- function(
     fun,
     trparsopt,
     jitter = 0,
-    verbose = TRUE,
+    verbose = FALSE,
     ...)
 {
   if(num_cycles == Inf)
@@ -810,7 +810,7 @@ optimizer <- function(
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-      if (verbose) cat('The last cycle failed; second last cycle result is returned.\n')
+      cat('The last cycle failed; second last cycle result is returned.\n')
       return(out) 
     } else
     {
@@ -826,7 +826,7 @@ optimizer <- function(
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        if (verbose) cat('More cycles in optimization recommended.\n')
+        cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
