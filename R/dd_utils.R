@@ -518,7 +518,7 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' of the optimization routine
 #' @param optimpars Parameters of the optimization: relative tolerance in
 #' function arguments, relative tolerance in function value, absolute tolerance
-#' in function arguments, and maximum number of iterations
+#' in function arguments, maximum number of iterations, and the level of verbosity
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
 #' optimization converged (\code{conv})}.
@@ -536,7 +536,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   reltolf = optimpars[2]
   abstolx = optimpars[3]
   maxiter = optimpars[4]
-  verbose <- optimpars[5]
+  if(length(optimpars) > 4) verbose <- optimpars[5]
 
   ## Setting up initial simplex
   v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
