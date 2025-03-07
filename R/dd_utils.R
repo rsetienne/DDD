@@ -536,7 +536,7 @@ simplex = function(fun,trparsopt,optimpars,...)
   reltolf = optimpars[2]
   abstolx = optimpars[3]
   maxiter = optimpars[4]
-  if(length(optimpars) > 4) verbose <- optimpars[5]
+  if(length(optimpars) > 4) verbose <- optimpars[5] else verbose <- 1
 
   ## Setting up initial simplex
   v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
