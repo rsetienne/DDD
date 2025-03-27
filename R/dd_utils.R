@@ -516,9 +516,11 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' @param trparsopt Initial guess of the parameters to be optimized
 #' @param ... Any other arguments of the function to be optimimized, or settings
 #' of the optimization routine
-#' @param optimpars Parameters of the optimization: relative tolerance in
-#' function arguments, relative tolerance in function value, absolute tolerance
-#' in function arguments, and maximum number of iterations
+#' @param optimpars Parameters of the optimization: 1) relative tolerance in
+#' function arguments, 2) relative tolerance in function value, 3) absolute 
+#' tolerance in function arguments as well as the function value, 4) 
+#' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output, 
+#' default is TRUE
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
 #' optimization converged (\code{conv})}.
@@ -720,6 +722,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' function arguments, 2) relative tolerance in function value, 3) absolute 
 #' tolerance in function arguments as well as the function value, 4) 
 #' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output
+#' when using the simplex method, default is TRUE
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
 #' equal to the starting values, with a maximum of 10 cycles.

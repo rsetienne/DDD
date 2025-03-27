@@ -4,18 +4,18 @@
 \alias{simplex}
 \title{Carries out optimization using a simplex algorithm (finding a minimum)}
 \usage{
-simplex(fun, trparsopt, optimpars, verbose = TRUE, ...)
+simplex(fun, trparsopt, optimpars, ...)
 }
 \arguments{
 \item{fun}{Function to be optimized}
 
 \item{trparsopt}{Initial guess of the parameters to be optimized}
 
-\item{optimpars}{Parameters of the optimization: relative tolerance in
-function arguments, relative tolerance in function value, absolute tolerance
-in function arguments, and maximum number of iterations}
-
-\item{verbose}{adds verbose output of intermediate evaluations}
+\item{optimpars}{Parameters of the optimization: 1) relative tolerance in
+function arguments, 2) relative tolerance in function value, 3) absolute 
+tolerance in function arguments as well as the function value, 4) 
+maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output, 
+default is TRUE}
 
 \item{...}{Any other arguments of the function to be optimimized, or settings
 of the optimization routine}
