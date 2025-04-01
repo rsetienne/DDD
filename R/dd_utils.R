@@ -573,13 +573,6 @@ simplex = function(fun, trparsopt, optimpars, ...)
     cat(string)
     utils::flush.console()
   }
-
-  
-  if (verbose) {
-    string = paste(string, -fv[1], how, "\n", sep = " ")
-    cat(string)
-    utils::flush.console()
-  }
   
   tmp = order(fv)
   if(numpar == 1)
@@ -685,13 +678,6 @@ simplex = function(fun, trparsopt, optimpars, ...)
        {
          string = paste(string, untransform_pars(v[i,1]), sep = " ")
        }
-       string = paste(string, -fv[1], how, "\n", sep = " ")
-       cat(string)
-       utils::flush.console()
-     }
-
-     
-     if (verbose) {
        string = paste(string, -fv[1], how, "\n", sep = " ")
        cat(string)
        utils::flush.console()
