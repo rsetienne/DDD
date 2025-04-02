@@ -571,7 +571,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
     }
     string = paste(string, -fv[1], how, "\n", sep = " ")
     cat(string)
-    utils::flush.console()
+    #utils::flush.console()
   }
   
   tmp = order(fv)
@@ -680,7 +680,6 @@ simplex = function(fun, trparsopt, optimpars, ...)
        }
        string = paste(string, -fv[1], how, "\n", sep = " ")
        cat(string)
-       utils::flush.console()
      }
 
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
