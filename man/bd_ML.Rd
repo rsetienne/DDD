@@ -20,7 +20,7 @@ bd_ML(
   tol = c(0.001, 1e-04, 1e-06),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   num_cycles = 1,
   methode = "odeint::runge_kutta_cash_karp54",
   verbose = FALSE
@@ -85,7 +85,7 @@ abstolx = absolute tolerance of parameter values in optimization}
 does not converge}
 
 \item{optimmethod}{Method used in optimization of the likelihood. Current
-default is 'subplex'. Alternative is 'simplex' (default of previous
+default is 'simplex'. Alternative is 'subplex' (default of previous
 versions)}
 
 \item{num_cycles}{the number of cycles of opimization. If set at Inf, it will
