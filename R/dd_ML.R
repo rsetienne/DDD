@@ -95,6 +95,8 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' = relative tolerance of parameter values in optimization \cr reltolf =
 #' relative tolerance of function value in optimization \cr abstolx = absolute
 #' tolerance of parameter values in optimization
+#' @param tolint Sets the tolerance of the numerical integration. COnsists of:
+#' \cr absoltint = absolute tolerance and \cr reltolint = relative tolerance.
 #' @param maxiter Sets the maximum number of iterations in the optimization
 #' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
 #' does not converge

@@ -18,6 +18,7 @@ dd_ML(
   btorph = 1,
   soc = 2,
   tol = c(0.001, 1e-04, 1e-06),
+  tolint = c(1e-10, 1e-08),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = "simplex",
@@ -99,6 +100,9 @@ the phylogeny (1)}
 = relative tolerance of parameter values in optimization \cr reltolf =
 relative tolerance of function value in optimization \cr abstolx = absolute
 tolerance of parameter values in optimization}
+
+\item{tolint}{Sets the tolerance of the numerical integration. COnsists of:
+\cr absoltint = absolute tolerance and \cr reltolint = relative tolerance.}
 
 \item{maxiter}{Sets the maximum number of iterations in the optimization}
 
