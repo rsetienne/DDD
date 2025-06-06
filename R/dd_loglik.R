@@ -181,8 +181,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
   } else {
-    abstol = 1e-10
-    reltol = 1e-8 
+    if(is.na(pars2['abstol'])) abstol <- 1e-10
+    if(is.na(pars2['reltol'])) reltol <- 1e-8
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
