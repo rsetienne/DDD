@@ -145,6 +145,7 @@ dd_ML = function(
   btorph = 1,
   soc = 2,
   tol = c(1E-3, 1E-4, 1E-6),
+  tolint = c(1E-10,1E-8),
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = 'simplex',
@@ -183,7 +184,7 @@ dd_ML = function(
       trparsopt[which(initparsopt == Inf)] = 1
       trparsfix = parsfix/(1 + parsfix)
       trparsfix[which(parsfix == Inf)] = 1
-      pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter)
+      pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter,abstol = tolint[1],reltol = tolint[2])
       optimpars = c(tol,maxiter)
       initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
       cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
