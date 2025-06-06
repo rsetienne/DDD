@@ -22,7 +22,7 @@ dd_LR(
   tol = c(0.001, 1e-04, 1e-06),
   maxiter = 2000,
   changeloglikifnoconv = FALSE,
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   methode = "analytical"
 )
 }
@@ -96,7 +96,7 @@ tolerance of parameter values in optimization}
 does not converge}
 
 \item{optimmethod}{Method used in optimization of the likelihood. Current
-default is 'subplex'. Alternative is 'simplex' (default of previous
+default is 'simplex'. Alternative is 'subplex' (default of previous
 versions)}
 
 \item{methode}{The method used to solve the master equation, default is
