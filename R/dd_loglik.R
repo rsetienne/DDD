@@ -181,8 +181,8 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
   } else {
-    if(is.na(pars2['abstolint'])) abstolint <- 1e-10
-    if(is.na(pars2['reltolint'])) reltolint <- 1e-8
+    if(is.na(pars2['abstolint'])) abstolint <- 1e-10 else abstolint <- pars2['abstolint']
+    if(is.na(pars2['reltolint'])) reltolint <- 1e-8 else reltolint <- pars2['reltolint']
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
@@ -350,8 +350,8 @@ if((ddep == 1) & ((mu == 0 & missnumspec == 0 & floor(K) != ceiling(K) & la > 0.
 {
     loglik = bd_loglik(pars1[1:(2 + (K < Inf))],c(2*(mu == 0 & K < Inf),pars2[3:6]),brts,missnumspec)
 } else {
-if(is.na(pars2['abstolint'])) abstolint <- 1e-16
-if(is.na(pars2['reltolint'])) reltolint <- 1e-10
+if(is.na(pars2['abstolint'])) abstolint <- 1e-16 else abstolint <- pars2['abstolint']
+if(is.na(pars2['reltolint'])) reltolint <- 1e-10 else reltolint <- pars2['reltolint']
 brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
 if(sum(brts == 0) == 0)
 {
