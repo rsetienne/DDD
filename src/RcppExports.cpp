@@ -27,6 +27,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dd_integrate_log_odeint
+NumericVector dd_integrate_log_odeint(NumericVector ry, NumericVector times, NumericVector pars, double atol, double rtol, std::string stepper);
+RcppExport SEXP _DDD_dd_integrate_log_odeint(SEXP rySEXP, SEXP timesSEXP, SEXP parsSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP stepperSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ry(rySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type times(timesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type pars(parsSEXP);
+    Rcpp::traits::input_parameter< double >::type atol(atolSEXP);
+    Rcpp::traits::input_parameter< double >::type rtol(rtolSEXP);
+    Rcpp::traits::input_parameter< std::string >::type stepper(stepperSEXP);
+    rcpp_result_gen = Rcpp::wrap(dd_integrate_log_odeint(ry, times, pars, atol, rtol, stepper));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dd_integrate_odeint
 NumericVector dd_integrate_odeint(NumericVector ry, NumericVector times, NumericVector pars, double atol, double rtol, std::string stepper);
 RcppExport SEXP _DDD_dd_integrate_odeint(SEXP rySEXP, SEXP timesSEXP, SEXP parsSEXP, SEXP atolSEXP, SEXP rtolSEXP, SEXP stepperSEXP) {
@@ -94,6 +110,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DDD_dd_integrate_bw_odeint", (DL_FUNC) &_DDD_dd_integrate_bw_odeint, 6},
+    {"_DDD_dd_integrate_log_odeint", (DL_FUNC) &_DDD_dd_integrate_log_odeint, 6},
     {"_DDD_dd_integrate_odeint", (DL_FUNC) &_DDD_dd_integrate_odeint, 6},
     {"_DDD_dd_integrate_td_odeint", (DL_FUNC) &_DDD_dd_integrate_td_odeint, 6},
     {"_DDD_dd_logliknorm1_odeint", (DL_FUNC) &_DDD_dd_logliknorm1_odeint, 6},
