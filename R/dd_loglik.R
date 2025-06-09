@@ -151,7 +151,7 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 
 dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs')
 {
-  k_threshold <- 10000
+  k_threshold <- 10
   if(length(pars2) == 4)
   {
     pars2[5] = 0
@@ -210,18 +210,20 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
           {
             probs = rep(0,lx)
             probs[1] = 1 # change if other species at stem/crown age 
+            lx_old <- lx
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              #probs <- probs[1:lx]
-              #if(k >= k_threshold) {
-              #  lx <- min(lx,which(probs == 0) - 1)
-              #  probs <- probs[1:lx]
-              #  if(k == k_threshold) {
-              #    rhs_func_name <- 'dd_loglik_log_rhs'
-              #    probs <- log(probs)
-              #  }
-              #}
+              probs <- probs[1:lx]
+              if(k >= k_threshold) {
+                lx <- min(lx,which(probs == 0) - 1)
+                probs <- probs[1:lx]
+                if(k == k_threshold) {
+                  rhs_func_name <- 'dd_loglik_log_rhs'
+                  probs <- log(probs)
+                }
+              }
+              
               y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltolint,atol = abstolint,method = methode)
               probs = y[2,2:(lx+1)]
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
@@ -232,16 +234,16 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               }
               if(k < (S + 2 - soc))
               {
-                #if(k >= k_threshold) {
-                #  fac <- flavec(ddep,la,mu,K,r,lx,k1)
-                #  lx <- min(lx,which(fac == 0) - 1)
-                #  probs <- probs[1:lx]
-                #  fac <- fac[1:lx]
-                #  probs <- log(fac) + probs
-                #} else
-                #{
+                if(k >= k_threshold) {
+                  fac <- flavec(ddep,la,mu,K,r,lx,k1)
+                  lx <- min(lx,which(fac == 0) - 1)
+                  probs <- probs[1:lx]
+                  fac <- fac[1:lx]
+                  probs <- log(fac) + probs
+                } else
+                {
                   probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
-                #}
+                }
               }
               #cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
             }    
@@ -257,7 +259,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               {
                 probs = c(flavec(ddep,la,mu,K,r,lx,k1-1),1) * probs # speciation event
               }
-              #cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
+              cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
           }
           if((k < k_threshold & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
@@ -269,10 +271,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             } else
             {
-              loglik = loglik + (cond != 3 | soc == 1) * probs[1 + (cond != 3) * missnumspec] - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+              loglik <- loglik + (cond != 3 | soc == 1) * probs[1 + (cond != 3) * missnumspec] - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1) 
               rhs_func_name <- 'dd_loglik_rhs'
             }
+            
             logliknorm = 0
+            lx <- lx_old
             if(cond == 1 | cond == 2)
             {
               probsn = rep(0,lx)
@@ -280,20 +284,16 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               k = soc
               t1 = brts[1] 
               t2 = brts[S + 2 - soc]
-              #interval <- seq(t1,t2,(t2 - t1)/1000)
-              #for(i in 1:999) {
-              #  y <- dd_integrate(probsn,c(interval[i],interval[i + 1]),rhs_func_name,c(pars1,k,ddep),rtol = reltolint,atol = abstolint,method = methode);
-              #  probsn <- y[2,2:(lx+1)]
-              #  cp <- check_probs(logliknorm,probsn,verbose); logliknorm <- cp[[1]]; probsn <- cp[[2]];
-              #}  
               y = dd_integrate(probsn,c(t1,t2),rhs_func_name,c(pars1,k,ddep),rtol = reltolint,atol = abstolint,method = methode);
               probsn = y[2,2:(lx+1)]
               if(soc == 1) { aux = 1:lx }
               if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
               probsc = probsn/aux
               #cp <- check_probs(logliknorm,probsc,verbose); logliknorm <- cp[[1]]; probsc <- cp[[2]];
-              if(cond == 1) { logliknorm = logliknorm + log(sum(probsc)) }
-              if(cond == 2) { logliknorm = logliknorm + log(probsc[S + missnumspec - soc + 1])}
+              #if(cond == 1) { logliknorm = logliknorm + log(sum(probsc)) }
+              #if(cond == 2) { logliknorm = logliknorm + log(probsc[S + missnumspec - soc + 1])}
+              if(cond == 1) { logliknorm = log(sum(probsc)) }
+              if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}
             }
             if(cond == 3)
             { 
@@ -463,7 +463,6 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               if(soc == 1) { aux = 1:lx }
               if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
               probsc = probsn/aux
-              print(sum(probsc))
               if(cond == 1) { logliknorm = log(sum(probsc)) }
               if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
             }
@@ -559,7 +558,7 @@ dd_integrate <- function(initprobs,tvec,rhs_func,pars,rtol,atol,method)
     rhs_func = match.fun(rhs_func)
     #}
     #}
-    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_bw_rhs' || rhs_func_name == 'dd_loglik_log_rhs')
+    if(rhs_func_name == 'dd_loglik_rhs' || rhs_func_name == 'dd_loglik_log_rhs' || rhs_func_name == 'dd_loglik_bw_rhs')
     {
       parsvec = c(dd_loglik_rhs_precomp(pars,initprobs),pars[length(pars) - 1])
     } else 
@@ -628,3 +627,5 @@ dd_ode_odeint = function(initprobs, tvec, parsvec, atol, rtol, method, rhs_name)
   }
   return(y)
 }
+
+
