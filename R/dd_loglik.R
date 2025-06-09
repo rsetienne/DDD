@@ -151,7 +151,6 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 
 dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs')
 {
-  k_threshold <- 10
   if(length(pars2) == 4)
   {
     pars2[5] = 0
@@ -184,6 +183,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   } else {
     if(is.na(pars2['abstolint'])) abstolint <- 1e-10 else abstolint <- pars2['abstolint']
     if(is.na(pars2['reltolint'])) reltolint <- 1e-8 else reltolint <- pars2['reltolint']
+    if(is.na(pars2['k_threshold'])) k_threshold <- Inf else k_threshold <- pars2['k_threshold']
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
@@ -243,9 +243,9 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
                 } else
                 {
                   probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
+                  cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
                 }
               }
-              #cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
             }    
           } else {
             probs = rep(0,lx + 1)
