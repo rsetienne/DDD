@@ -151,6 +151,7 @@ dd_loglik = function(pars1,pars2,brts,missnumspec,methode = 'analytical')
 
 dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutta_cash_karp54',rhs_func_name = 'dd_loglik_rhs')
 {
+  k_threshold <- 10000
   if(length(pars2) == 4)
   {
     pars2[5] = 0
@@ -212,15 +213,17 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              if(k == 15) {
-                print(probs[1])
-                rhs_func_name <- 'dd_loglik_log_rhs'
-                probs <- log(probs)
-                print(probs[1])
+              probs <- probs[1:lx]
+              if(k >= k_threshold) {
+                lx <- min(lx,which(probs == 0) - 1)
+                probs <- probs[1:lx]
+                if(k == k_threshold) {
+                  rhs_func_name <- 'dd_loglik_log_rhs'
+                  probs <- log(probs)
+                }
               }
               y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltolint,atol = abstolint,method = methode)
               probs = y[2,2:(lx+1)]
-              print(c(k,probs[1]))
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
               { 
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
@@ -229,10 +232,14 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               }
               if(k < (S + 2 - soc))
               {
-                if(any(flavec(ddep,la,mu,K,r,lx,k1) == 0)) print(which.max(flavec(ddep,la,mu,K,r,lx,k1) == 0))
-                if(k >= 15) {
-                  probs <- log(flavec(ddep,la,mu,K,r,lx,k1)) + probs # speciation event
-                } else {
+                if(k >= k_threshold) {
+                  fac <- flavec(ddep,la,mu,K,r,lx,k1)
+                  lx <- min(lx,which(fac == 0) - 1)
+                  probs <- probs[1:lx]
+                  fac <- fac[1:lx]
+                  probs <- log(fac) + probs
+                } else
+                {
                   probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
                 }
               }
@@ -253,12 +260,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               #cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
           }
-          if((k < 15 & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
+          if((k < k_threshold & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
           {
             if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else {        
-            if(k < 15) {
+            if(k < k_threshold) {
               loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             } else
             {
