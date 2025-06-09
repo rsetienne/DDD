@@ -529,162 +529,106 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' cat("No examples")
 #' 
 #' @export simplex
-simplex = function(fun,trparsopt,optimpars,...)
-{
-  numpar = length(trparsopt)
-  reltolx = optimpars[1]
-  reltolf = optimpars[2]
-  abstolx = optimpars[3]
-  maxiter = optimpars[4]
+simplex <- function(fun, trparsopt, optimpars, ...,
+                    log_scale = TRUE, big_neg = 1e308, verbose = TRUE) {
+  numpar  <- length(trparsopt)
+  reltolx <- optimpars[1]
+  reltolf <- optimpars[2]
+  abstolx <- optimpars[3]
+  maxiter <- optimpars[4]
 
-  ## Setting up initial simplex
-  v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
-  for(i in 1:numpar)
-  {
-      parsoptff = 1.05 * untransform_pars(trparsopt[i])
-      trparsoptff = transform_pars(parsoptff)
-      fac = trparsoptff/trparsopt[i]
-      if(v[i,i + 1] == 0)
-      {
-         v[i,i + 1] = 0.00025
+  ## safe evaluator on (log-)scale
+  eval_on_log <- function(p, ...) {
+    ll <- tryCatch(fun(trparsopt = p, ...), error = function(e) NaN)
+    if (!log_scale) ll <- log(ll)
+    if (is.na(ll) || is.nan(ll) || is.infinite(ll)) ll <- -big_neg
+    ll
+  }
+
+  v <- t(matrix(rep(trparsopt, each = numpar + 1), nrow = numpar + 1))
+  for (i in seq_len(numpar)) {
+    parsoptff   <- 1.05 * untransform_pars(trparsopt[i])
+    trparsoptff <- transform_pars(parsoptff)
+    fac         <- trparsoptff / trparsopt[i]
+    v[i, i + 1] <- if (v[i, i + 1] == 0) 0.00025 else v[i, i + 1] * min(1.05, fac)
+  }
+
+  fv <- vapply(seq_len(numpar + 1), function(i) -eval_on_log(v[, i], ...), numeric(1))
+
+  how       <- "initial"
+  itercount <- 1
+  if (verbose) {
+    cat(itercount, paste(untransform_pars(v[, 1]), collapse = " "), -fv[1], how, "\n")
+    utils::flush.console()
+  }
+
+  tmp <- order(fv)
+  v   <- if (numpar == 1) matrix(v[tmp], nrow = 1, ncol = 2) else v[, tmp]
+  fv  <- fv[tmp]
+
+  rh <- 1; ch <- 2; ps <- 0.5; si <- 0.5
+  v2 <- t(matrix(rep(v[, 1], each = numpar + 1), nrow = numpar + 1))
+
+  while (itercount <= maxiter &&
+    ((is.nan(max(abs(fv - fv[1]))) ||
+      (max(abs(fv - fv[1])) - reltolf * abs(fv[1]) > 0)) +
+      ((max(abs(v - v2) - reltolx * abs(v2)) > 0) ||
+        (max(abs(v - v2)) - abstolx > 0)))) {
+
+    xbar <- if (numpar == 1) v[1] else rowSums(v[, 1:numpar]) / numpar
+    xr   <- (1 + rh) * xbar - rh * v[, numpar + 1]
+    fxr  <- -eval_on_log(xr, ...)
+
+    if (fxr < fv[1]) {
+      xe   <- (1 + rh * ch) * xbar - rh * ch * v[, numpar + 1]
+      fxe  <- -eval_on_log(xe, ...)
+      if (fxe < fxr) {
+        v[, numpar + 1] <- xe;  fv[numpar + 1] <- fxe;  how <- "expand"
       } else {
-         v[i,i + 1] = v[i,i + 1] * min(1.05,fac)
+        v[, numpar + 1] <- xr;  fv[numpar + 1] <- fxr;  how <- "reflect"
       }
+    } else {
+      if (fxr < fv[numpar]) {
+        v[, numpar + 1] <- xr;  fv[numpar + 1] <- fxr;  how <- "reflect"
+      } else {
+        if (fxr < fv[numpar + 1]) {
+          xco   <- (1 + ps * rh) * xbar - ps * rh * v[, numpar + 1]
+          fxco  <- -eval_on_log(xco, ...)
+          if (fxco <= fxr) {
+            v[, numpar + 1] <- xco; fv[numpar + 1] <- fxco; how <- "contract outside"
+          } else how <- "shrink"
+        } else {
+          xci  <- (1 - ps) * xbar + ps * v[, numpar + 1]
+          fxci <- -eval_on_log(xci, ...)
+          if (fxci < fv[numpar + 1]) {
+            v[, numpar + 1] <- xci; fv[numpar + 1] <- fxci; how <- "contract inside"
+          } else how <- "shrink"
+        }
+        if (how == "shrink") {
+          for (j in 2:(numpar + 1)) {
+            v[, j] <- v[, 1] + si * (v[, j] - v[, 1])
+            fv[j]  <- -eval_on_log(v[, j], ...)
+          }
+        }
+      }
+    }
+
+    tmp <- order(fv)
+    v   <- if (numpar == 1) matrix(v[tmp], nrow = 1, ncol = 2) else v[, tmp]
+    fv  <- fv[tmp]
+    itercount <- itercount + 1
+    if (verbose) {
+      cat(itercount, paste(untransform_pars(v[, 1]), collapse = " "), -fv[1], how, "\n")
+      utils::flush.console()
+    }
+    v2 <- t(matrix(rep(v[, 1], each = numpar + 1), nrow = numpar + 1))
   }
-  
-  fv = rep(0,numpar + 1)
-  for(i in 1:(numpar + 1))
-  {
-     fv[i] = -fun(trparsopt = v[,i], ...)
-  }
-  
-  how = "initial"
-  itercount = 1
-  string = itercount
-  for(i in 1:numpar)
-  {
-     string = paste(string, untransform_pars(v[i,1]), sep = " ")
-  }
-  string = paste(string, -fv[1], how, "\n", sep = " ")
-  cat(string)
-  utils::flush.console()
-  
-  tmp = order(fv)
-  if(numpar == 1)
-  {
-     v = matrix(v[tmp],nrow = 1,ncol = 2)
-  } else {
-     v = v[,tmp]
-  }
-  fv = fv[tmp]
-  
-  ## Iterate until stopping criterion is reached
-  rh = 1
-  ch = 2
-  ps = 0.5
-  si = 0.5
-  
-  v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
-  
-  while(itercount <= maxiter & ( ( is.nan(max(abs(fv - fv[1]))) | (max(abs(fv - fv[1])) - reltolf * abs(fv[1]) > 0) ) + ( (max(abs(v - v2) - reltolx * abs(v2)) > 0) | (max(abs(v - v2)) - abstolx > 0) ) ) )
-  { 
-     ## Calculate reflection point
-  
-     if(numpar == 1)
-     {
-         xbar = v[1]
-     } else {
-         xbar = rowSums(v[,1:numpar])/numpar
-     }
-     xr = (1 + rh) * xbar - rh * v[,numpar + 1]
-     fxr = -fun(trparsopt = xr, ...)
-   
-     if(fxr < fv[1])
-     {
-         ## Calculate expansion point
-         xe = (1 + rh * ch) * xbar - rh * ch * v[,numpar + 1]
-         fxe = -fun(trparsopt = xe, ...)
-         if(fxe < fxr)
-         {
-             v[,numpar + 1] = xe
-             fv[numpar + 1] = fxe
-             how = "expand"
-         } else {
-             v[,numpar + 1] = xr
-             fv[numpar + 1] = fxr
-             how = "reflect"
-         }
-     } else {
-         if(fxr < fv[numpar])
-         {      
-             v[,numpar + 1] = xr
-             fv[numpar + 1] = fxr
-             how = "reflect"
-         } else {
-             if(fxr < fv[numpar + 1])
-             {
-                ## Calculate outside contraction point
-                xco = (1 + ps * rh) * xbar - ps * rh * v[,numpar + 1]
-                fxco = -fun(trparsopt = xco, ...)
-                if(fxco <= fxr)
-                {
-                   v[,numpar + 1] = xco
-                   fv[numpar + 1] = fxco            
-                   how = "contract outside"
-                } else {
-                   how = "shrink"
-                }
-             } else {
-                ## Calculate inside contraction point
-                xci = (1 - ps) * xbar + ps * v[,numpar + 1]
-                fxci = -fun(trparsopt = xci, ...)
-                if(fxci < fv[numpar + 1])
-                {  
-                   v[,numpar + 1] = xci
-                   fv[numpar + 1] = fxci
-                   how = "contract inside"
-                } else {
-                   how = "shrink"
-                }
-             }
-             if(how == "shrink")
-             {
-                 for(j in 2:(numpar + 1))
-                 {
-  
-                     v[,j] = v[,1] + si * (v[,j] - v[,1])
-                     fv[j] = -fun(trparsopt = v[,j], ...)
-                 }
-             }
-         }
-     }
-     tmp = order(fv)
-     if(numpar == 1)
-     {
-        v = matrix(v[tmp],nrow = 1,ncol = 2)
-     } else {
-        v = v[,tmp]
-     }
-     fv = fv[tmp]
-     itercount = itercount + 1
-     string = itercount;
-     for(i in 1:numpar)
-     {
-         string = paste(string, untransform_pars(v[i,1]), sep = " ")
-     }
-     string = paste(string, -fv[1], how, "\n", sep = " ")
-     cat(string)
-     utils::flush.console()
-     v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
-  }
-  if(itercount < maxiter)
-  {
-     cat("Optimization has terminated successfully.","\n")
-  } else {
-     cat("Maximum number of iterations has been exceeded.","\n")
-  }
-  out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
-  invisible(out)
+
+  if (verbose)
+    cat(if (itercount < maxiter) "Optimization has terminated successfully.\n"
+        else "Maximum number of iterations has been exceeded.\n")
+
+  list(par = v[, 1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
 }
 
 #' Carries out optimization (finding a minimum)
