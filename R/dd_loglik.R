@@ -213,15 +213,15 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
-              probs <- probs[1:lx]
-              if(k >= k_threshold) {
-                lx <- min(lx,which(probs == 0) - 1)
-                probs <- probs[1:lx]
-                if(k == k_threshold) {
-                  rhs_func_name <- 'dd_loglik_log_rhs'
-                  probs <- log(probs)
-                }
-              }
+              #probs <- probs[1:lx]
+              #if(k >= k_threshold) {
+              #  lx <- min(lx,which(probs == 0) - 1)
+              #  probs <- probs[1:lx]
+              #  if(k == k_threshold) {
+              #    rhs_func_name <- 'dd_loglik_log_rhs'
+              #    probs <- log(probs)
+              #  }
+              #}
               y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltolint,atol = abstolint,method = methode)
               probs = y[2,2:(lx+1)]
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
@@ -232,16 +232,16 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               }
               if(k < (S + 2 - soc))
               {
-                if(k >= k_threshold) {
-                  fac <- flavec(ddep,la,mu,K,r,lx,k1)
-                  lx <- min(lx,which(fac == 0) - 1)
-                  probs <- probs[1:lx]
-                  fac <- fac[1:lx]
-                  probs <- log(fac) + probs
-                } else
-                {
+                #if(k >= k_threshold) {
+                #  fac <- flavec(ddep,la,mu,K,r,lx,k1)
+                #  lx <- min(lx,which(fac == 0) - 1)
+                #  probs <- probs[1:lx]
+                #  fac <- fac[1:lx]
+                #  probs <- log(fac) + probs
+                #} else
+                #{
                   probs = flavec(ddep,la,mu,K,r,lx,k1) * probs # speciation event
-                }
+                #}
               }
               #cp <- check_probs(loglik,probs,verbose); loglik <- cp[[1]]; probs <- cp[[2]];
             }    
