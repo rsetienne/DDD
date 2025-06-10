@@ -82,7 +82,8 @@ dd_loglik_M = function(pars,lx,k,ddep,tt,p)
     pars = changepars(pars)
     MM = dd_loglik_M_aux(pars,lx,k,ddep)
     #p = expoRkit::expv(x = MM,v = p,t = tt,m = 50L)
-    p = expm::expAtv(A = MM,v = p,t = tt,m.max = 50)[[1]]
+    p = try(expm::expAtv(A = MM,v = p,t = tt,m.max = 50)[[1]])
+    if(!is.numeric(p)) p <- rep(0,length(p))
     return(p)
 }
 
