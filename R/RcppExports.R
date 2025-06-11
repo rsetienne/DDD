@@ -8,6 +8,13 @@ dd_integrate_bw_odeint <- function(ry, times, pars, atol, rtol, stepper) {
 #' @useDynLib DDD
 NULL
 
+dd_integrate_log_odeint <- function(ry, times, pars, atol, rtol, stepper) {
+    .Call('_DDD_dd_integrate_log_odeint', PACKAGE = 'DDD', ry, times, pars, atol, rtol, stepper)
+}
+
+#' @useDynLib DDD
+NULL
+
 dd_integrate_odeint <- function(ry, times, pars, atol, rtol, stepper) {
     .Call('_DDD_dd_integrate_odeint', PACKAGE = 'DDD', ry, times, pars, atol, rtol, stepper)
 }

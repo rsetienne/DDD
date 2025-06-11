@@ -19,6 +19,7 @@ dd_ML(
   soc = 2,
   tol = c(0.001, 1e-04, 1e-06),
   tolint = c(1e-10, 1e-08),
+  k_threshold = 3,
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = "simplex",
@@ -103,6 +104,9 @@ tolerance of parameter values in optimization}
 
 \item{tolint}{Sets the tolerance of the numerical integration. COnsists of:
 \cr absoltint = absolute tolerance and \cr reltolint = relative tolerance.}
+
+\item{k_threshold}{Sets the threshold of number of species above which
+logarithmic integration must be used. Default is Inf.}
 
 \item{maxiter}{Sets the maximum number of iterations in the optimization}
 
