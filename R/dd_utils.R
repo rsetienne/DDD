@@ -800,14 +800,14 @@ optimizer <- function(
       {           
         return(-fun(trparsopt = trparsopt, ...))
       }
-      outnew <- suppressWarnings(optim(par = trparsopt,
-                                       fn = minfun3,
-                                       method = substr(optimmethod,8,nchar(optimmethod)),
-                                       control = list(reltol = optimpars[2],
-                                                      abstol = optimpars[3],
-                                                      maxit = optimpars[4]),
-                                       fun = fun,
-                                       ...))
+      outnew <- suppressWarnings(stats::optim(par = trparsopt,
+                                              fn = minfun3,
+                                              method = substr(optimmethod,8,nchar(optimmethod)),
+                                              control = list(reltol = optimpars[2],
+                                                             abstol = optimpars[3],
+                                                             maxit = optimpars[4]),
+                                              fun = fun,
+                                              ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
