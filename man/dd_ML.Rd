@@ -19,7 +19,7 @@ dd_ML(
   soc = 2,
   tol = c(0.001, 1e-04, 1e-06),
   tolint = c(1e-10, 1e-08),
-  k_threshold = 3,
+  k_threshold = 100,
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = "simplex",
