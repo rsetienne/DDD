@@ -91,14 +91,15 @@ parsfixdefault = function(ddmodel,brts,missnumspec,idparsopt)
 #' @param btorph Sets whether the likelihood is for the branching times (0) or
 #' the phylogeny (1)
 #' @param soc Sets whether stem or crown age should be used (1 or 2)
-#' @param tol Sets the tolerances in the optimization. Consists of: \cr reltolx
-#' = relative tolerance of parameter values in optimization \cr reltolf =
-#' relative tolerance of function value in optimization \cr abstolx = absolute
-#' tolerance of parameter values in optimization
-#' @param tolint Sets the tolerance of the numerical integration. COnsists of:
-#' \cr absoltint = absolute tolerance and \cr reltolint = relative tolerance.
-#' @param k_threshold Sets the threshold of number of species above which
-#' logarithmic integration must be used. Default is Inf.
+#' @param tol Sets the tolerances in the optimization. Consists of:\cr
+#' reltolx = relative tolerance of parameter values in optimization \cr
+#' reltolf = relative tolerance of function value in optimization \cr
+#' abstolx = absolute tolerance of parameter values in optimization
+#' @param tolint Sets the tolerance of the numerical integration. Consists of: \cr
+#' absoltint = absolute tolerance and \cr
+#' reltolint = relative tolerance.
+#' @param probs_threshold Sets the threshold of the probability below which
+#' logarithmic integration must be used. Default is 0.
 #' @param maxiter Sets the maximum number of iterations in the optimization
 #' @param changeloglikifnoconv if TRUE the loglik will be set to -Inf if ML
 #' does not converge
@@ -150,7 +151,7 @@ dd_ML = function(
   soc = 2,
   tol = c(1E-3, 1E-4, 1E-6),
   tolint = c(1E-10,1E-8),
-  k_threshold = 100,
+  probs_threshold = 0,
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
   optimmethod = 'simplex',
@@ -189,7 +190,7 @@ dd_ML = function(
       trparsopt[which(initparsopt == Inf)] = 1
       trparsfix = parsfix/(1 + parsfix)
       trparsfix[which(parsfix == Inf)] = 1
-      pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter,abstolint = tolint[1],reltolint = tolint[2],k_threshold = k_threshold)
+      pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter,abstolint = tolint[1],reltolint = tolint[2],probs_threshold = probs_threshold)
       optimpars = c(tol,maxiter)
       initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
       cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
