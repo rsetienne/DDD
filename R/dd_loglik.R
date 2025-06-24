@@ -188,7 +188,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   } else {
     if(is.na(pars2['abstolint'])) abstolint <- 1e-10 else abstolint <- pars2['abstolint']
     if(is.na(pars2['reltolint'])) reltolint <- 1e-8 else reltolint <- pars2['reltolint']
-    if(is.na(pars2['k_threshold'])) k_threshold <- Inf else k_threshold <- pars2['k_threshold']
+    if(is.na(pars2['probs_threshold'])) probs_threshold <- 0 else probs_threshold <- pars2['probs_threshold']
     brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
     if(sum(brts == 0) == 0)
     {
@@ -216,17 +216,17 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             probs = rep(0,lx)
             probs[1] = 1 # change if other species at stem/crown age 
             lx_old <- lx
+            logtrafo <- FALSE
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
               probs <- probs[1:lx]
-              if(k >= k_threshold) {
+              if(probs[1] > 0 & probs[1] < probs_threshold) {
                 lx <- min(lx,which(probs == 0) - 1)
                 probs <- probs[1:lx]
-                if(k == k_threshold) {
-                  rhs_func_name <- 'dd_loglik_log_rhs'
-                  probs <- log(probs)
-                }
+                logtrafo <- TRUE
+                rhs_func_name <- 'dd_loglik_log_rhs'
+                probs <- log(probs)
               }
               
               y = dd_integrate(probs,brts[(k-1):k],rhs_func_name,c(pars1,k1,ddep),rtol = reltolint,atol = abstolint,method = methode)
@@ -239,7 +239,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               }
               if(k < (S + 2 - soc))
               {
-                if(k >= k_threshold) {
+                if(logtrafo) {
                   fac <- flavec(ddep,la,mu,K,r,lx,k1)
                   lx <- min(lx,which(fac == 0) - 1)
                   probs <- probs[1:lx]
@@ -267,12 +267,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               cp <- check_probs(loglik,probs[1:lx],verbose); loglik <- cp[[1]]; probs[1:lx] <- cp[[2]];
             }
           }
-          if((k < k_threshold & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
+          if((!logtrafo & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
           {
             if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else {        
-            if(k < k_threshold) {
+            if(!logtrafo) {
               loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
             } else
             {
