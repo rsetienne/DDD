@@ -1,0 +1,111 @@
+# Loglikelihood for diversity-dependent diversification models with multiple decoupling (rate shift) events
+
+This function computes loglikelihood of a diversity-dependent
+diversification model for a given set of branching times and parameter
+values where the diversity-dependent dynamics of subclades decouple from
+the dynamics of main clades, potentially accompanied by a shift in
+parameters.
+
+## Usage
+
+``` r
+dd_multiple_KI_loglik(
+  pars1_list,
+  pars2,
+  brts_k_list,
+  missnumspec_list,
+  reltol = 1e-14,
+  abstol = 1e-16,
+  methode = "odeint::runge_kutta_cash_karp54"
+)
+```
+
+## Arguments
+
+- pars1_list:
+
+  list of paramater sets one for each rate regime (subclade). The
+  parameters are: lambda (speciation rate), mu (extinction rate), and K
+  (clade-level carrying capacity).
+
+- pars2:
+
+  Vector of model settings:  
+    
+  `pars2[1]` sets the maximum number of species for which a probability
+  must be computed. This must be larger than 1 + missnumspec +
+  length(brts).  
+    
+  `pars2[2]` sets the model of diversity-dependence:  
+  - `pars2[2] == 1` linear dependence in speciation rate with parameter
+  K (= diversity where speciation = extinction)  
+  - `pars2[2] == 1.3` linear dependence in speciation rate with
+  parameter K' (= diversity where speciation = 0)  
+  - `pars2[2] == 2` exponential dependence in speciation rate with
+  parameter K (= diversity where speciation = extinction)  
+  - `pars2[2] == 2.1` variant of exponential dependence in speciation
+  rate with offset at infinity  
+  - `pars2[2] == 2.2` 1/n dependence in speciation rate  
+  - `pars2[2] == 2.3` exponential dependence in speciation rate with
+  parameter x (= exponent)  
+  - `pars2[2] == 3` linear dependence in extinction rate  
+  - `pars2[2] == 4` exponential dependence in extinction rate  
+  - `pars2[2] == 4.1` variant of exponential dependence in extinction
+  rate with offset at infinity  
+  - `pars2[2] == 4.2` 1/n dependence in extinction rate  
+    
+  `pars2[3]` sets the conditioning:  
+  - `pars2[3] == 0` no conditioning (or just crown age)  
+  - `pars2[3] == 1` conditioning on non-extinction of the phylogeny  
+  - `pars2[3] == 2` conditioning on number of species and crown age; not
+  yet implemented  
+  - `pars2[3] == 3` conditioning on number of species only; not yet
+  implemented  
+  - `pars2[3] == 4` conditioning on survival of the subclade  
+  - `pars2[3] == 5` conditioning on survival of all subclades and of
+  both crown lineages in the main clade. This assumes that subclades
+  that have already shifted do not undergo another shift, i.e. shifts
+  only occur in the main clade.  
+    
+  `pars2[4]` Obsolete.  
+    
+  `pars2[5]` sets whether the parameters and likelihood should be shown
+  on screen (1) or not (0)  
+    
+  `pars2[6]` sets whether the first data point is stem age (1) or crown
+  age (2)  
+    
+  `pars2[7]` sets whether the old (incorrect) likelihood should be used
+  (0), or whether the new corrected likelihood should be used (1).
+
+- brts_k_list:
+
+  list of matrices, one for each rate regime (subclade). Each matrix has
+  in the first row the branching times including the shift/decoupling
+  time and the present time (0) in negative time (i.e. 10 mya = -10). In
+  the second row it has the number of lineages, i.e. starting at 2 for a
+  phylogeny with a crown and increasing by one at each branching time
+  and decreasing by one at each decoupling/shift time. The last element
+  is the same as the second last.
+
+- missnumspec_list:
+
+  list containing the number of missing species for each clade. If only
+  a single number m of missing species is known for the entire
+  phylogeny, then each element of the list should be 0:m. One can also
+  create this from m using the function create_missnumspec_list
+
+- reltol:
+
+  relative tolerance in integration of the ODE system, default at 1e-14
+
+- abstol:
+
+  tolerance tolerance in integration of the ODE system, default at 1e-16
+
+- methode:
+
+  The method used to solve the master equation, default is 'analytical'
+  which uses matrix exponentiation; alternatively numerical ODE solvers
+  can be used, such as 'odeint::runge_kutta_cash_karp54'. These were
+  used in the package before version 3.1.

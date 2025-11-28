@@ -11,7 +11,7 @@ values."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DDD</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,7 +111,12 @@ the likelihood is for the branching times (0) or the phylogeny (1)
 <br><br><code>pars2[5]</code> sets whether the parameters and likelihood should be shown
 on screen (1) or not (0)
 <br><br><code>pars2[6]</code> sets whether the first data
-point is stem age (1) or crown age (2)</p></dd>
+point is stem age (1) or crown age (2)
+<br><br><code>pars2[7]</code> sets the absolute tolerance of the integration
+<br><br><code>pars2[8]</code> sets the relative tolerance of the integration
+<br><br><code>pars2[9]</code> sets threshold on the number of species for which
+logarithmic integration will be used. If the last three elements are not set
+ddefault values will be used of 1E-10, 1E-8 and Inf.</p></dd>
 
 
 <dt id="arg-brts">brts<a class="anchor" aria-label="anchor" href="#arg-brts"></a></dt>
@@ -168,7 +173,7 @@ doi: 10.1098/rspb.2011.1439 <br> - Etienne, R.S. &amp; B. Haegeman 2012. Am. Nat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

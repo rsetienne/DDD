@@ -13,7 +13,7 @@ be used in model comparisons."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DDD</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">5.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,9 +59,11 @@ be used in model comparisons.</p>
 <span>  btorph <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  soc <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">1e-04</span>, <span class="fl">1e-06</span><span class="op">)</span>,</span>
+<span>  tolint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e-10</span>, <span class="fl">1e-08</span><span class="op">)</span>,</span>
+<span>  probs_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1000</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1.25</span><span class="op">)</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idparsopt</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  changeloglikifnoconv <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  optimmethod <span class="op">=</span> <span class="st">"subplex"</span>,</span>
+<span>  optimmethod <span class="op">=</span> <span class="st">"simplex"</span>,</span>
 <span>  num_cycles <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  methode <span class="op">=</span> <span class="st">"analytical"</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -151,10 +153,21 @@ the phylogeny (1)</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
-<dd><p>Sets the tolerances in the optimization. Consists of: <br> reltolx
-= relative tolerance of parameter values in optimization <br> reltolf =
-relative tolerance of function value in optimization <br> abstolx = absolute
-tolerance of parameter values in optimization</p></dd>
+<dd><p>Sets the tolerances in the optimization. Consists of:<br>
+reltolx = relative tolerance of parameter values in optimization <br>
+reltolf = relative tolerance of function value in optimization <br>
+abstolx = absolute tolerance of parameter values in optimization</p></dd>
+
+
+<dt id="arg-tolint">tolint<a class="anchor" aria-label="anchor" href="#arg-tolint"></a></dt>
+<dd><p>Sets the tolerance of the numerical integration. Consists of: <br>
+absoltint = absolute tolerance and <br>
+reltolint = relative tolerance.</p></dd>
+
+
+<dt id="arg-probs-threshold">probs_threshold<a class="anchor" aria-label="anchor" href="#arg-probs-threshold"></a></dt>
+<dd><p>Sets the threshold of the probability below which
+logarithmic integration must be used. Default is 0.</p></dd>
 
 
 <dt id="arg-maxiter">maxiter<a class="anchor" aria-label="anchor" href="#arg-maxiter"></a></dt>
@@ -168,7 +181,7 @@ does not converge</p></dd>
 
 <dt id="arg-optimmethod">optimmethod<a class="anchor" aria-label="anchor" href="#arg-optimmethod"></a></dt>
 <dd><p>Method used in optimization of the likelihood. Current
-default is 'subplex'. Alternative is 'simplex' (default of previous
+default is 'simplex'. Alternative is 'subplex' (default of previous
 versions)</p></dd>
 
 
@@ -289,7 +302,7 @@ doi: 10.1098/rspb.2011.1439 <br> - Etienne, R.S. &amp; B. Haegeman 2012. Am. Nat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
