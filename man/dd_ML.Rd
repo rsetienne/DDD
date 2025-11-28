@@ -18,9 +18,11 @@ dd_ML(
   btorph = 1,
   soc = 2,
   tol = c(0.001, 1e-04, 1e-06),
+  tolint = c(1e-10, 1e-08),
+  probs_threshold = 0,
   maxiter = 1000 * round((1.25)^length(idparsopt)),
   changeloglikifnoconv = FALSE,
-  optimmethod = "subplex",
+  optimmethod = "simplex",
   num_cycles = 1,
   methode = "analytical",
   verbose = FALSE
@@ -95,10 +97,17 @@ the phylogeny (1)}
 
 \item{soc}{Sets whether stem or crown age should be used (1 or 2)}
 
-\item{tol}{Sets the tolerances in the optimization. Consists of: \cr reltolx
-= relative tolerance of parameter values in optimization \cr reltolf =
-relative tolerance of function value in optimization \cr abstolx = absolute
-tolerance of parameter values in optimization}
+\item{tol}{Sets the tolerances in the optimization. Consists of:\cr
+reltolx = relative tolerance of parameter values in optimization \cr
+reltolf = relative tolerance of function value in optimization \cr
+abstolx = absolute tolerance of parameter values in optimization}
+
+\item{tolint}{Sets the tolerance of the numerical integration. Consists of: \cr
+absoltint = absolute tolerance and \cr
+reltolint = relative tolerance.}
+
+\item{probs_threshold}{Sets the threshold of the probability below which
+logarithmic integration must be used. Default is 0.}
 
 \item{maxiter}{Sets the maximum number of iterations in the optimization}
 
@@ -106,7 +115,7 @@ tolerance of parameter values in optimization}
 does not converge}
 
 \item{optimmethod}{Method used in optimization of the likelihood. Current
-default is 'subplex'. Alternative is 'simplex' (default of previous
+default is 'simplex'. Alternative is 'subplex' (default of previous
 versions)}
 
 \item{num_cycles}{the number of cycles of opimization. If set at Inf, it will

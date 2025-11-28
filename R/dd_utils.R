@@ -93,17 +93,17 @@ brts2phylo <- function(times,root=FALSE,tip.label=NULL)
 #' conv(1:10,1:10)
 #' 
 #' @export conv
-conv = function(x,y)
+conv <- function(x,y)
 {
-   lx = length(x)
-   ly = length(y)
-   lxy = length(x) + length(y)
-   x = c(x,rep(0,lxy - lx))
-   y = c(y,rep(0,lxy - ly))
-   cvxy = rep(0,lxy)
+   lx <- length(x)
+   ly <- length(y)
+   lxy <- length(x) + length(y)
+   x <- c(x,rep(0,lxy - lx))
+   y <- c(y,rep(0,lxy - ly))
+   cvxy <- rep(0,lxy)
    for(i in 2:lxy)
    {
-      cvxy[i] = crossprod(x[(i-1):1],y[1:(i-1)])
+      cvxy[i] <- crossprod(x[(i-1):1],y[1:(i-1)])
    }
    return(cvxy[2:lxy])
 }
@@ -514,11 +514,13 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' 
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
-#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' @param ... Any other arguments of the function to be optimimized, or settings
 #' of the optimization routine
-#' @param optimpars Parameters of the optimization: relative tolerance in
-#' function arguments, relative tolerance in function value, absolute tolerance
-#' in function arguments, and maximum number of iterations
+#' @param optimpars Parameters of the optimization: 1) relative tolerance in
+#' function arguments, 2) relative tolerance in function value, 3) absolute 
+#' tolerance in function arguments as well as the function value, 4) 
+#' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output, 
+#' default is TRUE
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
 #' optimization converged (\code{conv})}.
@@ -529,13 +531,14 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' cat("No examples")
 #' 
 #' @export simplex
-simplex = function(fun,trparsopt,optimpars,...)
+simplex = function(fun, trparsopt, optimpars, ...)
 {
   numpar = length(trparsopt)
   reltolx = optimpars[1]
   reltolf = optimpars[2]
   abstolx = optimpars[3]
   maxiter = optimpars[4]
+  if(length(optimpars) > 4) verbose <- optimpars[5] else verbose <- 1
 
   ## Setting up initial simplex
   v = t(matrix(rep(trparsopt,each = numpar + 1),nrow = numpar + 1))
@@ -557,17 +560,19 @@ simplex = function(fun,trparsopt,optimpars,...)
   {
      fv[i] = -fun(trparsopt = v[,i], ...)
   }
-  
-  how = "initial"
   itercount = 1
-  string = itercount
-  for(i in 1:numpar)
-  {
-     string = paste(string, untransform_pars(v[i,1]), sep = " ")
+  
+  if(verbose) {
+    how = "initial"
+    string = itercount
+    for(i in 1:numpar)
+    {
+      string = paste(string, untransform_pars(v[i,1]), sep = " ")
+    }
+    string = paste(string, -fv[1], how, "\n", sep = " ")
+    cat(string)
+    #utils::flush.console()
   }
-  string = paste(string, -fv[1], how, "\n", sep = " ")
-  cat(string)
-  utils::flush.console()
   
   tmp = order(fv)
   if(numpar == 1)
@@ -667,21 +672,23 @@ simplex = function(fun,trparsopt,optimpars,...)
      }
      fv = fv[tmp]
      itercount = itercount + 1
-     string = itercount;
-     for(i in 1:numpar)
-     {
+     if(verbose) {
+       string = itercount;
+       for(i in 1:numpar)
+       {
          string = paste(string, untransform_pars(v[i,1]), sep = " ")
+       }
+       string = paste(string, -fv[1], how, "\n", sep = " ")
+       cat(string)
      }
-     string = paste(string, -fv[1], how, "\n", sep = " ")
-     cat(string)
-     utils::flush.console()
+
      v2 = t(matrix(rep(v[,1],each = numpar + 1),nrow = numpar + 1))
   }
   if(itercount < maxiter)
   {
-     cat("Optimization has terminated successfully.","\n")
+    if (verbose) cat("Optimization has terminated successfully.","\n")
   } else {
-     cat("Maximum number of iterations has been exceeded.","\n")
+    if (verbose) cat("Maximum number of iterations has been exceeded.","\n")
   }
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
@@ -696,18 +703,20 @@ simplex = function(fun,trparsopt,optimpars,...)
 #' 
 #' @param optimmethod The method to use for optimization, either 'simplex' or
 #' 'subplex'
-#' @param optimpars Parameters of the optimization: relative tolerance in
-#' function arguments, relative tolerance in function value, absolute tolerance
-#' in function arguments as well as the function value, and maximum number of iterations
+#' @param optimpars Parameters of the optimization: 1) relative tolerance in
+#' function arguments, 2) relative tolerance in function value, 3) absolute 
+#' tolerance in function arguments as well as the function value, 4) 
+#' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output
+#' when using the simplex method, default is TRUE
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
 #' equal to the starting values, with a maximum of 10 cycles.
 #' @param fun Function to be optimized
 #' @param trparsopt Initial guess of the parameters to be optimized
-#' @param jitter Perturbation of an initial parameter value when precisely equal to 0.5;
-#' this is only relevant when subplex is chosen. The default value is 0, so no jitter
-#' is applied. A recommended value when using it is 1E-5.
-#' @param ... Any other arguments of the function to be optimimzed, or settings
+#' @param jitter Perturbation of an initial parameter value when precisely equal
+#' to 0.5; this is only relevant when subplex is chosen. The default value is 
+#' 0, so no jitter is applied. A recommended value when using it is 1E-5.
+#' @param ... Any other arguments of the function to be optimimized, or settings
 #' of the optimization routine
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
@@ -782,7 +791,7 @@ optimizer <- function(
                                                                  itermax = optimpars[4],
                                                                  packages = c('DDD')),
                                                   fun = fun,
-  
+                                                  
                                                   ...))$optim
       outnew <- list(par = outnew$bestmem, fvalues = -outnew$bestval, conv = 0)
     } else if(substr(optimmethod,1,7) == 'optim::')
@@ -791,14 +800,14 @@ optimizer <- function(
       {           
         return(-fun(trparsopt = trparsopt, ...))
       }
-      outnew <- suppressWarnings(optim(par = trparsopt,
-                                       fn = minfun3,
-                                       method = substr(optimmethod,8,nchar(optimmethod)),
-                                       control = list(reltol = optimpars[2],
-                                                      abstol = optimpars[3],
-                                                      maxit = optimpars[4]),
-                                       fun = fun,
-                                       ...))
+      outnew <- suppressWarnings(stats::optim(par = trparsopt,
+                                              fn = minfun3,
+                                              method = substr(optimmethod,8,nchar(optimmethod)),
+                                              control = list(reltol = optimpars[2],
+                                                             abstol = optimpars[3],
+                                                             maxit = optimpars[4]),
+                                              fun = fun,
+                                              ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
@@ -826,6 +835,8 @@ optimizer <- function(
   }
   return(out)
 }
+
+
 #' @name transform_pars
 #' @title Transforming parameters from -Inf to Inf into parameters
 #' from -1 to 1

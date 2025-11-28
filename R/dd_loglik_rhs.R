@@ -89,3 +89,18 @@ dd_loglik_rhs = function(t,x,parsvec)
   dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * xx[(2:(lx+1))-1] + muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * xx[(2:(lx+1))+1] - (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk] * xx[2:(lx+1)]
   return(list(dx))
 }
+
+dd_loglik_log_rhs = function(t,x,parsvec)
+{
+  lv = (length(parsvec) - 1)/3
+  lavec = parsvec[1:lv]
+  muvec = parsvec[(lv + 1):(2 * lv)]
+  nn = parsvec[(2 * lv + 1):(3 * lv)]
+  kk = parsvec[length(parsvec)]
+  lx = length(x)
+  xx = c(-Inf,x,-Inf)
+  dx = lavec[(2:(lx+1))+kk-1] * nn[(2:(lx+1))+2*kk-1] * exp(xx[(2:(lx+1))-1] - xx[2:(lx+1)]) +
+    muvec[(2:(lx+1))+kk+1] * nn[(2:(lx+1))+1] * exp(xx[(2:(lx+1))+1] - xx[2:(lx+1)]) -
+    (lavec[(2:(lx+1))+kk] + muvec[(2:(lx+1))+kk]) * nn[(2:(lx+1))+kk]
+  return(list(dx))
+}

@@ -65,7 +65,12 @@ the likelihood is for the branching times (0) or the phylogeny (1)
 \cr \cr \code{pars2[5]} sets whether the parameters and likelihood should be shown
 on screen (1) or not (0)
 \cr \cr \code{pars2[6]} sets whether the first data
-point is stem age (1) or crown age (2)}
+point is stem age (1) or crown age (2)
+\cr \cr \code{pars2[7]} sets the absolute tolerance of the integration
+\cr \cr \code{pars2[8]} sets the relative tolerance of the integration
+\cr \cr \code{pars2[9]} sets threshold on the number of species for which
+logarithmic integration will be used. If the last three elements are not set
+ddefault values will be used of 1E-10, 1E-8 and Inf.}
 
 \item{brts}{A set of branching times of a phylogeny, all positive}
 

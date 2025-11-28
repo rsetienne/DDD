@@ -1,8 +1,7 @@
 Package: DDD
 Type: Package
 Title: Diversity-Dependent Diversification
-Version: 5.2.3
-Date: 2024-11-26
+Version: 5.2.4
 Depends: R (>= 3.5.0)
 Imports:
   deSolve,
