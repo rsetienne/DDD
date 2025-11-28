@@ -60,6 +60,6 @@ Description:
  <DOI:10.1093/sysbio/syaa048>.
  Also contains functions to simulate the diversity-dependent
  process.
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 URL: https://rsetienne.github.io/DDD/
