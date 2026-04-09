@@ -694,15 +694,18 @@ simplex = function(fun, trparsopt, optimpars, ...)
   invisible(out)
 }
 
-#' Carries out optimization (finding a minimum)
+#' Carries out optimization (finding a maximum)
 #' 
-#' A wrapper to use several optimization routines, currently only 'simplex' (a
-#' method adopted from Matlab, or 'subplex', from the R package subplex). The
-#' function is called from several packages by the same author.
+#' A wrapper to use several optimization routines 
 #' 
-#' 
-#' @param optimmethod The method to use for optimization, either 'simplex' or
-#' 'subplex'
+#' @param optimmethod The method to use for optimization. There is a choice of:
+#' 'simplex', which is a simplex algorithm that shows (when verbose > 0) the
+#' optimization trajectory.
+#' 'subplex', from the package with the same name
+#' 'DEoptim', from the package with the same name
+#' 'pso', from the package with the same name
+#' 'optim::name_of_algorithm', the algorithm from the optim package (e.g.
+#' "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")
 #' @param optimpars Parameters of the optimization: 1) relative tolerance in
 #' function arguments, 2) relative tolerance in function value, 3) absolute 
 #' tolerance in function arguments as well as the function value, 4) 
@@ -809,6 +812,23 @@ optimizer <- function(
                                               fun = fun,
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'pso') {
+      minfun4 <- function(trparsopt, fun, ...)
+      {           
+        return(-fun(trparsopt = trparsopt, ...))
+      }
+      outnew <- suppressWarnings(pso::psoptim(par = trparsopt,
+                                              fn = minfun4,
+                                              lower = 0,
+                                              upper = 1,
+                                              control = list(reltol = optimpars[2],
+                                                             abstol = optimpars[3],
+                                                             maxit = optimpars[4]),
+                                              fun = fun,
+                                              ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else {
+      stop('The specified optimization method is not supported')
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {

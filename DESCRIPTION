@@ -9,6 +9,7 @@ Imports:
   phytools,
   subplex,
   DEoptim,
+  pso,
   Matrix,
   expm,
   SparseM,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dd_utils.R
 \name{optimizer}
 \alias{optimizer}
-\title{Carries out optimization (finding a minimum)}
+\title{Carries out optimization (finding a maximum)}
 \usage{
 optimizer(
   optimmethod = "simplex",
@@ -15,8 +15,14 @@ optimizer(
 )
 }
 \arguments{
-\item{optimmethod}{The method to use for optimization, either 'simplex' or
-'subplex'}
+\item{optimmethod}{The method to use for optimization. There is a choice of:
+'simplex', which is a simplex algorithm that shows (when verbose > 0) the
+optimization trajectory.
+'subplex', from the package with the same name
+'DEoptim', from the package with the same name
+'pso', from the package with the same name
+'optim::name_of_algorithm', the algorithm from the optim package (e.g.
+"Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")}
 
 \item{optimpars}{Parameters of the optimization: 1) relative tolerance in
 function arguments, 2) relative tolerance in function value, 3) absolute 
@@ -45,9 +51,7 @@ of the optimization routine}
 optimization converged (\code{conv})}.
 }
 \description{
-A wrapper to use several optimization routines, currently only 'simplex' (a
-method adopted from Matlab, or 'subplex', from the R package subplex). The
-function is called from several packages by the same author.
+A wrapper to use several optimization routines
 }
 \examples{
 
