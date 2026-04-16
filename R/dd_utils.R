@@ -840,9 +840,9 @@ optimizer <- function(
       trparsopt <- out$par
       fvalue[cy] <- out$fvalues
     }  
+    cat(paste0('The maximum likelihood is: ', fvalue[cy], '.\n'))
     if(cy > 1)
     {
-      cat(paste0('The maximum likelihood is: ', fvalue[cy], '.\n'))
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
         if(cy < max_cycles) cat('No more cycles needed.\n')
