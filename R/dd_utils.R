@@ -841,8 +841,9 @@ optimizer <- function(
       fvalue[cy] <- out$fvalues
     }  
     cat(paste0('The maximum likelihood is: ', fvalue[cy], '.\n'))
-    cat(paste0('The corresponding parameters are: \n'))
+    cat(paste0('The corresponding parameters are: '))
     cat(untransform_pars(trparsopt))
+    cat('\n')
     if(cy > 1)
     {
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
