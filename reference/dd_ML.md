@@ -266,6 +266,8 @@ dd_ML(brts = brts,initparsopt = c(1.3078,7.4188), idparsopt = c(1,3), parsfix = 
 #> 19 1.3078 7.41879999999999 -9.3490879225759 contract outside 
 #> 20 1.3078 7.41879999999999 -9.3490879225759 contract inside 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: -9.3490879225759.
+#> The corresponding parameters are: 1.3078 7.4188
 #> 
 #> Maximum likelihood parameter estimates: lambda: 1.307800, mu: 0.100000, K: 7.418800
 #> Maximum loglikelihood: -9.349088

@@ -260,6 +260,8 @@ dd_SR_ML(brts = brts, initparsopt = c(0.4581, 1E-6, 17.69, 11.09, 8.9999), idpar
 #> The loglikelihood for the initial parameter values is -24.52893 
 #> 1 0.4581 1e-06 17.69 11.09 8.9999 -24.5289252582909 initial 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: -24.5278072613762.
+#> The corresponding parameters are: 0.4581 1e-06 18.5745 11.09 8.9999
 #> 
 #> Maximum likelihood parameter estimates: 0.458100 0.000001 18.574500 0.458100 0.000001 11.090000 8.999900
 #> Maximum loglikelihood: -24.527807

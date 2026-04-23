@@ -271,6 +271,8 @@ dd_KI_ML(brtsM = brtsM, brtsS = brtsS, tsplit = tsplit, idparsopt = c(1:3,6,7),
 #> The loglikelihood for the initial parameter values is -24.45333 
 #> 1 0.885 2e-14 6.999 6.848 4.001 -24.4533303187317 initial 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: -24.4533303187317.
+#> The corresponding parameters are: 0.885 2e-14 6.999 6.848 4.001
 #> 
 #> Maximum likelihood parameter estimates: 0.885000 0.000000 6.999000 0.885000 0.000000 6.848000 4.001000
 #> Maximum loglikelihood: -24.453330

@@ -366,6 +366,8 @@ bd_ML(brts = brts, cond = 1)
 #> 161 0.082607221207963 5.81399751544815e-16 -66.3791662684048 shrink 
 #> 162 0.082607221207963 5.81399751544815e-16 -66.3791662684048 shrink 
 #> Optimization has terminated successfully. 
+#> The maximum likelihood is: -66.3791662684048.
+#> The corresponding parameters are: 0.08260722 5.813998e-16
 #> 
 #> Maximum likelihood parameter estimates: lambda0: 0.082607, mu0: 0.000000, lambda1: 0.000000, mu1: 0.000000: 
 #> Maximum loglikelihood: -66.379166

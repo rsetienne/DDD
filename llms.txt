@@ -112,7 +112,7 @@ remotes::install_github("rsetienne/DDD")
 - [`dd_sim()`](https://rsetienne.github.io/DDD/reference/dd_sim.md) :
   Function to simulate the diversity-dependent diversification process
 - [`optimizer()`](https://rsetienne.github.io/DDD/reference/optimizer.md)
-  : Carries out optimization (finding a minimum)
+  : Carries out optimization (finding a maximum)
 - [`phylo2L()`](https://rsetienne.github.io/DDD/reference/phylo2L.md) :
   Function to convert phylogeny to a table with speciation and
   extinction events

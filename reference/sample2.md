@@ -43,7 +43,7 @@ Rampal S. Etienne
 
 ``` r
 sample(x = 10,size = 5,replace = TRUE)
-#> [1]  1 10  8  8  6
+#> [1] 10  1  2  4  1
 sample2(x = 10,size = 5,replace = TRUE)
 #> [1] 10 10 10 10 10
 ```

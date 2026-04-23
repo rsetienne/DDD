@@ -103,63 +103,46 @@ Rampal S. Etienne
 
 #> $tes
 #> 
-#> Phylogenetic tree with 8 tips and 7 internal nodes.
+#> Phylogenetic tree with 6 tips and 5 internal nodes.
 #> 
 #> Tip labels:
-#>   t1, t9, t10, t8, t6, t13, ...
+#>   t1, t7, t9, t8, t3, t4
 #> 
 #> Rooted; includes branch length(s).
 #> 
 #> $tas
 #> 
-#> Phylogenetic tree with 13 tips and 12 internal nodes.
+#> Phylogenetic tree with 9 tips and 8 internal nodes.
 #> 
 #> Tip labels:
-#>   t1, t9, t10, t8, t2, t4, ...
+#>   t1, t7, t9, t8, t5, t2, ...
 #> 
 #> Rooted; includes branch length(s).
 #> 
 #> $L
-#>              [,1] [,2] [,3]       [,4] [,5]
-#>  [1,] 10.00000000    0   -1 -1.0000000    0
-#>  [2,] 10.00000000   -1    2  6.0324077    0
-#>  [3,]  7.71544830    2    3  2.7422639    0
-#>  [4,]  7.33115475    2    4  4.3769175    0
-#>  [5,]  7.26533859    3    5 -1.0000000    0
-#>  [6,]  5.44666769    4    6 -1.0000000    1
-#>  [7,]  5.04996898    3    7  1.0552860    0
-#>  [8,]  3.88506468   -1   -8 -1.0000000    0
-#>  [9,]  2.84387093   -1   -9 -1.0000000    0
-#> [10,]  2.39720551   -9  -10 -1.0000000    0
-#> [11,]  0.84916460    5   11 -1.0000000    0
-#> [12,]  0.76349279   11   12  0.1043106    0
-#> [13,]  0.09764081    6   13 -1.0000000    1
+#>            [,1] [,2] [,3]      [,4] [,5]
+#>  [1,] 10.000000    0   -1 -1.000000    0
+#>  [2,] 10.000000   -1    2  8.003286    0
+#>  [3,]  9.381329    2    3 -1.000000    0
+#>  [4,]  7.972618    3    4 -1.000000    1
+#>  [5,]  7.650547   -1   -5  5.786228    0
+#>  [6,]  6.857887    3    6  2.240755    0
+#>  [7,]  2.054015   -1   -7 -1.000000    0
+#>  [8,]  1.426913   -7   -8 -1.000000    0
+#>  [9,]  1.011446   -7   -9 -1.000000    0
 #> 
 #> $tesS
-#> 
-#> Phylogenetic tree with 2 tips and 1 internal node.
-#> 
-#> Tip labels:
-#>   t6, t13
-#> 
-#> Rooted; includes branch length(s).
+#> NULL
 #> 
 #> $tasS
-#> 
-#> Phylogenetic tree with 2 tips and 1 internal node.
-#> 
-#> Tip labels:
-#>   t6, t13
-#> 
-#> Rooted; includes branch length(s).
+#> NULL
 #> 
 #> $tes2
 #> 
-#> Phylogenetic tree with 8 tips and 7 internal nodes.
+#> Phylogenetic tree with 6 tips and 5 internal nodes.
 #> 
 #> Tip labels:
-#>  t1, t9, t10, t8, t6, t13, ...
-#> 
+#>  t1, t7, t9, t8, t3, t4
 #> The tree includes a mapped, 2-state discrete character
 #> with states:
 #>  0, 1
@@ -168,10 +151,10 @@ Rampal S. Etienne
 #> 
 #> $tas2
 #> 
-#> Phylogenetic tree with 13 tips and 12 internal nodes.
+#> Phylogenetic tree with 9 tips and 8 internal nodes.
 #> 
 #> Tip labels:
-#>  t1, t9, t10, t8, t2, t4, ...
+#>  t1, t7, t9, t8, t5, t2, ...
 #> 
 #> The tree includes a mapped, 2-state discrete character
 #> with states:
