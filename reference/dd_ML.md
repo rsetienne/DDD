@@ -234,6 +234,7 @@ Rampal S. Etienne & Bart Haegeman
 ## Examples
 
 ``` r
+
 cat("Estimating the intrinsic speciation rate lambda and the carrying capacity K")
 #> Estimating the intrinsic speciation rate lambda and the carrying capacity K
 cat("for a fixed extinction rate of 0.1, conditioning on clade survival and two missing species:")

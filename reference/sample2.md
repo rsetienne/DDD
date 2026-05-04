@@ -42,6 +42,7 @@ Rampal S. Etienne
 ## Examples
 
 ``` r
+
 sample(x = 10,size = 5,replace = TRUE)
 #> [1] 10  1  2  4  1
 sample2(x = 10,size = 5,replace = TRUE)

@@ -195,6 +195,7 @@ Rampal S. Etienne & Bart Haegeman
 ## Examples
 
 ``` r
+
 cat("Estimating parameters for a set of branching times brts with the default settings:")
 #> Estimating parameters for a set of branching times brts with the default settings:
 brts = 1:20

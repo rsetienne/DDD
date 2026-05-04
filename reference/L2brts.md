@@ -50,6 +50,7 @@ Rampal S. Etienne
 ## Examples
 
 ``` r
+
 sim = dd_sim(c(0.2,0.1,20),10)
 phy = L2brts(sim$L)
 plot(phy)

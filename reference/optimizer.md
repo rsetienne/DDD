@@ -79,6 +79,7 @@ Rampal S. Etienne
 ## Examples
 
 ``` r
+
 cat("No examples")
 #> No examples
 ```

@@ -245,6 +245,7 @@ Rampal S. Etienne & Bart Haegeman
 ## Examples
 
 ``` r
+
 cat("This will estimate parameters for two sets of branching times brtsM, brtsS\n")
 #> This will estimate parameters for two sets of branching times brtsM, brtsS
 cat("without conditioning.\n")

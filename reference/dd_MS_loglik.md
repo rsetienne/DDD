@@ -124,6 +124,7 @@ Rampal S. Etienne & Bart Haegeman
 ## Examples
 
 ``` r
+
 pars1 = c(0.2,0.1,40,1.0,0.1,9.8)
 pars2 = c(200,1,0,18.8,1,2)
 missnumspec = 0

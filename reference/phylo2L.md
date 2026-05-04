@@ -44,6 +44,7 @@ Liang Xu
 ## Examples
 
 ``` r
+
 sim = dd_sim(c(0.2,0.1,20),10)
 phy = sim$tas
 L = phylo2L(phy)

@@ -49,6 +49,7 @@ Rampal S. Etienne
 ## Examples
 
 ``` r
+
 sim = dd_sim(c(0.2,0.1,20),10)
 phy = L2phylo(sim$L)
 plot(phy)

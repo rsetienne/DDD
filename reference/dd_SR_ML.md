@@ -242,6 +242,7 @@ Rampal S. Etienne & Bart Haegeman
 ## Examples
 
 ``` r
+
 cat("This will estimate parameters for a sets of branching times brts without conditioning.\n")
 #> This will estimate parameters for a sets of branching times brts without conditioning.
 cat("The tolerance of the optimization is set ridiculously high to make runtime fast.\n")

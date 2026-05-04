@@ -16,13 +16,13 @@
 ## Citation
 
 Etienne R, Haegeman B (2026). *DDD: Diversity-Dependent
-Diversification*. R package version 5.2.4,
+Diversification*. R package version 5.2.5,
 <https://rsetienne.github.io/DDD/>.
 
     @Manual{,
       title = {DDD: Diversity-Dependent Diversification},
       author = {Rampal S. Etienne and Bart Haegeman},
       year = {2026},
-      note = {R package version 5.2.4},
+      note = {R package version 5.2.5},
       url = {https://rsetienne.github.io/DDD/},
     }
