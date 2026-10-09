@@ -1,19 +1,20 @@
 Package: DDD
 Type: Package
 Title: Diversity-Dependent Diversification
-Version: 5.2.5
+Version: 5.2.6
 Depends: R (>= 3.5.0)
 Imports:
-  deSolve,
   ape,
-  phytools,
-  subplex,
+  cmaesr,
   DEoptim,
-  pso,
-  Matrix,
+  deSolve,
   expm,
+  Matrix,
+  phytools,
+  pso,
+  Rcpp (>= 1.0.10),
   SparseM,
-  Rcpp (>= 1.0.10)
+  subplex
 LinkingTo: 
   Rcpp (>= 1.0.10),
   RcppEigen,
