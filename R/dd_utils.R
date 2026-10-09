@@ -733,7 +733,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' @export optimizer
 optimizer <- function(
     optimmethod = 'simplex',
-    optimpars = c(1E-4,1E-4,1E-6,1000),
+    optimpars = c(1E-4,1E-4,1E-6,1000, 1),
     num_cycles = 1,
     fun,
     trparsopt,
@@ -826,6 +826,43 @@ optimizer <- function(
                                                              maxit = optimpars[4]),
                                               fun = fun,
                                               ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'cmaes') {
+      n_params <- length(trparsopt)
+      param_set <- makeParamSet(
+        makeNumericVectorParam("x", len = n_params, lower = rep(0,n_params), upper = rep(1E+10,n_params))
+      )
+      minfun5 <- makeSingleObjectiveFunction(
+        name = "Universal CMA-ES Wrapper",
+        fn = function(x) {
+          val = -fun(x, ...)
+          if (is.na(val) || is.nan(val)) return(Inf) 
+          return(val)
+        },
+        par.set = param_set
+      )
+      if(optimpars[5] == 1) {
+        monitor <- makeSimpleMonitor()
+      } else {
+        monitor <- makeMonitor()
+      }
+      outnew <- suppressWarnings(cmaesr::cmaes(start.point = trparsopt,
+                                               objective.fun = minfun5,
+                                               monitor = monitor,
+                                               control = list(sigma = 0.05,
+                                                              lambda = as.integer(20 + 3 * log(n_params)),
+                                                              stop.ons = getDefaultStoppingConditions())))
+      minfun5 <- function(fun,trparsopt,...)
+      {           
+        return(-fun(trparsopt = trparsopt,...))
+      }
+      outnew <- suppressWarnings(subplex::subplex(par = outnew$best.param,
+                                                  fn = minfun5,
+                                                  control = list(abstol = optimpars[3],
+                                                                 reltol = optimpars[1],
+                                                                 maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else {
       stop('The specified optimization method is not supported')

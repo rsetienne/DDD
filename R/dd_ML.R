@@ -191,7 +191,7 @@ dd_ML = function(
       trparsfix = parsfix/(1 + parsfix)
       trparsfix[which(parsfix == Inf)] = 1
       pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter,abstolint = tolint[1],reltolint = tolint[2],probs_threshold = probs_threshold)
-      optimpars = c(tol,maxiter)
+      optimpars = c(tol,maxiter,verbose)
       initloglik = dd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
       cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
       utils::flush.console()
