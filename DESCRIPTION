@@ -5,15 +5,11 @@ Version: 5.2.6
 Depends: R (>= 3.5.0)
 Imports:
   ape,
-  cmaesr,
-  DEoptim,
   deSolve,
   expm,
   Matrix,
   phytools,
-  pso,
   Rcpp (>= 1.0.10),
-  smoof,
   SparseM,
   subplex
 LinkingTo: 
@@ -21,9 +17,13 @@ LinkingTo:
   RcppEigen,
   BH (>= 1.81.0-1)
 Suggests:
-    testthat (>= 3.0.0),
-    testit,
-    igraph
+  cmaesr,
+  DEoptim,
+  ParamHelpers,
+  pso,
+  smoof,
+  testthat (>= 3.0.0),
+  testit
 Authors@R: c(
     person(given = "Rampal S.",
            family = "Etienne",
