@@ -780,6 +780,8 @@ optimizer <- function(
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'DEoptim')
     {
+      if(!requireNamespace('DEoptim', quietly = TRUE))
+        stop('The package DEoptim is not installed. Please install first')
       minfun2 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -813,6 +815,8 @@ optimizer <- function(
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'pso') {
+      if(!requireNamespace('pso', quietly = TRUE))
+        stop('The package pso is not installed. Please install first')
       minfun4 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -828,11 +832,17 @@ optimizer <- function(
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'cmaes') {
+      if(!requireNamespace('cmaesr', quietly = TRUE))
+        stop('The package cmaesr is not installed. Please install first')
+      if(!requireNamespace('smoof', quietly = TRUE))
+        stop('The package smoof is not installed. Please install first')
+      if(!requireNamespace('ParamHelpers', quietly = TRUE))
+        stop('The package ParamHelpers is not installed. Please install first')
       n_params <- length(trparsopt)
-      param_set <- makeParamSet(
-        makeNumericVectorParam("x", len = n_params, lower = rep(0,n_params), upper = rep(1E+10,n_params))
+      param_set <- ParamHelpers::makeParamSet(
+       ParamHelpers::makeNumericVectorParam("x", len = n_params, lower = rep(0,n_params), upper = rep(1E+10,n_params))
       )
-      minfun5 <- makeSingleObjectiveFunction(
+      minfun5 <- smoof::makeSingleObjectiveFunction(
         name = "Universal CMA-ES Wrapper",
         fn = function(x) {
           val = -fun(x, ...)
@@ -842,16 +852,16 @@ optimizer <- function(
         par.set = param_set
       )
       if(optimpars[5] == 1) {
-        monitor <- makeSimpleMonitor()
+        monitor <- cmaesr::makeSimpleMonitor()
       } else {
-        monitor <- makeMonitor()
+        monitor <- cmaesr::makeMonitor()
       }
       outnew <- suppressWarnings(cmaesr::cmaes(start.point = trparsopt,
                                                objective.fun = minfun5,
                                                monitor = monitor,
                                                control = list(sigma = 0.05,
                                                               lambda = as.integer(20 + 3 * log(n_params)),
-                                                              stop.ons = getDefaultStoppingConditions())))
+                                                              stop.ons = cmaesr::getDefaultStoppingConditions())))
       minfun5 <- function(fun,trparsopt,...)
       {           
         return(-fun(trparsopt = trparsopt,...))

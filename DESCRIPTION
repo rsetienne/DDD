@@ -13,6 +13,7 @@ Imports:
   phytools,
   pso,
   Rcpp (>= 1.0.10),
+  smoof,
   SparseM,
   subplex
 LinkingTo: 
