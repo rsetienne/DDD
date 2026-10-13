@@ -702,10 +702,16 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' 'simplex', which is a simplex algorithm that shows (when verbose > 0) the
 #' optimization trajectory.
 #' 'subplex', from the package with the same name
-#' 'DEoptim', from the package with the same name
-#' 'pso', from the package with the same name
 #' 'optim::name_of_algorithm', the algorithm from the optim package (e.g.
 #' "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")
+#' 'DEoptim', from the package with the same name
+#' 'pso', from the package with the same name
+#' 'cmaes', from the package cmaesr. This method uses a combination of cmaes and
+#' subplex, as cmaes is supposedly good at finding the global peak and subplex
+#' at fine-tuning.
+#' The packages underlying the last three methods need to be installed separately.
+#' The user will get a message if they try to use the method without having
+#' installed the corresponding package.
 #' @param optimpars Parameters of the optimization: 1) relative tolerance in
 #' function arguments, 2) relative tolerance in function value, 3) absolute 
 #' tolerance in function arguments as well as the function value, 4) 
@@ -733,7 +739,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' @export optimizer
 optimizer <- function(
     optimmethod = 'simplex',
-    optimpars = c(1E-4,1E-4,1E-6,1000),
+    optimpars = c(1E-4,1E-4,1E-6,1000, 1),
     num_cycles = 1,
     fun,
     trparsopt,
@@ -780,6 +786,8 @@ optimizer <- function(
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'DEoptim')
     {
+      if(!requireNamespace('DEoptim', quietly = TRUE))
+        stop('The package DEoptim is not installed. Please install first')
       minfun2 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -813,6 +821,8 @@ optimizer <- function(
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'pso') {
+      if(!requireNamespace('pso', quietly = TRUE))
+        stop('The package pso is not installed. Please install first')
       minfun4 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -826,6 +836,49 @@ optimizer <- function(
                                                              maxit = optimpars[4]),
                                               fun = fun,
                                               ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'cmaes') {
+      if(!requireNamespace('cmaesr', quietly = TRUE))
+        stop('The package cmaesr is not installed. Please install first')
+      if(!requireNamespace('smoof', quietly = TRUE))
+        stop('The package smoof is not installed. Please install first')
+      if(!requireNamespace('ParamHelpers', quietly = TRUE))
+        stop('The package ParamHelpers is not installed. Please install first')
+      n_params <- length(trparsopt)
+      param_set <- ParamHelpers::makeParamSet(
+       ParamHelpers::makeNumericVectorParam("x", len = n_params, lower = rep(0,n_params), upper = rep(1E+10,n_params))
+      )
+      minfun5 <- smoof::makeSingleObjectiveFunction(
+        name = "Universal CMA-ES Wrapper",
+        fn = function(x) {
+          val = -fun(x, ...)
+          if (is.na(val) || is.nan(val)) return(Inf) 
+          return(val)
+        },
+        par.set = param_set
+      )
+      if(optimpars[5] == 1) {
+        monitor <- cmaesr::makeSimpleMonitor()
+      } else {
+        monitor <- cmaesr::makeMonitor()
+      }
+      outnew <- suppressWarnings(cmaesr::cmaes(start.point = trparsopt,
+                                               objective.fun = minfun5,
+                                               monitor = monitor,
+                                               control = list(sigma = 0.05,
+                                                              lambda = as.integer(20 + 3 * log(n_params)),
+                                                              stop.ons = cmaesr::getDefaultStoppingConditions())))
+      minfun5 <- function(fun,trparsopt,...)
+      {           
+        return(-fun(trparsopt = trparsopt,...))
+      }
+      outnew <- suppressWarnings(subplex::subplex(par = outnew$best.param,
+                                                  fn = minfun5,
+                                                  control = list(abstol = optimpars[3],
+                                                                 reltol = optimpars[1],
+                                                                 maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else {
       stop('The specified optimization method is not supported')
