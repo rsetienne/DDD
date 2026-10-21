@@ -76,8 +76,9 @@
 #' - \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr \cr
 #' \code{pars2[4]} sets the time of splitting of the branch that will undergo
 #' the key innovation leading to different parameters \cr \cr
-#' \code{pars2[5]} sets whether the parameters and likelihood should be shown on
-#' screen (1) or not (0) \cr \cr
+#' \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
+#' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+#' 3 = as 2 plus messages about invalid parameter values and numerical problems \cr \cr
 #' \code{pars2[6]} sets whether the first data point is stem age (1) or crown
 #' age (2)
 #' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0)
@@ -143,7 +144,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
 } else {
    if(((pars1[2] == 0 | pars1[4] == 0) & pars2[2] == 2) | ((pars1[1] == 0 | pars1[3] == 0) & pars2[2] == 4) | pars1[1] <= pars1[2] | pars1[4] <= pars1[5])
    { 
-      cat("These parameter values cannot satisfy lambda(N) = mu(N) for some finite N.\n")
+      if(verbose >= 3) cat("These parameter values cannot satisfy lambda(N) = mu(N) for some finite N.\n")
       loglik = -Inf
    } else {
       abstol = 1e-16
@@ -198,7 +199,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       soc = pars2[6]
       if(ddep != 1.3 & ddep != 2.3)
       {
-          cat("This only works for ddmodel = 1.3 or ddmodel == 2.3.\n")
+          if(verbose >= 3) cat("This only works for ddmodel = 1.3 or ddmodel == 2.3.\n")
           loglik = -Inf
       } else {
          lx = ceiling(min(max(1 + m[1],1 + K),lmax))
@@ -206,7 +207,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
          n0 = (ddep == 2 | ddep == 4)
          if(ddep == 1.3 & ceiling(K) < S1 + S2 + summ)
          { 
-            cat("The carrying capacity is lower than the actual number of species.\n")
+            if(verbose >= 3) cat("The carrying capacity is lower than the actual number of species.\n")
             loglik = -Inf
          } else {
             loglik = 0
@@ -323,7 +324,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
             {
                logliknorm = 0
             } else {   
-               cat("Cond > 0 is not yet implemented.\n")
+               if(verbose >= 3) cat("Cond > 0 is not yet implemented.\n")
                # COMPUTE NORMALIZATION
                tcrown = brts[1]
                tpres = 0
@@ -340,7 +341,7 @@ if(min(pars1[1:5]) < 0 | tinn <= min(brtsM) | tinn > maxbrtsS)
       }
    } 
 }
-if(verbose)
+if(verbose >= 2)
 {
     s1 = sprintf('Parameters: %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6])
     s2 = sprintf('Loglikelihood: %f',loglik)

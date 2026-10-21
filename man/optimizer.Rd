@@ -33,8 +33,8 @@ installed the corresponding package.}
 \item{optimpars}{Parameters of the optimization: 1) relative tolerance in
 function arguments, 2) relative tolerance in function value, 3) absolute 
 tolerance in function arguments as well as the function value, 4) 
-maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output
-when using the simplex method, default is TRUE}
+maximum number of iterations and 5) verbose level (0 = no output, >= 1 shows
+the optimization trajectory and the result of each cycle), default is 1}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to Inf, the
 optimization will be repeated until the result is, within the tolerance,

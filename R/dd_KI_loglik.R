@@ -58,8 +58,9 @@
 #' that have already shifted do not undergo another shift, i.e. shifts only
 #' occur in the main clade. \cr \cr
 #' \code{pars2[4]} Obsolete. \cr \cr
-#' \code{pars2[5]} sets whether the parameters and likelihood should be
-#' shown on screen (1) or not (0) \cr \cr
+#' \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
+#' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+#' 3 = as 2 plus messages about invalid parameter values and numerical problems \cr \cr
 #' \code{pars2[6]} sets whether the first data point is stem age (1) or crown age (2) \cr\cr
 #' \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0),
 #' or whether the new corrected likelihood should be used (1).
@@ -161,6 +162,13 @@ dd_KI_loglik <- function(pars1,
   if(are_pars_impossible || tinn >= 0 || tinn <= min(brtsM))
   {
     loglik <- -Inf
+    if(pars2[5] >= 2)
+    {
+      s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
+      s2 = sprintf('Loglikelihood: %f',loglik)
+      cat(s1,s2,"\n",sep = "")
+      utils::flush.console()
+    }
     return(loglik)
   }
   
@@ -172,7 +180,7 @@ dd_KI_loglik <- function(pars1,
                                   abstol = 1e-16,
                                   methode = methode)
   
-  if(pars2[5])
+  if(pars2[5] >= 2)
   {
     s1 = sprintf('Parameters: %f %f %f %f %f %f %f, ',pars1[1],pars1[2],pars1[3],pars1[4],pars1[5],pars1[6],pars1[7])
     s2 = sprintf('Loglikelihood: %f',loglik)
@@ -484,7 +492,7 @@ check_for_impossible_pars_KI <- function(S_list,
   sumSm <- max(missnumspec_list[[1]])
   for(i in 1:length(S_list))
   {
-    are_pars_impossible <- check_for_impossible_pars(pars1_list[[i]],ddep)
+    are_pars_impossible <- check_for_impossible_pars(pars1_list[[i]],ddep,verbose = pars2[5])
     if(are_pars_impossible)
     {
       return(are_pars_impossible)
@@ -509,12 +517,13 @@ check_for_impossible_pars_KI <- function(S_list,
 }
 
 check_for_impossible_pars <- function(pars1,
-                                      ddep)
+                                      ddep,
+                                      verbose = 0)
 {
   are_pars_impossible <- min(pars1) < 0
   if(are_pars_impossible)
   {
-    cat('One or more parameters are negative.')
+    if(verbose >= 3) cat('One or more parameters are negative.\n')
   } else
   { 
     are_pars_impossible <-   
@@ -523,7 +532,7 @@ check_for_impossible_pars <- function(pars1,
       (pars1[1] <= pars1[2] && (ddep == 1 || ddep == 2 || ddep == 2.1 || ddep == 2.2 || ddep == 3 || ddep == 4 || ddep == 4.1))
     if(are_pars_impossible)
     {
-      cat('These parameters are incompatible with the chosen model')
+      if(verbose >= 3) cat('These parameters are incompatible with the chosen model\n')
     }
   }
   return(are_pars_impossible)

@@ -79,8 +79,17 @@
 #' 'analytical' which uses matrix exponentiation; alternatively numerical ODE
 #' solvers can be used, such as 'odeint::runge_kutta_cash_karp54'. These were used in the
 #' package before version 3.1.
-#' @param verbose Show the parameters and loglikelihood for every call to the
-#' loglik function 
+#' @param verbose Sets the amount of output shown on screen: \cr
+#' verbose = 0 : no intermediate output (only the final result and error
+#' messages are shown) \cr
+#' verbose = 1 : which parameters are optimized and fixed, the loglikelihood of
+#' the initial parameter values and a trace of the iterations of the
+#' optimization \cr
+#' verbose = 2 : as 1, plus the parameters and loglikelihood for every call to
+#' the loglik function \cr
+#' verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+#' numerical problems that lead to a loglikelihood of -Inf). \cr
+#' TRUE is interpreted as 1 and FALSE as 0.
 #' @return \item{lambda_1}{ gives the maximum likelihood estimate of lambda
 #' before the shift} \item{mu_1}{ gives the maximum likelihood estimate of mu
 #' before the shift} \item{K_1}{ gives the maximum likelihood estimate of K
@@ -191,21 +200,21 @@ dd_SR_ML = function(brts,
     } else {
       namepars = c("la","mu","K","la2","mu2","K2","tshift")
       if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
-      cat("You are optimizing",optstr,"\n")
+      if(verbose >= 1) cat("You are optimizing",optstr,"\n")
       if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
-      cat("You are fixing",fixstr,"\n")
+      if(verbose >= 1) cat("You are fixing",fixstr,"\n")
       if(length(namepars[idparsnoshift]) == 0) { noshiftstr = "anything" } else { noshiftstr = namepars[idparsnoshift] }
-      cat("You are not shifting",noshiftstr,"\n")
-      cat("Optimizing the likelihood - this may take a while.","\n")
+      if(verbose >= 1) cat("You are not shifting",noshiftstr,"\n")
+      if(verbose >= 1) cat("Optimizing the likelihood - this may take a while.","\n")
       utils::flush.console()
       trparsopt = initparsopt/(1 + initparsopt)
       trparsopt[which(initparsopt == Inf)] = 1
       trparsfix = parsfix/(1 + parsfix)
       trparsfix[which(parsfix == Inf)] = 1
       pars2 = c(res,ddmodel,cond,btorph,verbose,soc,tol,maxiter)
-      optimpars = c(tol,maxiter)
+      optimpars = c(tol,maxiter,verbose)
       initloglik = dd_SR_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,idparsnoshift = idparsnoshift,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
-      cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
+      if(verbose >= 1) cat("The loglikelihood for the initial parameter values is",initloglik,"\n")
       if(initloglik == -Inf)
       {
         cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")
