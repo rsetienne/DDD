@@ -120,8 +120,17 @@ for explicit matrix exponentation or any of the solvers in the deSolve package.}
 \item{correction}{Sets whether the correction should be applied (TRUE) or
 not (FALSE)}
 
-\item{verbose}{Show the parameters and loglikelihood for every call to the
-loglik function}
+\item{verbose}{Sets the amount of output shown on screen: \cr
+verbose = 0 : no intermediate output (only the final result and error
+messages are shown) \cr
+verbose = 1 : which parameters are optimized and fixed, the loglikelihood of
+the initial parameter values and a trace of the iterations of the
+optimization \cr
+verbose = 2 : as 1, plus the parameters and loglikelihood for every call to
+the loglik function \cr
+verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+numerical problems that lead to a loglikelihood of -Inf). \cr
+TRUE is interpreted as 1 and FALSE as 0.}
 }
 \value{
 \item{lambda_M}{ gives the maximum likelihood estimate of lambda of

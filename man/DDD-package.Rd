@@ -20,6 +20,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Rampal S. Etienne \email{r.s.etienne@rug.nl} (\href{https://orcid.org/0000-0003-2142-7612}{ORCID})
   \item Bart Haegeman \email{bart.haegeman@sete.cnrs.fr} (\href{https://orcid.org/0000-0003-2325-4727}{ORCID})
 }
 

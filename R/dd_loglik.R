@@ -105,8 +105,9 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' extant taxa (including missing species)
 #' \cr \cr \code{pars2[4]} sets whether
 #' the likelihood is for the branching times (0) or the phylogeny (1)
-#' \cr \cr \code{pars2[5]} sets whether the parameters and likelihood should be shown
-#' on screen (1) or not (0)
+#' \cr \cr \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
+#' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+#' 3 = as 2 plus messages about invalid parameter values and numerical problems
 #' \cr \cr \code{pars2[6]} sets whether the first data
 #' point is stem age (1) or crown age (2)
 #' \cr \cr \code{pars2[7]} sets the absolute tolerance of the integration
@@ -197,17 +198,17 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     S = length(brts) + (soc - 2)
     if(min(pars1) < 0)
     {
-      if(verbose) cat('The parameters are negative.\n')
+      if(verbose >= 3) cat('The parameters are negative.\n')
       loglik = -Inf
     } else {
       if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
       { 
-        if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+        if(verbose >= 3) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
         if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
         {
-          if(verbose) cat('The parameters are incompatible.\n')
+          if(verbose >= 3) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
@@ -234,7 +235,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
               { 
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-                if(verbose) cat('High lambda approximation has been applied.\n')
+                if(verbose >= 3) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
@@ -269,7 +270,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
           }
           if((!logtrafo & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
           {
-            if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
+            if(verbose >= 3) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else {        
             if(!logtrafo) {
@@ -319,7 +320,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             }
             if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
             {
-              if(verbose) cat('The normalization did not yield a number.\n')
+              if(verbose >= 3) cat('The normalization did not yield a number.\n')
               loglik = -Inf
             } else
             {
@@ -329,7 +330,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
         }
       }
     }
-    if(verbose)
+    if(verbose >= 2)
     {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
       if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
@@ -395,15 +396,17 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
     S = length(brts) + (soc - 2)
     if(min(pars1) < 0)
     {
+      if(verbose >= 3) cat('The parameters are negative.\n')
       loglik = -Inf
     } else {
       if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
       { 
-        if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+        if(verbose >= 3) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
         if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & ((S + missnumspec) > ceiling(K))))
         {
+          if(verbose >= 3) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
@@ -420,7 +423,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
               {
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-                if(verbose) cat('High lambda approximation has been applied.\n')
+                if(verbose >= 3) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
@@ -450,6 +453,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
           }
           if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)
           {
+            if(verbose >= 3) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else  {        
             loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
@@ -507,7 +511,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
           }
         }
       }}
-    if(verbose)
+    if(verbose >= 2)
     {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
       if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}

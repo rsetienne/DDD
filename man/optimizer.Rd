@@ -6,7 +6,7 @@
 \usage{
 optimizer(
   optimmethod = "simplex",
-  optimpars = c(1e-04, 1e-04, 1e-06, 1000),
+  optimpars = c(1e-04, 1e-04, 1e-06, 1000, 1),
   num_cycles = 1,
   fun,
   trparsopt,
@@ -19,16 +19,22 @@ optimizer(
 'simplex', which is a simplex algorithm that shows (when verbose > 0) the
 optimization trajectory.
 'subplex', from the package with the same name
+'optim::name_of_algorithm', the algorithm from the optim package (e.g.
+"Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")
 'DEoptim', from the package with the same name
 'pso', from the package with the same name
-'optim::name_of_algorithm', the algorithm from the optim package (e.g.
-"Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")}
+'cmaes', from the package cmaesr. This method uses a combination of cmaes and
+subplex, as cmaes is supposedly good at finding the global peak and subplex
+at fine-tuning.
+The packages underlying the last three methods need to be installed separately.
+The user will get a message if they try to use the method without having
+installed the corresponding package.}
 
 \item{optimpars}{Parameters of the optimization: 1) relative tolerance in
 function arguments, 2) relative tolerance in function value, 3) absolute 
 tolerance in function arguments as well as the function value, 4) 
-maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output
-when using the simplex method, default is TRUE}
+maximum number of iterations and 5) verbose level (0 = no output, >= 1 shows
+the optimization trajectory and the result of each cycle), default is 1}
 
 \item{num_cycles}{Number of cycles of the optimization. When set to Inf, the
 optimization will be repeated until the result is, within the tolerance,

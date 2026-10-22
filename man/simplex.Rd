@@ -14,8 +14,8 @@ simplex(fun, trparsopt, optimpars, ...)
 \item{optimpars}{Parameters of the optimization: 1) relative tolerance in
 function arguments, 2) relative tolerance in function value, 3) absolute 
 tolerance in function arguments as well as the function value, 4) 
-maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output, 
-default is TRUE}
+maximum number of iterations and 5) verbose level (0 = no output, >= 1 shows
+the optimization trajectory), default is 1}
 
 \item{...}{Any other arguments of the function to be optimimized, or settings
 of the optimization routine}
