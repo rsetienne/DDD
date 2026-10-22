@@ -817,7 +817,8 @@ optimizer <- function(
                                               method = substr(optimmethod,8,nchar(optimmethod)),
                                               control = list(reltol = optimpars[2],
                                                              abstol = optimpars[3],
-                                                             maxit = optimpars[4]),
+                                                             maxit = optimpars[4],
+                                                             trace = optimpars[5]),
                                               fun = fun,
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
@@ -834,7 +835,9 @@ optimizer <- function(
                                               upper = 1,
                                               control = list(reltol = optimpars[2],
                                                              abstol = optimpars[3],
-                                                             maxit = optimpars[4]),
+                                                             maxit = optimpars[4],
+                                                             trace = optimpars[5],
+                                                             report = 1),
                                               fun = fun,
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
