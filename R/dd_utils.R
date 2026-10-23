@@ -686,9 +686,9 @@ simplex = function(fun, trparsopt, optimpars, ...)
   }
   if(itercount < maxiter)
   {
-    if(verbose >= 3) cat("Optimization has terminated successfully.","\n")
+    if(verbose >= 1) cat("Optimization has terminated successfully.","\n")
   } else {
-    if(verbose >= 3) cat("Maximum number of iterations has been exceeded.","\n")
+    if(verbose >= 1) cat("Maximum number of iterations has been exceeded.","\n")
   }
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
