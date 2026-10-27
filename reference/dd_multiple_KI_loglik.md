@@ -69,8 +69,10 @@ dd_multiple_KI_loglik(
     
   `pars2[4]` Obsolete.  
     
-  `pars2[5]` sets whether the parameters and likelihood should be shown
-  on screen (1) or not (0)  
+  `pars2[5]` sets the verbosity: 0 = no output, 1 = trace of the
+  optimization only (no output from this function), 2 = parameters and
+  loglikelihood shown on screen, 3 = as 2 plus messages about invalid
+  parameter values and numerical problems  
     
   `pars2[6]` sets whether the first data point is stem age (1) or crown
   age (2)  

@@ -170,8 +170,17 @@ dd_KI_ML(
 
 - verbose:
 
-  Show the parameters and loglikelihood for every call to the loglik
-  function
+  Sets the amount of output shown on screen:  
+  verbose = 0 : no intermediate output (only the final result and error
+  messages are shown)  
+  verbose = 1 : which parameters are optimized and fixed, the
+  loglikelihood of the initial parameter values and a trace of the
+  iterations of the optimization  
+  verbose = 2 : as 1, plus the parameters and loglikelihood for every
+  call to the loglik function  
+  verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+  numerical problems that lead to a loglikelihood of -Inf).  
+  TRUE is interpreted as 1 and FALSE as 0.
 
 ## Value
 
@@ -265,15 +274,6 @@ dd_KI_ML(brtsM = brtsM, brtsS = brtsS, tsplit = tsplit, idparsopt = c(1:3,6,7),
   initparsopt = c(0.885, 2e-14, 6.999, 6.848, 4.001), idparsfix = NULL,
   parsfix = NULL,idparsnoshift = c(4,5), cond = 0, tol = c(3E-1,3E-1,3E-1),
   optimmethod = 'simplex')
-#> You are optimizing la_M mu_M K_M K_S t_d 
-#> You are fixing nothing 
-#> You are not shifting la_S mu_S 
-#> Optimizing the likelihood - this may take a while. 
-#> The loglikelihood for the initial parameter values is -24.45333 
-#> 1 0.885 2e-14 6.999 6.848 4.001 -24.4533303187317 initial 
-#> Optimization has terminated successfully. 
-#> The maximum likelihood is: -24.4533303187317.
-#> The corresponding parameters are: 0.885 2e-14 6.999 6.848 4.001
 #> 
 #> Maximum likelihood parameter estimates: 0.885000 0.000000 6.999000 0.885000 0.000000 6.848000 4.001000
 #> Maximum loglikelihood: -24.453330

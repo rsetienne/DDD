@@ -169,8 +169,17 @@ dd_MS_ML(
 
 - verbose:
 
-  Show the parameters and loglikelihood for every call to the loglik
-  function
+  Sets the amount of output shown on screen:  
+  verbose = 0 : no intermediate output (only the final result and error
+  messages are shown)  
+  verbose = 1 : which parameters are optimized and fixed, the
+  loglikelihood of the initial parameter values and a trace of the
+  iterations of the optimization  
+  verbose = 2 : as 1, plus the parameters and loglikelihood for every
+  call to the loglik function  
+  verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+  numerical problems that lead to a loglikelihood of -Inf).  
+  TRUE is interpreted as 1 and FALSE as 0.
 
 ## Value
 
@@ -260,11 +269,5 @@ tsplit = 5
 dd_MS_ML(brtsM = brtsM, brtsS = brtsS, tsplit = tsplit, idparsopt = c(1:3,6),
           initparsopt = c(0.885, 2e-14, 10, 4.001), idparsfix = NULL, parsfix = NULL,
           idparsnoshift = c(4,5), cond = 0, tol = c(3E-1,3E-1,3E-1))
-#> You are optimizing la_M mu_M K t_d 
-#> You are fixing nothing 
-#> You are not shifting la_S mu_S 
-#> Optimizing the likelihood - this may take a while. 
-#> The carrying capacity is lower than the actual number of species.
-#> The loglikelihood for the initial parameter values is -Inf 
 #> The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.
 ```

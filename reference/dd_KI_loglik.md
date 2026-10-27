@@ -77,8 +77,10 @@ dd_KI_loglik(
     
   `pars2[4]` Obsolete.  
     
-  `pars2[5]` sets whether the parameters and likelihood should be shown
-  on screen (1) or not (0)  
+  `pars2[5]` sets the verbosity: 0 = no output, 1 = trace of the
+  optimization only (no output from this function), 2 = parameters and
+  loglikelihood shown on screen, 3 = as 2 plus messages about invalid
+  parameter values and numerical problems  
     
   `pars2[6]` sets whether the first data point is stem age (1) or crown
   age (2)  
@@ -141,6 +143,5 @@ missnumspec = 0
 brtsM = c(25.2,24.6,24.0,22.5,21.7,20.4,19.9,19.7,18.8,17.1,15.8,11.8,9.7,8.9,5.7,5.2)
 brtsS = c(9.6,8.6,7.4,4.9,2.5)
 dd_KI_loglik(pars1,pars2,brtsM,brtsS,missnumspec)
-#> Parameters: 0.250000 0.120000 25.510000 1.000000 0.160000 8.610000 9.800000, Loglikelihood: -77.815687
 #> [1] -77.81569
 ```

@@ -113,7 +113,9 @@ dd_SR_ML(
   Note: cond == 3 assumes a uniform prior on stem age, as is the
   standard in constant-rate birth-death models, see e.g. D. Aldous & L.
   Popovic 2004. Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J.
-  Theor. Biol. 261: 58-66.
+  Theor. Biol. 261: 58-66. Because the likelihood then integrates over
+  all possible stem ages, the first branching time is the crown age,
+  whatever the value of soc.
 
 - btorph:
 
@@ -122,7 +124,10 @@ dd_SR_ML(
 
 - soc:
 
-  Sets whether stem or crown age should be used (1 or 2)
+  Sets whether stem or crown age should be used (1 or 2). Ignored when
+  cond == 3: the likelihood is then computed by integrating over all
+  possible stem ages, so the first branching time is always the crown
+  age.
 
 - allbp:
 
@@ -163,8 +168,17 @@ dd_SR_ML(
 
 - verbose:
 
-  Show the parameters and loglikelihood for every call to the loglik
-  function
+  Sets the amount of output shown on screen:  
+  verbose = 0 : no intermediate output (only the final result and error
+  messages are shown)  
+  verbose = 1 : which parameters are optimized and fixed, the
+  loglikelihood of the initial parameter values and a trace of the
+  iterations of the optimization  
+  verbose = 2 : as 1, plus the parameters and loglikelihood for every
+  call to the loglik function  
+  verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+  numerical problems that lead to a loglikelihood of -Inf).  
+  TRUE is interpreted as 1 and FALSE as 0.
 
 ## Value
 
@@ -254,15 +268,6 @@ dd_SR_ML(brts = brts, initparsopt = c(0.4581, 1E-6, 17.69, 11.09, 8.9999), idpar
          idparsfix = NULL, parsfix = NULL, idparsnoshift = c(4,5), cond = 0,
          tol = c(1E-1,1E-1,1E-1),optimmethod = 'simplex'
 )
-#> You are optimizing la mu K K2 tshift 
-#> You are fixing nothing 
-#> You are not shifting la2 mu2 
-#> Optimizing the likelihood - this may take a while. 
-#> The loglikelihood for the initial parameter values is -24.52893 
-#> 1 0.4581 1e-06 17.69 11.09 8.9999 -24.5289252582909 initial 
-#> Optimization has terminated successfully. 
-#> The maximum likelihood is: -24.5278072613762.
-#> The corresponding parameters are: 0.4581 1e-06 18.5745 11.09 8.9999
 #> 
 #> Maximum likelihood parameter estimates: 0.458100 0.000001 18.574500 0.458100 0.000001 11.090000 8.999900
 #> Maximum loglikelihood: -24.527807

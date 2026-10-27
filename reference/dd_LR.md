@@ -116,7 +116,9 @@ dd_LR(
   Note: cond == 3 assumes a uniform prior on stem age, as is the
   standard in constant-rate birth-death models, see e.g. D. Aldous & L.
   Popovic 2004. Adv. Appl. Prob. 37: 1094-1115 and T. Stadler 2009. J.
-  Theor. Biol. 261: 58-66.
+  Theor. Biol. 261: 58-66. Because the likelihood then integrates over
+  all possible stem ages, the first branching time is the crown age,
+  whatever the value of soc.
 
 - btorph:
 
@@ -125,7 +127,10 @@ dd_LR(
 
 - soc:
 
-  Sets whether stem or crown age should be used (1 or 2)
+  Sets whether stem or crown age should be used (1 or 2). Ignored when
+  cond == 3: the likelihood is then computed by integrating over all
+  possible stem ages, so the first branching time is always the crown
+  age.
 
 - tol:
 

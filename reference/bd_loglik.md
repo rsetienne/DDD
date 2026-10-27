@@ -50,16 +50,21 @@ bd_loglik(
   - `pars[2] == 2` conditioning on stem or crown age and on the total
   number of extant taxa (including missing species)  
   - `pars[2] == 3` conditioning on the total number of extant taxa
-  (including missing species)  
+  (including missing species); the likelihood is then computed by
+  integrating over all possible stem ages, so the first branching time
+  is the crown age  
     
   `pars2[3]` sets whether the likelihood is for the branching times (0)
   or the phylogeny (1)  
     
-  `pars2[4]` sets whether the parameters and likelihood should be shown
-  on screen (1) or not (0)  
+  `pars2[4]` sets the verbosity: 0 = no output, 1 = trace of the
+  optimization only (no output from this function), 2 = parameters and
+  loglikelihood shown on screen, 3 = as 2 plus messages about invalid
+  parameter values and numerical problems  
     
   `pars2[5]` sets whether the first data point is stem age (1) or crown
-  age (2)
+  age (2); ignored when `pars2[2] == 3`, where the first data point is
+  always the crown age
 
 - brts:
 

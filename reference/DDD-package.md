@@ -27,6 +27,9 @@ Useful links:
 
 Authors:
 
+- Rampal S. Etienne <r.s.etienne@rug.nl>
+  ([ORCID](https://orcid.org/0000-0003-2142-7612))
+
 - Bart Haegeman <bart.haegeman@sete.cnrs.fr>
   ([ORCID](https://orcid.org/0000-0003-2325-4727))
 
