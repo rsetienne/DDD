@@ -460,7 +460,7 @@ L2brts = function(L,dropextinct = T)
 roundn = function(x, digits = 0)
 {
     fac = 10^digits
-    n = trunc(fac * x + 0.5)/fac
+    n = floor(fac * x + 0.5)/fac
     return(n)
 }
 
@@ -519,8 +519,8 @@ sample2 = function(x,size,replace = FALSE,prob = NULL)
 #' @param optimpars Parameters of the optimization: 1) relative tolerance in
 #' function arguments, 2) relative tolerance in function value, 3) absolute 
 #' tolerance in function arguments as well as the function value, 4) 
-#' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output, 
-#' default is TRUE
+#' maximum number of iterations and 5) verbose level (0 = no output, >= 1 shows
+#' the optimization trajectory), default is 1
 #' @return \item{out}{ A list containing optimal function arguments
 #' (\code{par}, the optimal function value (\code{fvalues}) and whether the
 #' optimization converged (\code{conv})}.
@@ -562,7 +562,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
   }
   itercount = 1
   
-  if(verbose) {
+  if(verbose >= 1) {
     how = "initial"
     string = itercount
     for(i in 1:numpar)
@@ -672,7 +672,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
      }
      fv = fv[tmp]
      itercount = itercount + 1
-     if(verbose) {
+     if(verbose >= 1) {
        string = itercount;
        for(i in 1:numpar)
        {
@@ -686,9 +686,9 @@ simplex = function(fun, trparsopt, optimpars, ...)
   }
   if(itercount < maxiter)
   {
-    if (verbose) cat("Optimization has terminated successfully.","\n")
+    if(verbose >= 3) cat("Optimization has terminated successfully.","\n")
   } else {
-    if (verbose) cat("Maximum number of iterations has been exceeded.","\n")
+    if(verbose >= 3) cat("Maximum number of iterations has been exceeded.","\n")
   }
   out = list(par = v[,1], fvalues = -fv[1], conv = as.numeric(itercount > maxiter))
   invisible(out)
@@ -702,15 +702,21 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' 'simplex', which is a simplex algorithm that shows (when verbose > 0) the
 #' optimization trajectory.
 #' 'subplex', from the package with the same name
-#' 'DEoptim', from the package with the same name
-#' 'pso', from the package with the same name
 #' 'optim::name_of_algorithm', the algorithm from the optim package (e.g.
 #' "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", or "Brent")
+#' 'DEoptim', from the package with the same name
+#' 'pso', from the package with the same name
+#' 'cmaes', from the package cmaesr. This method uses a combination of cmaes and
+#' subplex, as cmaes is supposedly good at finding the global peak and subplex
+#' at fine-tuning.
+#' The packages underlying the last three methods need to be installed separately.
+#' The user will get a message if they try to use the method without having
+#' installed the corresponding package.
 #' @param optimpars Parameters of the optimization: 1) relative tolerance in
 #' function arguments, 2) relative tolerance in function value, 3) absolute 
 #' tolerance in function arguments as well as the function value, 4) 
-#' maximum number of iterations and 5) TRUE/FALSE flag to allow verbose output
-#' when using the simplex method, default is TRUE
+#' maximum number of iterations and 5) verbose level (0 = no output, >= 1 shows
+#' the optimization trajectory and the result of each cycle), default is 1
 #' @param num_cycles Number of cycles of the optimization. When set to Inf, the
 #' optimization will be repeated until the result is, within the tolerance,
 #' equal to the starting values, with a maximum of 10 cycles.
@@ -733,7 +739,7 @@ simplex = function(fun, trparsopt, optimpars, ...)
 #' @export optimizer
 optimizer <- function(
     optimmethod = 'simplex',
-    optimpars = c(1E-4,1E-4,1E-6,1000),
+    optimpars = c(1E-4,1E-4,1E-6,1000, 1),
     num_cycles = 1,
     fun,
     trparsopt,
@@ -751,12 +757,13 @@ optimizer <- function(
   {
     max_cycles <- 1 # cycles are of no use in global optimization
   }
+  if(length(optimpars) > 4) verbose <- optimpars[5] else verbose <- 1
   cy <- 1
   fvalue <- rep(-Inf,max_cycles)
   out <- NULL
   while(cy <= max_cycles)
   {
-    if(max_cycles > 1) cat(paste('Cycle ',cy,'\n',sep =''))
+    if(max_cycles > 1 && verbose >= 1) cat(paste('Cycle ',cy,'\n',sep =''))
     if(optimmethod == 'simplex')
     {
       outnew <- suppressWarnings(simplex(fun = fun,
@@ -780,6 +787,8 @@ optimizer <- function(
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'DEoptim')
     {
+      if(!requireNamespace('DEoptim', quietly = TRUE))
+        stop('The package DEoptim is not installed. Please install first')
       minfun2 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -808,11 +817,14 @@ optimizer <- function(
                                               method = substr(optimmethod,8,nchar(optimmethod)),
                                               control = list(reltol = optimpars[2],
                                                              abstol = optimpars[3],
-                                                             maxit = optimpars[4]),
+                                                             maxit = optimpars[4],
+                                                             trace = optimpars[5]),
                                               fun = fun,
                                               ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else if(optimmethod == 'pso') {
+      if(!requireNamespace('pso', quietly = TRUE))
+        stop('The package pso is not installed. Please install first')
       minfun4 <- function(trparsopt, fun, ...)
       {           
         return(-fun(trparsopt = trparsopt, ...))
@@ -823,16 +835,61 @@ optimizer <- function(
                                               upper = 1,
                                               control = list(reltol = optimpars[2],
                                                              abstol = optimpars[3],
-                                                             maxit = optimpars[4]),
+                                                             maxit = optimpars[4],
+                                                             trace = optimpars[5],
+                                                             report = 1),
                                               fun = fun,
                                               ...))
+      outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
+    } else if(optimmethod == 'cmaes') {
+      if(!requireNamespace('cmaesr', quietly = TRUE))
+        stop('The package cmaesr is not installed. Please install first')
+      if(!requireNamespace('smoof', quietly = TRUE))
+        stop('The package smoof is not installed. Please install first')
+      if(!requireNamespace('ParamHelpers', quietly = TRUE))
+        stop('The package ParamHelpers is not installed. Please install first')
+      n_params <- length(trparsopt)
+      param_set <- ParamHelpers::makeParamSet(
+       ParamHelpers::makeNumericVectorParam("x", len = n_params, lower = rep(0,n_params), upper = rep(1E+10,n_params))
+      )
+      minfun5 <- smoof::makeSingleObjectiveFunction(
+        name = "Universal CMA-ES Wrapper",
+        fn = function(x) {
+          val = -fun(x, ...)
+          if (is.na(val) || is.nan(val)) return(Inf) 
+          return(val)
+        },
+        par.set = param_set
+      )
+      if(optimpars[5] == 1) {
+        monitor <- cmaesr::makeSimpleMonitor()
+      } else {
+        monitor <- cmaesr::makeMonitor()
+      }
+      outnew <- suppressWarnings(cmaesr::cmaes(start.point = trparsopt,
+                                               objective.fun = minfun5,
+                                               monitor = monitor,
+                                               control = list(sigma = 0.05,
+                                                              lambda = as.integer(20 + 3 * log(n_params)),
+                                                              stop.ons = cmaesr::getDefaultStoppingConditions())))
+      minfun5 <- function(fun,trparsopt,...)
+      {           
+        return(-fun(trparsopt = trparsopt,...))
+      }
+      outnew <- suppressWarnings(subplex::subplex(par = outnew$best.param,
+                                                  fn = minfun5,
+                                                  control = list(abstol = optimpars[3],
+                                                                 reltol = optimpars[1],
+                                                                 maxit = optimpars[4]),
+                                                  fun = fun,
+                                                  ...))
       outnew <- list(par = outnew$par, fvalues = -outnew$value, conv = outnew$convergence)
     } else {
       stop('The specified optimization method is not supported')
     }
     if(cy > 1 & (any(is.na(outnew$par)) | any(is.nan(outnew$par)) | is.na(outnew$fvalues) | is.nan(outnew$fvalues) | outnew$conv != 0))
     {
-      cat('The last cycle failed; second last cycle result is returned.\n')
+      if(verbose >= 1) cat('The last cycle failed; second last cycle result is returned.\n')
       return(out) 
     } else
     {
@@ -840,19 +897,22 @@ optimizer <- function(
       trparsopt <- out$par
       fvalue[cy] <- out$fvalues
     }  
-    cat(paste0('The maximum likelihood is: ', fvalue[cy], '.\n'))
-    cat(paste0('The corresponding parameters are: '))
-    cat(untransform_pars(trparsopt))
-    cat('\n')
+    if(verbose >= 1)
+    {
+      cat(paste0('The maximum likelihood is: ', fvalue[cy], '.\n'))
+      cat(paste0('The corresponding parameters are: '))
+      cat(untransform_pars(trparsopt))
+      cat('\n')
+    }
     if(cy > 1)
     {
       if(abs(fvalue[cy] - fvalue[cy - 1]) < optimpars[3])
       {
-        if(cy < max_cycles) cat('No more cycles needed.\n')
+        if(cy < max_cycles && verbose >= 1) cat('No more cycles needed.\n')
         cy <- max_cycles
       } else if(cy == max_cycles)
       {
-        cat('More cycles in optimization recommended.\n')
+        if(verbose >= 1) cat('More cycles in optimization recommended.\n')
       }
     }
     cy <- cy + 1
@@ -902,12 +962,12 @@ check_probs <- function(loglik,probs,verbose)
   probs <- probs * (probs > 0)
   if(is.na(sum(probs)) | is.nan(sum(probs)))
   {
-    if(verbose) cat('NA or NaN issues encountered.\n')
+    if(verbose >= 3) cat('NA or NaN issues encountered.\n')
     loglik <- -Inf
     #probs <- rep(-Inf,length(probs)); this line may cause problems with subplex
   } else if(sum(probs) <= 0)
   {
-    if(verbose) cat('Probabilities smaller than 0 encountered\n')
+    if(verbose >= 3) cat('Probabilities smaller than 0 encountered\n')
     loglik <- -Inf
     #probs <- rep(-Inf,length(probs)); this line may cause problems with subplex
   } else {

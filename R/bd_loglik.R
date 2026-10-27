@@ -35,14 +35,17 @@
 #' stem or crown age and on the total number of extant taxa (including missing
 #' species)
 #' \cr - \code{pars[2] == 3} conditioning on the total number of
-#' extant taxa (including missing species)
+#' extant taxa (including missing species); the likelihood is then computed by
+#' integrating over all possible stem ages, so the first branching time is the
+#' crown age
 #' \cr \cr \code{pars2[3]} sets whether
 #' the likelihood is for the branching times (0) or the phylogeny (1)
-#' \cr \cr \code{pars2[4]} sets whether the parameters and likelihood should be 
-#' shown
-#' on screen (1) or not (0)
+#' \cr \cr \code{pars2[4]} sets the verbosity: 0 = no output, 1 = trace of the
+#' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+#' 3 = as 2 plus messages about invalid parameter values and numerical problems
 #' \cr \cr \code{pars2[5]} sets whether the first data
-#' point is stem age (1) or crown age (2)
+#' point is stem age (1) or crown age (2); ignored when \code{pars2[2] == 3},
+#' where the first data point is always the crown age
 #' @param brts A set of branching times of a phylogeny, all positive
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
@@ -83,7 +86,7 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
   #   age (1), number of taxa and age (2), number of taxa (3)
   # - pars2[3] = btorph = likelihood for branching times (0) or phylogeny (1)
   # - pars2[4] = printing of parameters and likelihood (1) or not (0)
-  # - pars2[5] = likelihood is for a tree with crown age (2) or stem age (1) - 
+  # - pars2[5] = likelihood is for a tree with crown age (2) or stem age (1); ignored (crown age) when cond == 3 - 
   #   stem age not yet implemented for tdmodel == 2
   # - pars2[6] = lx = length of ODE equation (only for tdmodel = 4..8)
   
@@ -131,9 +134,19 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
   }
   
   tdmodel <- pars2[1]
+  verbose <- pars2[4]
   if (min(pars1) < 0 | (tdmodel == 4 & pars1[1] <= pars1[2])){
-    cat("Negative parameter values are not allowed.\n")
+    if (verbose >= 3) {
+      if (min(pars1) < 0) {
+        cat('The parameters are negative.\n')
+      } else {
+        cat('These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n')
+      }
+    }
     loglik <- -Inf
+    if (verbose >= 2) {
+      bd_print_loglik(pars1, tdmodel, loglik)
+    }
     return(as.numeric(loglik))
   } else {
     cond <- pars2[2]
@@ -142,7 +155,6 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
       soc <- 2
     }
     btorph <- pars2[3]
-    verbose <- pars2[4]
     m <- missnumspec
     if (is.na(pars2[6])){
       pars2[6] = Inf
@@ -274,13 +286,13 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
             stop("f95 is gone")
           }
           if (is.na(sum(variables)) | is.nan(sum(variables))) {
-            if (verbose) {
+            if (verbose >= 3) {
               cat('NA or NaN issues encountered.\n')
             }
             loglik <- -Inf
             variables <- rep(-Inf, length(variables))
           } else if (sum(variables) <= 0) {
-            if(verbose) cat('Probabilities smaller than 0 encountered\n')
+            if(verbose >= 3) cat('Probabilities smaller than 0 encountered\n')
             loglik <- -Inf
             variables <- rep(-Inf,length(variables))
           } 
@@ -299,7 +311,7 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
         if (sum(variables[1:lx]) < 0.99 ) {
           #print(lx)
           #print(sum(variables[1:lx]))
-          cat('Leaking probabilities detected.')
+          if (verbose >= 3) cat('Leaking probabilities detected.\n')
           loglik <- -Inf
         }
         sig <- expn[1:(np - 1)] * variables[(lx + 1):(lx + np - 1)]
@@ -397,10 +409,12 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
       
       if (m > 0) {
         if(tdmodel == 2) {
-          cat(
-            "Missing species in diversity-dependence models 
+          if (verbose >= 3) {
+            cat(
+              "Missing species in diversity-dependence models 
               cannot be dealt with by bd_loglik.R\n"
-          )
+            )
+          }
           return(-Inf)
         }
         if(cond == 3) {
@@ -416,19 +430,8 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
           lgamma(S + m + 1) + log(x[m + 1])
         #loglik = loglik - log(S + m + 1) + log(S + 1) + log(S + m - 1) - log(S - 1)
       }
-      if (verbose) {
-        if(tdmodel == 0) {
-          s1 <- sprintf('Parameters: %f %f', pars1[1], pars1[2])
-        } else if (tdmodel == 1) {
-          s1 <- sprintf(
-            'Parameters: %f %f %f %f', pars1[1], pars1[2], pars1[3], pars1[4]
-          )
-        } else if (tdmodel >= 2) {
-          s1 <- sprintf('Parameters: %f %f %f', pars1[1], pars1[2], pars1[3])
-        }
-        s2 <- sprintf(', Loglikelihood: %f', loglik)
-        cat(s1, s2, "\n", sep = "")
-        utils::flush.console()
+      if (verbose >= 2) {
+        bd_print_loglik(pars1, tdmodel, loglik)
       }
     }
     loglik <- as.numeric(loglik)
@@ -437,4 +440,20 @@ bd_loglik <- function(pars1, pars2, brts, missnumspec, methode = "odeint::runge_
     }
     return(loglik)
   }
+}
+
+bd_print_loglik <- function(pars1, tdmodel, loglik)
+{
+  if(tdmodel == 0) {
+    s1 <- sprintf('Parameters: %f %f', pars1[1], pars1[2])
+  } else if (tdmodel == 1) {
+    s1 <- sprintf(
+      'Parameters: %f %f %f %f', pars1[1], pars1[2], pars1[3], pars1[4]
+    )
+  } else if (tdmodel >= 2) {
+    s1 <- sprintf('Parameters: %f %f %f', pars1[1], pars1[2], pars1[3])
+  }
+  s2 <- sprintf(', Loglikelihood: %f', loglik)
+  cat(s1, s2, "\n", sep = "")
+  utils::flush.console()
 }

@@ -16,6 +16,14 @@ test_that("optimizer works", {
   #      optimmethod = 'NLOPT_LN_SBPLX')
   testthat::expect_equal(res_simplex$fvalues,res_subplex$fvalues,tolerance = 0.0001)
   #testthat::expect_equal(res_nloptr$fvalues,res_subplex$fvalues,tolerance = 0.0001)
+  testthat::skip_if_not_installed('cmaesr')
+  testthat::skip_if_not_installed('smoof')
+  testthat::skip_if_not_installed('ParamHelpers')
+  res_cmaes <- DDD::dd_ML(brts = brts,
+                          initparsopt = initparsopt,
+                          idparsopt = idparsopt,
+                          optimmethod = 'cmaes')
+  testthat::expect_equal(res_cmaes$fvalues,res_subplex$fvalues,tolerance = 0.0001)
 })
 
   

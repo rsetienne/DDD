@@ -72,7 +72,9 @@ cond == 3 : conditioning on the total number of extant taxa (including missing s
 \item{btorph}{Sets whether the likelihood is for the branching times (0) or
 the phylogeny (1)}
 
-\item{soc}{Sets whether stem or crown age should be used (1 or 2)}
+\item{soc}{Sets whether stem or crown age should be used (1 or 2). Ignored when
+cond == 3: the likelihood is then computed by integrating over all possible
+stem ages, so the first branching time is always the crown age.}
 
 \item{tol}{Sets the tolerances in the optimization. Consists of: \cr
 reltolx = relative tolerance of parameter values in optimization \cr
@@ -94,8 +96,17 @@ do as many cycles as needed to meet the tolerance set for the target function.}
 \item{methode}{The method used to solve the master equation under tdmodel =
 4, default is 'odeint::runge_kutta_cash_karp54'.}
 
-\item{verbose}{Show the parameters and loglikelihood for every call to the
-loglik function}
+\item{verbose}{Sets the amount of output shown on screen: \cr
+verbose = 0 : no intermediate output (only the final result and error
+messages are shown) \cr
+verbose = 1 : which parameters are optimized and fixed, the loglikelihood of
+the initial parameter values and a trace of the iterations of the
+optimization \cr
+verbose = 2 : as 1, plus the parameters and loglikelihood for every call to
+the loglik function \cr
+verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+numerical problems that lead to a loglikelihood of -Inf). \cr
+TRUE is interpreted as 1 and FALSE as 0.}
 }
 \value{
 A dataframe with the following elements:\cr

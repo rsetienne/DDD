@@ -48,7 +48,9 @@
 #' cond == 3 : conditioning on the total number of extant taxa (including missing species)
 #' @param btorph Sets whether the likelihood is for the branching times (0) or
 #' the phylogeny (1)
-#' @param soc Sets whether stem or crown age should be used (1 or 2)
+#' @param soc Sets whether stem or crown age should be used (1 or 2). Ignored when
+#' cond == 3: the likelihood is then computed by integrating over all possible
+#' stem ages, so the first branching time is always the crown age.
 #' @param tol Sets the tolerances in the optimization. Consists of: \cr
 #' reltolx = relative tolerance of parameter values in optimization \cr
 #' reltolf = relative tolerance of function value in optimization \cr
@@ -63,8 +65,17 @@
 #' do as many cycles as needed to meet the tolerance set for the target function.
 #' @param methode The method used to solve the master equation under tdmodel =
 #' 4, default is 'odeint::runge_kutta_cash_karp54'.
-#' @param verbose Show the parameters and loglikelihood for every call to the
-#' loglik function 
+#' @param verbose Sets the amount of output shown on screen: \cr
+#' verbose = 0 : no intermediate output (only the final result and error
+#' messages are shown) \cr
+#' verbose = 1 : which parameters are optimized and fixed, the loglikelihood of
+#' the initial parameter values and a trace of the iterations of the
+#' optimization \cr
+#' verbose = 2 : as 1, plus the parameters and loglikelihood for every call to
+#' the loglik function \cr
+#' verbose = 3 : as 2, plus all messages (e.g. about parameter values or
+#' numerical problems that lead to a loglikelihood of -Inf). \cr
+#' TRUE is interpreted as 1 and FALSE as 0.
 #' @return A dataframe with the following elements:\cr
 #' \item{lambda0}{ gives the maximum likelihood estimate of lambda0}
 #' \item{mu0}{ gives the maximum likelihood estimate of mu0}
@@ -130,19 +141,19 @@ bd_ML = function(brts,
   namepars2 = c("lambda0","mu0","K","")
   if(tdmodel == 2 | tdmodel == 3) { namepars = namepars2 } else  { namepars = namepars1 }
   if(length(namepars[idparsopt]) == 0) { optstr = "nothing" } else { optstr = namepars[idparsopt] }
-  cat("You are optimizing",optstr,"\n")
+  if(verbose >= 1) cat("You are optimizing",optstr,"\n")
   if(length(namepars[idparsfix]) == 0) { fixstr = "nothing" } else { fixstr = namepars[idparsfix] }
-  cat("You are fixing",fixstr,"\n")
-  cat("Optimizing the likelihood - this may take a while.","\n")
+  if(verbose >= 1) cat("You are fixing",fixstr,"\n")
+  if(verbose >= 1) cat("Optimizing the likelihood - this may take a while.","\n")
   utils::flush.console()
   trparsopt = initparsopt/(1 + initparsopt)
   trparsopt[which(initparsopt == Inf)] = 1
   trparsfix = parsfix/(1 + parsfix)
   trparsfix[which(parsfix == Inf)] = 1
   pars2 = c(tdmodel,cond,btorph,verbose,soc,1000,tol,maxiter)
-  optimpars = c(tol,maxiter)
+  optimpars = c(tol,maxiter,verbose)
   initloglik = bd_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idparsopt = idparsopt,idparsfix = idparsfix,pars2 = pars2,brts = brts,missnumspec = missnumspec, methode = methode)
-  cat(paste("The loglikelihood for the initial parameter values is ",initloglik,".\n",sep = ''))
+  if(verbose >= 1) cat(paste("The loglikelihood for the initial parameter values is ",initloglik,".\n",sep = ''))
   if(initloglik == -Inf)
   {
      cat("The initial parameter values have a likelihood that is equal to 0 or below machine precision. Try again with different initial values.\n")

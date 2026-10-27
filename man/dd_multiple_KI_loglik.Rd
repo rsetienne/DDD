@@ -58,8 +58,9 @@ and of both crown lineages in the main clade. This assumes that subclades
 that have already shifted do not undergo another shift, i.e. shifts only
 occur in the main clade. \cr \cr
 \code{pars2[4]} Obsolete. \cr \cr
-\code{pars2[5]} sets whether the parameters and likelihood should be
-shown on screen (1) or not (0) \cr \cr
+\code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
+optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+3 = as 2 plus messages about invalid parameter values and numerical problems \cr \cr
 \code{pars2[6]} sets whether the first data point is stem age (1) or crown age (2) \cr\cr
 \code{pars2[7]} sets whether the old (incorrect) likelihood should be used (0),
 or whether the new corrected likelihood should be used (1).}

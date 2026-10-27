@@ -23,10 +23,10 @@
 #  . cond == 0 : conditioning on stem or crown age
 #  . cond == 1 : conditioning on stem or crown age and non-extinction of the phylogeny
 #  . cond == 2 : conditioning on stem or crown age and on the total number of extant taxa (including missing species)
-#  . cond == 3 : conditioning on the total number of extant taxa (including missing species)
+#  . cond == 3 : conditioning on the total number of extant taxa (including missing species); the likelihood then integrates over all possible stem ages, so the first branching time is the crown age
 # - pars2[4] = btorph = likelihood of branching times (0) or phylogeny (1), differ by a factor (S - 1)! where S is the number of extant species
 # - pars2[5] = parameters and likelihood should be printed (1) or not (0)
-# - pars2[6] = likelihood is for a tree with crown age (2) or stem age (1)
+# - pars2[6] = likelihood is for a tree with crown age (2) or stem age (1); ignored (crown age) when cond == 3
 # missnumspec = number of missing species    
 # methode = the method used in the numerical solving of the set of the ode's or 'analytical' which means matrix exponentiation is used
 
@@ -102,13 +102,17 @@ dd_loglik_test = function(pars1,pars2,brts,missnumspec,methode = 'analytical',rh
 #' stem or crown age and on the total number of extant taxa (including missing
 #' species)
 #' \cr - \code{pars2[3] == 3} conditioning on the total number of
-#' extant taxa (including missing species)
+#' extant taxa (including missing species); the likelihood is then computed by
+#' integrating over all possible stem ages, so the first branching time is the
+#' crown age
 #' \cr \cr \code{pars2[4]} sets whether
 #' the likelihood is for the branching times (0) or the phylogeny (1)
-#' \cr \cr \code{pars2[5]} sets whether the parameters and likelihood should be shown
-#' on screen (1) or not (0)
+#' \cr \cr \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
+#' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
+#' 3 = as 2 plus messages about invalid parameter values and numerical problems
 #' \cr \cr \code{pars2[6]} sets whether the first data
-#' point is stem age (1) or crown age (2)
+#' point is stem age (1) or crown age (2); ignored when \code{pars2[3] == 3},
+#' where the first data point is always the crown age
 #' \cr \cr \code{pars2[7]} sets the absolute tolerance of the integration
 #' \cr \cr \code{pars2[8]} sets the relative tolerance of the integration
 #' \cr \cr \code{pars2[9]} sets threshold on the number of species for which
@@ -166,7 +170,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
   btorph = pars2[4]
   verbose = pars2[5]
   soc = pars2[6]
-  if(cond == 3) { soc = 2 }
+  if(cond == 3) { soc = 2 } # cond == 3 integrates over all possible stem ages, so the first branching time is the crown age
   la = pars1[1]
   mu = pars1[2]
   K = pars1[3]
@@ -197,26 +201,26 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
     S = length(brts) + (soc - 2)
     if(min(pars1) < 0)
     {
-      if(verbose) cat('The parameters are negative.\n')
+      if(verbose >= 3) cat('The parameters are negative.\n')
       loglik = -Inf
     } else {
       if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
       { 
-        if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+        if(verbose >= 3) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
         if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & (S + missnumspec > ceiling(K))))
         {
-          if(verbose) cat('The parameters are incompatible.\n')
+          if(verbose >= 3) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
+          lx_old <- lx
+          logtrafo <- FALSE
           if(cond != 3)
           {
             probs = rep(0,lx)
             probs[1] = 1 # change if other species at stem/crown age 
-            lx_old <- lx
-            logtrafo <- FALSE
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)
@@ -234,7 +238,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
               { 
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-                if(verbose) cat('High lambda approximation has been applied.\n')
+                if(verbose >= 3) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
@@ -269,7 +273,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
           }
           if((!logtrafo & probs[1 + missnumspec] <= 0) | loglik == -Inf | is.na(loglik) | is.nan(loglik))
           {
-            if(verbose) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
+            if(verbose >= 3) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else {        
             if(!logtrafo) {
@@ -319,7 +323,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
             }
             if(is.na(logliknorm) | is.nan(logliknorm) | logliknorm == Inf)
             {
-              if(verbose) cat('The normalization did not yield a number.\n')
+              if(verbose >= 3) cat('The normalization did not yield a number.\n')
               loglik = -Inf
             } else
             {
@@ -329,7 +333,7 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
         }
       }
     }
-    if(verbose)
+    if(verbose >= 2)
     {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
       if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}
@@ -360,7 +364,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
   soc = pars2[6]
   if(cond == 3)
   { 
-    soc = 2
+    soc = 2 # cond == 3 integrates over all possible stem ages, so the first branching time is the crown age
   }
   la = pars1[1]
   mu = pars1[2]
@@ -395,15 +399,17 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
     S = length(brts) + (soc - 2)
     if(min(pars1) < 0)
     {
+      if(verbose >= 3) cat('The parameters are negative.\n')
       loglik = -Inf
     } else {
       if((mu == 0 & (ddep == 2 | ddep == 2.1 | ddep == 2.2)) | (la == 0 & (ddep == 4 | ddep == 4.1 | ddep == 4.2)) | (la <= mu))
       { 
-        if(verbose) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
+        if(verbose >= 3) cat("These parameter values cannot satisfy lambda(N) = mu(N) for a positive and finite N.\n")
         loglik = -Inf
       } else {
         if(((ddep == 1 | ddep == 5) & ceiling(la/(la - mu) * (r + 1) * K) < (S + missnumspec)) | ((ddep == 1.3) & ((S + missnumspec) > ceiling(K))))
         {
+          if(verbose >= 3) cat('The parameters are incompatible.\n')
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
@@ -420,7 +426,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
               if(is.na(sum(probs)) && pars1[2]/pars1[1] < 1E-4 && missnumspec == 0)
               {
                 loglik = dd_loglik_high_lambda(pars1 = pars1,pars2 = pars2,brts = brts)
-                if(verbose) cat('High lambda approximation has been applied.\n')
+                if(verbose >= 3) cat('High lambda approximation has been applied.\n')
                 return(loglik)
               }
               if(k < (S + 2 - soc))
@@ -450,6 +456,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
           }
           if(probs[1 + (cond != 3) * missnumspec] <= 0 | loglik == -Inf)
           {
+            if(verbose >= 3) cat('Probabilities smaller than 0 or other numerical problems are encountered in final result.\n')
             loglik = -Inf
           } else  {        
             loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
@@ -507,7 +514,7 @@ dd_loglik2 = function(pars1,pars2,brts,missnumspec)
           }
         }
       }}
-    if(verbose)
+    if(verbose >= 2)
     {
       s1 = sprintf('Parameters: %f %f %f',pars1[1],pars1[2],pars1[3])
       if(ddep == 5) {s1 = sprintf('%s %f',s1,pars1[4])}

@@ -16,6 +16,12 @@ lambdamu = function(n,pars,ddep)
     } else if(ddep == 1.3)
     {
        lavec = pmax(zeros,la * (1 - n/K))
+    } else if(ddep == 1.4)
+    {
+       lavec = pmax(zeros,la * n/(n + K))
+    } else if(ddep == 1.5)
+    {
+       lavec = pmax(zeros,la * n/K * (1 - n/K))
     } else if(ddep == 2 | ddep == 2.1 | ddep == 2.2)
     {
        y = -(log(la/mu)/log(K+n0))^(ddep != 2.2)
@@ -143,7 +149,7 @@ lambdamu2 = function(nxt,pars,ddep)
     {
         lavec = laM * matrix(1,lnn,lnn)
         x = (log(laM/muM)/log(KM+n0))^(ddep != 4.2)
-        muvec = (nxt + n0)^x
+        muvec = muM * (nxt + n0)^x
     }
     return(list(lavec,muvec))
 }
