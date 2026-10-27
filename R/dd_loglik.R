@@ -212,12 +212,12 @@ dd_loglik1 = function(pars1,pars2,brts,missnumspec,methode = 'odeint::runge_kutt
           loglik = -Inf
         } else {
           loglik = (btorph == 0) * lgamma(S)
+          lx_old <- lx
+          logtrafo <- FALSE
           if(cond != 3)
           {
             probs = rep(0,lx)
             probs[1] = 1 # change if other species at stem/crown age 
-            lx_old <- lx
-            logtrafo <- FALSE
             for(k in 2:(S + 2 - soc))
             {
               k1 = k + (soc - 2)

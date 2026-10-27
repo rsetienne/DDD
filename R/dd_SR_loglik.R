@@ -246,7 +246,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
        { 
           loglik = -Inf
        } else {
-          loglik = loglik + (cond != 3 & soc == 2) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+          loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
                     
           logliknorm = 0
           if(cond == 1 | cond == 2)
@@ -262,7 +262,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
              if(soc == 2) { aux = (2:(lx+1)) * (3:(lx+2))/6 }
              probsc = probs/aux
              if(cond == 1) { logliknorm = log(sum(probsc)) }
-             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - 1])}             
+             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
           }
           if(cond == 3)
           { 
@@ -452,7 +452,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
        { 
           loglik = -Inf
        } else {
-          loglik = loglik + (cond != 3 & soc == 2) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
+          loglik = loglik + (cond != 3 | soc == 1) * log(probs[1 + (cond != 3) * missnumspec]) - lgamma(S + missnumspec + 1) + lgamma(S + 1) + lgamma(missnumspec + 1)
                     
           logliknorm = 0
           if(cond == 1 | cond == 2)
@@ -473,7 +473,7 @@ if(((pars1[2] == 0 || pars1[4] == 0) && (ddep == 2 | ddep == 2.1 | ddep == 2.2))
                }
                logliknorm <- log(sum(probsc))
              }
-             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - 1])}             
+             if(cond == 2) { logliknorm = log(probsc[S + missnumspec - soc + 1])}             
           }
           if(cond == 3)
           { 
