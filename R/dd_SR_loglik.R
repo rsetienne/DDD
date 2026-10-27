@@ -24,10 +24,10 @@
 #  . cond == 0 : no conditioning
 #  . cond == 1 : conditioning on non-extinction of the phylogeny
 #  . cond == 2 : conditioning on non-extinction of the phylogeny and on the total number of extant taxa (including missing species)
-#  . cond == 3 : conditioning on the total number of extant taxa (including missing species)
+#  . cond == 3 : conditioning on the total number of extant taxa (including missing species); the likelihood then integrates over all possible stem ages, so the first branching time is the crown age
 # - pars2[4] = btorph = likelihood of branching times (0) or phylogeny (1), differ by a factor (S - 1)! where S is the number of extant species
 # - pars2[5] = parameters and likelihood should be printed (1) or not (0)
-# - pars2[6] = likelihood is for a tree with crown age (2) or stem age (1)
+# - pars2[6] = likelihood is for a tree with crown age (2) or stem age (1); ignored (crown age) when cond == 3
 # missnumspec = number of missing species    
 # methode = the method used in the numerical solving of the set of the ode's
 
@@ -69,12 +69,16 @@
 #' conditioning: \cr - \code{pars2[3] == 0} no conditioning \cr -
 #' \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr -
 #' \code{pars2[3] == 2} conditioning on non-extinction of the phylogeny and on
-#' the total number of extant taxa (including missing species) \cr \cr
+#' the total number of extant taxa (including missing species) \cr -
+#' \code{pars2[3] == 3} conditioning on the total number of extant taxa
+#' (including missing species); the likelihood is then computed by integrating
+#' over all possible stem ages, so the first branching time is the crown age \cr \cr
 #' \code{pars2[4]} sets whether the likelihood is for the branching times (0)
 #' or the phylogeny (1) \cr \cr \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
 #' optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
 #' 3 = as 2 plus messages about invalid parameter values and numerical problems \cr \cr \code{pars2[6]}
-#' sets whether the first data point is stem age (1) or crown age (2)
+#' sets whether the first data point is stem age (1) or crown age (2); ignored
+#' when \code{pars2[3] == 3}, where the first data point is always the crown age
 #' @param brts A set of branching times of a phylogeny, all positive
 #' @param missnumspec The number of species that are in the clade but missing
 #' in the phylogeny
@@ -119,6 +123,7 @@ reltol = 1e-10
 brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
 if(sum(brts == 0) == 0) { brts[length(brts) + 1] = 0 }
 soc = pars2[6]
+if(pars2[3] == 3) { soc = 2 } # cond == 3 integrates over all possible stem ages, so the first branching time is the crown age
 S = length(brts) + (soc - 2)
 if(min(pars1) < 0 || -pars1[7] <= min(brts))
 {
@@ -315,6 +320,7 @@ reltol = 1e-10
 brts = -sort(abs(as.numeric(brts)),decreasing = TRUE)
 if(sum(brts == 0) == 0) { brts[length(brts) + 1] = 0 }
 soc = pars2[6]
+if(pars2[3] == 3) { soc = 2 } # cond == 3 integrates over all possible stem ages, so the first branching time is the crown age
 S = length(brts) + (soc - 2)
 if(min(pars1) < 0 || -pars1[7] <= min(brts))
 {

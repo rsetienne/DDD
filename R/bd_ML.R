@@ -48,7 +48,9 @@
 #' cond == 3 : conditioning on the total number of extant taxa (including missing species)
 #' @param btorph Sets whether the likelihood is for the branching times (0) or
 #' the phylogeny (1)
-#' @param soc Sets whether stem or crown age should be used (1 or 2)
+#' @param soc Sets whether stem or crown age should be used (1 or 2). Ignored when
+#' cond == 3: the likelihood is then computed by integrating over all possible
+#' stem ages, so the first branching time is always the crown age.
 #' @param tol Sets the tolerances in the optimization. Consists of: \cr
 #' reltolx = relative tolerance of parameter values in optimization \cr
 #' reltolf = relative tolerance of function value in optimization \cr

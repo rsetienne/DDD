@@ -37,12 +37,16 @@ dependence in extinction rate with offset at infinity\cr - \code{pars2[2] ==
 conditioning: \cr - \code{pars2[3] == 0} no conditioning \cr -
 \code{pars2[3] == 1} conditioning on non-extinction of the phylogeny \cr -
 \code{pars2[3] == 2} conditioning on non-extinction of the phylogeny and on
-the total number of extant taxa (including missing species) \cr \cr
+the total number of extant taxa (including missing species) \cr -
+\code{pars2[3] == 3} conditioning on the total number of extant taxa
+(including missing species); the likelihood is then computed by integrating
+over all possible stem ages, so the first branching time is the crown age \cr \cr
 \code{pars2[4]} sets whether the likelihood is for the branching times (0)
 or the phylogeny (1) \cr \cr \code{pars2[5]} sets the verbosity: 0 = no output, 1 = trace of the
 optimization only (no output from this function), 2 = parameters and loglikelihood shown on screen,
 3 = as 2 plus messages about invalid parameter values and numerical problems \cr \cr \code{pars2[6]}
-sets whether the first data point is stem age (1) or crown age (2)}
+sets whether the first data point is stem age (1) or crown age (2); ignored
+when \code{pars2[3] == 3}, where the first data point is always the crown age}
 
 \item{brts}{A set of branching times of a phylogeny, all positive}
 
